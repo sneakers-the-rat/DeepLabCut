@@ -1,0 +1,345 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.utils.select_crop_parameters &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.utils.select_crop_parameters</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.utils.select_crop_parameters</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+<span class="sd">Please see AUTHORS for contributors.</span>
+
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">wx</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="k">import</span> <span class="n">Figure</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_wxagg</span> <span class="k">import</span> <span class="n">FigureCanvasWxAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
+<span class="kn">from</span> <span class="nn">matplotlib.widgets</span> <span class="k">import</span> <span class="n">RectangleSelector</span>
+
+<span class="c1"># ###########################################################################</span>
+<span class="c1"># Class for GUI MainFrame</span>
+<span class="c1"># ###########################################################################</span>
+<div class="viewcode-block" id="ImagePanel"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.select_crop_parameters.ImagePanel">[docs]</a><span class="k">class</span> <span class="nc">ImagePanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">gui_size</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">h</span><span class="o">=</span><span class="n">gui_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+        <span class="n">w</span><span class="o">=</span><span class="n">gui_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">3</span>
+        <span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">SUNKEN_BORDER</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">w</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sizer</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">BoxSizer</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">LEFT</span> <span class="o">|</span> <span class="n">wx</span><span class="o">.</span><span class="n">TOP</span> <span class="o">|</span> <span class="n">wx</span><span class="o">.</span><span class="n">GROW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Fit</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ImagePanel.getfigure"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.select_crop_parameters.ImagePanel.getfigure">[docs]</a>    <span class="k">def</span> <span class="nf">getfigure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the figure, axes and canvas</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="WidgetPanel"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.select_crop_parameters.WidgetPanel">[docs]</a><span class="k">class</span> <span class="nc">WidgetPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">SUNKEN_BORDER</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainFrame"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.select_crop_parameters.MainFrame">[docs]</a><span class="k">class</span> <span class="nc">MainFrame</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Contains the main GUI and button boxes&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">image</span><span class="p">):</span>
+<span class="c1"># Settting the GUI size and panels design</span>
+        <span class="n">displays</span> <span class="o">=</span> <span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Display</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Display</span><span class="o">.</span><span class="n">GetCount</span><span class="p">()))</span> <span class="c1"># Gets the number of displays</span>
+        <span class="n">screenSizes</span> <span class="o">=</span> <span class="p">[</span><span class="n">display</span><span class="o">.</span><span class="n">GetGeometry</span><span class="p">()</span><span class="o">.</span><span class="n">GetSize</span><span class="p">()</span> <span class="k">for</span> <span class="n">display</span> <span class="ow">in</span> <span class="n">displays</span><span class="p">]</span> <span class="c1"># Gets the size of each display</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># For display 1.</span>
+        <span class="n">screenWidth</span> <span class="o">=</span> <span class="n">screenSizes</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">screenHeight</span> <span class="o">=</span> <span class="n">screenSizes</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">screenWidth</span><span class="o">*</span><span class="mf">0.7</span><span class="p">,</span><span class="n">screenHeight</span><span class="o">*</span><span class="mf">0.85</span><span class="p">)</span>
+
+        <span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">ID_ANY</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;DeepLabCut2.0 - Select Crop Parameters&#39;</span><span class="p">,</span>
+                            <span class="n">size</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">Size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_size</span><span class="p">),</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">DefaultPosition</span><span class="p">,</span> <span class="n">style</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">RESIZE_BORDER</span><span class="o">|</span><span class="n">wx</span><span class="o">.</span><span class="n">DEFAULT_FRAME_STYLE</span><span class="o">|</span><span class="n">wx</span><span class="o">.</span><span class="n">TAB_TRAVERSAL</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CreateStatusBar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span><span class="o">.</span><span class="n">SetStatusText</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">SetSizeHints</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_size</span><span class="p">))</span> <span class="c1">#  This sets the minimum size of the GUI. It can scale now!</span>
+        
+<span class="c1">###################################################################################################################################################</span>
+<span class="c1"># Spliting the frame into top and bottom panels. Bottom panels contains the widgets. The top panel is for showing images and plotting!</span>
+        <span class="n">topSplitter</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">SplitterWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_panel</span> <span class="o">=</span> <span class="n">ImagePanel</span><span class="p">(</span><span class="n">topSplitter</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span> <span class="o">=</span> <span class="n">WidgetPanel</span><span class="p">(</span><span class="n">topSplitter</span><span class="p">)</span>
+        
+        <span class="n">topSplitter</span><span class="o">.</span><span class="n">SplitHorizontally</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_panel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span><span class="n">sashPosition</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.83</span><span class="p">)</span><span class="c1">#0.9</span>
+        <span class="n">topSplitter</span><span class="o">.</span><span class="n">SetSashGravity</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">sizer</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">BoxSizer</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+        <span class="n">sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">topSplitter</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">EXPAND</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="n">sizer</span><span class="p">)</span>
+
+<span class="c1">###################################################################################################################################################</span>
+<span class="c1"># Add Buttons to the WidgetPanel and bind them to their respective functions.</span>
+
+        <span class="n">widgetsizer</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">WrapSizer</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">ID_ANY</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Help&quot;</span><span class="p">)</span>
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">help</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">helpButton</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">quit</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">ID_ANY</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Save parameters and Quit&quot;</span><span class="p">)</span>
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quit</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quit</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quitButton</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="n">widgetsizer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="o">.</span><span class="n">SetSizerAndFit</span><span class="p">(</span><span class="n">widgetsizer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="o">.</span><span class="n">Layout</span><span class="p">()</span>
+        
+<span class="c1"># Variables initialization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">MainFrame</span><span class="o">.</span><span class="n">show_image</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MainFrame.quitButton"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.select_crop_parameters.MainFrame.quitButton">[docs]</a>    <span class="k">def</span> <span class="nf">quitButton</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Quits the GUI</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span><span class="o">.</span><span class="n">SetStatusText</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">dlg</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">MessageDialog</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="s2">&quot;Are you sure?&quot;</span><span class="p">,</span> <span class="s2">&quot;Quit!&quot;</span><span class="p">,</span><span class="n">wx</span><span class="o">.</span><span class="n">YES_NO</span> <span class="o">|</span> <span class="n">wx</span><span class="o">.</span><span class="n">ICON_WARNING</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">dlg</span><span class="o">.</span><span class="n">ShowModal</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="n">wx</span><span class="o">.</span><span class="n">ID_YES</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Destroy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainFrame.show_image"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.select_crop_parameters.MainFrame.show_image">[docs]</a>    <span class="k">def</span> <span class="nf">show_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_panel</span><span class="o">.</span><span class="n">getfigure</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cid</span> <span class="o">=</span> <span class="n">RectangleSelector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_select_callback</span><span class="p">,</span><span class="n">drawtype</span><span class="o">=</span><span class="s1">&#39;box&#39;</span><span class="p">,</span> <span class="n">useblit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">button</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">minspanx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">minspany</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">spancoords</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">,</span><span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s1">&#39;key_press_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cid</span><span class="p">)</span></div>
+        
+        
+<div class="viewcode-block" id="MainFrame.line_select_callback"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.select_crop_parameters.MainFrame.line_select_callback">[docs]</a>    <span class="k">def</span> <span class="nf">line_select_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">eclick</span><span class="p">,</span> <span class="n">erelease</span><span class="p">):</span>
+        <span class="s1">&#39;eclick and erelease are the press and release events&#39;</span>
+        <span class="k">global</span> <span class="n">coords</span>
+        <span class="n">new_x1</span><span class="p">,</span> <span class="n">new_y1</span> <span class="o">=</span> <span class="n">eclick</span><span class="o">.</span><span class="n">xdata</span><span class="p">,</span> <span class="n">eclick</span><span class="o">.</span><span class="n">ydata</span>
+        <span class="n">new_x2</span><span class="p">,</span> <span class="n">new_y2</span> <span class="o">=</span> <span class="n">erelease</span><span class="o">.</span><span class="n">xdata</span><span class="p">,</span> <span class="n">erelease</span><span class="o">.</span><span class="n">ydata</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_x1</span><span class="p">)),</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_x2</span><span class="p">)),</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_y1</span><span class="p">)),</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_y2</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="MainFrame.helpButton"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.select_crop_parameters.MainFrame.helpButton">[docs]</a>    <span class="k">def</span> <span class="nf">helpButton</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Opens Instructions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wx</span><span class="o">.</span><span class="n">MessageBox</span><span class="p">(</span><span class="s1">&#39;1. Use left click to select the region of interest. A red box will be drawn around the selected region. </span><span class="se">\n\n</span><span class="s1">2. Use the corner points to expand the box and center to move the box around the image. </span><span class="se">\n\n</span><span class="s1">3. Click &#39;&#39;Save parameters and Quit&#39;&#39; to save the croppeing parameters and close the GUI. </span><span class="se">\n\n</span><span class="s1"> Click OK to continue&#39;</span><span class="p">,</span> <span class="s1">&#39;Instructions to use!&#39;</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">OK</span> <span class="o">|</span> <span class="n">wx</span><span class="o">.</span><span class="n">ICON_INFORMATION</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="show"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.select_crop_parameters.show">[docs]</a><span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">image</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">imageio</span>
+    <span class="n">imageio</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">ffmpeg</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">App</span><span class="p">()</span>
+    <span class="n">MainFrame</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">Show</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">MainLoop</span><span class="p">()</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span><span class="s1">&#39;image&#39;</span><span class="p">)</span>
+    <span class="n">cli_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

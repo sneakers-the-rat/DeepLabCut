@@ -1,0 +1,496 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_3d.camera_calibration &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_3d.camera_calibration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_3d.camera_calibration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">mcolors</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions_3d</span>
+<span class="kn">from</span> <span class="nn">matplotlib.axes._axes</span> <span class="k">import</span> <span class="n">_log</span> <span class="k">as</span> <span class="n">matplotlib_axes_logger</span>
+<span class="n">matplotlib_axes_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="calibrate_cameras"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_3d.html#deeplabcut.pose_estimation_3d.camera_calibration.calibrate_cameras">[docs]</a><span class="k">def</span> <span class="nf">calibrate_cameras</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">cbrow</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span><span class="n">cbcol</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span><span class="n">calibrate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function extracts the corners points from the calibration images, calibrates the camera and stores the calibration files in the project folder (defined in the config file).</span>
+<span class="sd">    </span>
+<span class="sd">    Make sure you have around 20-60 pairs of calibration images. The function should be used iteratively to select the right set of calibration images. </span>
+<span class="sd">    </span>
+<span class="sd">    A pair of calibration image is considered &quot;correct&quot;, if the corners are detected correctly in both the images. It may happen that during the first run of this function, </span>
+<span class="sd">    the extracted corners are incorrect or the order of detected corners does not align for the corresponding views (i.e. camera-1 and camera-2 images).</span>
+<span class="sd">    </span>
+<span class="sd">    In such a case, remove those pairs of images and re-run this function. Once the right number of calibration images are selected, </span>
+<span class="sd">    use the parameter ``calibrate=True`` to calibrate the cameras.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    cbrow : int</span>
+<span class="sd">        Integer specifying the number of rows in the calibration image.</span>
+<span class="sd">    </span>
+<span class="sd">    cbcol : int</span>
+<span class="sd">        Integer specifying the number of columns in the calibration image.</span>
+
+<span class="sd">    calibrate : bool</span>
+<span class="sd">        If this is set to True, the cameras are calibrated with the current set of calibration images. The default is ``False``</span>
+<span class="sd">        Set it to True, only after checking the results of the corner detection method and removing dysfunctional images!</span>
+<span class="sd">        </span>
+<span class="sd">    alpha: float</span>
+<span class="sd">        Floating point number between 0 and 1 specifying the free scaling parameter. When alpha = 0, the rectified images with only valid pixels are stored </span>
+<span class="sd">        i.e. the rectified images are zoomed in. When alpha = 1, all the pixels from the original images are retained. </span>
+<span class="sd">        For more details: https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html</span>
+<span class="sd">        </span>
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    Linux/MacOs/Windows</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.calibrate_camera(config)</span>
+
+<span class="sd">    Once the right set of calibration images are selected, </span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.calibrate_camera(config,calibrate=True)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Termination criteria</span>
+    <span class="n">criteria</span> <span class="o">=</span> <span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_EPS</span> <span class="o">+</span> <span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_MAX_ITER</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+    
+    <span class="c1"># Prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)</span>
+    <span class="n">objp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">cbrow</span> <span class="o">*</span> <span class="n">cbcol</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">objp</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">cbcol</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">cbrow</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    
+    <span class="c1"># Read the config file</span>
+    <span class="n">cfg_3d</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">img_path</span><span class="p">,</span><span class="n">path_corners</span><span class="p">,</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="n">path_undistort</span><span class="o">=</span><span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">Foldernames3Dproject</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">)</span>
+    
+    <span class="n">images</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">img_path</span><span class="p">,</span><span class="s1">&#39;*.jpg&#39;</span><span class="p">))</span>
+    <span class="n">cam_names</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;camera_names&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># update the variable snapshot* in config file according to the name of the cameras</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cam_names</span><span class="p">)):</span>
+            <span class="n">cfg_3d</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;config_file_&#39;</span><span class="o">+</span><span class="n">cam_names</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;config_file_camera-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cam_names</span><span class="p">)):</span>
+            <span class="n">cfg_3d</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;shuffle_&#39;</span><span class="o">+</span><span class="n">cam_names</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;shuffle_camera-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    
+    <span class="n">project_path</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">]</span>
+    <span class="n">projconfigfile</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">project_path</span><span class="p">),</span><span class="s1">&#39;config.yaml&#39;</span><span class="p">)</span>
+    <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">write_config_3d</span><span class="p">(</span><span class="n">projconfigfile</span><span class="p">,</span><span class="n">cfg_3d</span><span class="p">)</span>
+
+    <span class="c1"># Initialize the dictionary </span>
+    <span class="n">img_shape</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">objpoints</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># 3d point in real world space</span>
+    <span class="n">imgpoints</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># 2d points in image plane.</span>
+    <span class="n">dist_pickle</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">stereo_params</span><span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">cam</span> <span class="ow">in</span> <span class="n">cam_names</span><span class="p">:</span>
+        <span class="n">objpoints</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">cam</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">imgpoints</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">cam</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">dist_pickle</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">cam</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="c1"># Sort the images.</span>
+    <span class="n">images</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">,</span> <span class="n">f</span><span class="p">))))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No calibration images found. Make sure the calibration images are saved as .jpg and with prefix as the camera name as specified in the config.yaml file.&quot;</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">cam</span> <span class="ow">in</span> <span class="n">cam_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cam</span> <span class="ow">in</span> <span class="n">fname</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+                <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+
+                <span class="c1"># Find the chess board corners</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">corners</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">findChessboardCorners</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="p">(</span><span class="n">cbcol</span><span class="p">,</span><span class="n">cbrow</span><span class="p">),</span><span class="kc">None</span><span class="p">,)</span> <span class="c1">#  (8,6) pattern (dimensions = common points of black squares)</span>
+                <span class="c1"># If found, add object points, image points (after refining them)</span>
+                <span class="k">if</span> <span class="n">ret</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">img_shape</span><span class="p">[</span><span class="n">cam</span><span class="p">]</span> <span class="o">=</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">objpoints</span><span class="p">[</span><span class="n">cam</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">objp</span><span class="p">)</span>
+                    <span class="n">corners</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cornerSubPix</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span><span class="n">corners</span><span class="p">,(</span><span class="mi">11</span><span class="p">,</span><span class="mi">11</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">criteria</span><span class="p">)</span>
+                    <span class="n">imgpoints</span><span class="p">[</span><span class="n">cam</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corners</span><span class="p">)</span>
+                    <span class="c1"># Draw the corners and store the images</span>
+                    <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">drawChessboardCorners</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="n">cbcol</span><span class="p">,</span><span class="n">cbrow</span><span class="p">),</span> <span class="n">corners</span><span class="p">,</span><span class="n">ret</span><span class="p">)</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path_corners</span><span class="p">),</span><span class="n">filename</span><span class="o">+</span><span class="s1">&#39;_corner.jpg&#39;</span><span class="p">),</span><span class="n">img</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Corners not found for the image </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">h</span><span class="p">,</span>  <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;It seems that the name of calibration images does not match with the camera names in the config file. Please make sure that the calibration images are named with camera names as specified in the config.yaml file.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Perform calibration for each cameras and store the matrices as a pickle file</span>
+    <span class="k">if</span> <span class="n">calibrate</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># Calibrating each camera</span>
+        <span class="k">for</span> <span class="n">cam</span> <span class="ow">in</span> <span class="n">cam_names</span><span class="p">:</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">rvecs</span><span class="p">,</span> <span class="n">tvecs</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">calibrateCamera</span><span class="p">(</span><span class="n">objpoints</span><span class="p">[</span><span class="n">cam</span><span class="p">],</span> <span class="n">imgpoints</span><span class="p">[</span><span class="n">cam</span><span class="p">],</span> <span class="n">img_shape</span><span class="p">[</span><span class="n">cam</span><span class="p">],</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+
+            <span class="c1"># Save the camera calibration result for later use (we won&#39;t use rvecs / tvecs)</span>
+            <span class="n">dist_pickle</span><span class="p">[</span><span class="n">cam</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mtx&#39;</span><span class="p">:</span><span class="n">mtx</span> <span class="p">,</span> <span class="s1">&#39;dist&#39;</span><span class="p">:</span><span class="n">dist</span><span class="p">,</span> <span class="s1">&#39;objpoints&#39;</span><span class="p">:</span><span class="n">objpoints</span><span class="p">[</span><span class="n">cam</span><span class="p">]</span> <span class="p">,</span><span class="s1">&#39;imgpoints&#39;</span><span class="p">:</span><span class="n">imgpoints</span><span class="p">[</span><span class="n">cam</span><span class="p">]</span> <span class="p">}</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span> <span class="n">dist_pickle</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="n">cam</span><span class="o">+</span><span class="s1">&#39;_intrinsic_params.pickle&#39;</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Saving intrinsic camera calibration matrices for </span><span class="si">%s</span><span class="s1"> as a pickle file in </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">cam</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_camera_matrix</span><span class="p">)))</span>
+            
+            <span class="c1"># Compute mean re-projection errors for individual cameras</span>
+            <span class="n">mean_error</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">objpoints</span><span class="p">[</span><span class="n">cam</span><span class="p">])):</span>
+                <span class="n">imgpoints_proj</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">projectPoints</span><span class="p">(</span><span class="n">objpoints</span><span class="p">[</span><span class="n">cam</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">rvecs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tvecs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">imgpoints</span><span class="p">[</span><span class="n">cam</span><span class="p">][</span><span class="n">i</span><span class="p">],</span><span class="n">imgpoints_proj</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">NORM_L2</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">imgpoints_proj</span><span class="p">)</span>
+                <span class="n">mean_error</span> <span class="o">+=</span> <span class="n">error</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mean re-projection error for </span><span class="si">%s</span><span class="s2"> images: </span><span class="si">%.3f</span><span class="s2"> pixels &quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">cam</span><span class="p">,</span> <span class="n">mean_error</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">objpoints</span><span class="p">[</span><span class="n">cam</span><span class="p">])))</span>
+
+        <span class="c1"># Compute stereo calibration for each pair of cameras</span>
+        <span class="n">camera_pair</span> <span class="o">=</span> <span class="p">[[</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">camera_pair</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Computing stereo calibration for &quot;</span> <span class="o">%</span><span class="n">pair</span><span class="p">)</span>
+            <span class="n">retval</span><span class="p">,</span> <span class="n">cameraMatrix1</span><span class="p">,</span> <span class="n">distCoeffs1</span><span class="p">,</span> <span class="n">cameraMatrix2</span><span class="p">,</span> <span class="n">distCoeffs2</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">F</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">stereoCalibrate</span><span class="p">(</span><span class="n">objpoints</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span><span class="n">imgpoints</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span><span class="n">imgpoints</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span><span class="n">dist_pickle</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;mtx&#39;</span><span class="p">],</span><span class="n">dist_pickle</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;dist&#39;</span><span class="p">],</span> <span class="n">dist_pickle</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;mtx&#39;</span><span class="p">],</span> <span class="n">dist_pickle</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;dist&#39;</span><span class="p">],(</span><span class="n">h</span><span class="p">,</span>  <span class="n">w</span><span class="p">),</span><span class="n">flags</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CALIB_FIX_INTRINSIC</span><span class="p">)</span>
+
+            <span class="c1"># Stereo Rectification</span>
+            <span class="n">rectify_scale</span> <span class="o">=</span> <span class="n">alpha</span> <span class="c1"># Free scaling parameter check this https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html#fisheye-stereorectify</span>
+            <span class="n">R1</span><span class="p">,</span> <span class="n">R2</span><span class="p">,</span> <span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">roi1</span><span class="p">,</span> <span class="n">roi2</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">stereoRectify</span><span class="p">(</span><span class="n">cameraMatrix1</span><span class="p">,</span> <span class="n">distCoeffs1</span><span class="p">,</span> <span class="n">cameraMatrix2</span><span class="p">,</span> <span class="n">distCoeffs2</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">R</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">rectify_scale</span><span class="p">)</span>
+            
+            <span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cameraMatrix1&quot;</span><span class="p">:</span> <span class="n">cameraMatrix1</span><span class="p">,</span><span class="s2">&quot;cameraMatrix2&quot;</span><span class="p">:</span> <span class="n">cameraMatrix2</span><span class="p">,</span><span class="s2">&quot;distCoeffs1&quot;</span><span class="p">:</span> <span class="n">distCoeffs1</span><span class="p">,</span><span class="s2">&quot;distCoeffs2&quot;</span><span class="p">:</span> <span class="n">distCoeffs2</span><span class="p">,</span><span class="s2">&quot;R&quot;</span><span class="p">:</span><span class="n">R</span><span class="p">,</span><span class="s2">&quot;T&quot;</span><span class="p">:</span><span class="n">T</span><span class="p">,</span><span class="s2">&quot;E&quot;</span><span class="p">:</span><span class="n">E</span><span class="p">,</span><span class="s2">&quot;F&quot;</span><span class="p">:</span><span class="n">F</span><span class="p">,</span>
+                         <span class="s2">&quot;R1&quot;</span><span class="p">:</span><span class="n">R1</span><span class="p">,</span>
+                         <span class="s2">&quot;R2&quot;</span><span class="p">:</span><span class="n">R2</span><span class="p">,</span>
+                         <span class="s2">&quot;P1&quot;</span><span class="p">:</span><span class="n">P1</span><span class="p">,</span>
+                         <span class="s2">&quot;P2&quot;</span><span class="p">:</span><span class="n">P2</span><span class="p">,</span>
+                         <span class="s2">&quot;roi1&quot;</span><span class="p">:</span><span class="n">roi1</span><span class="p">,</span>
+                         <span class="s2">&quot;roi2&quot;</span><span class="p">:</span><span class="n">roi2</span><span class="p">,</span>
+                         <span class="s2">&quot;Q&quot;</span><span class="p">:</span><span class="n">Q</span><span class="p">,</span>
+                         <span class="s2">&quot;image_shape&quot;</span><span class="p">:[</span><span class="n">img_shape</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span><span class="n">img_shape</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]}</span>
+            
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Saving the stereo parameters for every pair of cameras as a pickle file in </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_camera_matrix</span><span class="p">)))</span>
+        
+        <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">write_pickle</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="s1">&#39;stereo_params.pickle&#39;</span><span class="p">),</span><span class="n">stereo_params</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Camera calibration done! Use the function ``check_undistortion`` to check the check the calibration&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Corners extracted! You may check for the extracted corners in the directory </span><span class="si">%s</span><span class="s2"> and remove the pair of images where the corners are incorrectly detected. If all the corners are detected correctly with right order, then re-run the same function and use the flag ``calibrate=True``, to calbrate the camera.&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">path_corners</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="check_undistortion"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_3d.html#deeplabcut.pose_estimation_3d.camera_calibration.check_undistortion">[docs]</a><span class="k">def</span> <span class="nf">check_undistortion</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">cbrow</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span><span class="n">cbcol</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span><span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function undistorts the calibration images based on the camera matrices and stores them in the project folder(defined in the config file) </span>
+<span class="sd">    to visually check if the camera matrices are correct. </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    cbrow : int</span>
+<span class="sd">        Int specifying the number of rows in the calibration image.</span>
+<span class="sd">    </span>
+<span class="sd">    cbcol : int</span>
+<span class="sd">        Int specifying the number of columns in the calibration image.</span>
+
+<span class="sd">    plot : bool</span>
+<span class="sd">        If this is set to True, the results of undistortion are saved as plots. The default is ``True``; if provided it must be either ``True`` or ``False``.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    Linux/MacOs/Windows</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.check_undistortion(config, cbrow = 8,cbcol = 6)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Read the config file</span>
+    <span class="n">criteria</span> <span class="o">=</span> <span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_EPS</span> <span class="o">+</span> <span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_MAX_ITER</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+    <span class="n">cfg_3d</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">img_path</span><span class="p">,</span><span class="n">path_corners</span><span class="p">,</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="n">path_undistort</span><span class="o">=</span><span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">Foldernames3Dproject</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">)</span>
+    
+    <span class="c1">#colormap = plt.get_cmap(cfg_3d[&#39;colormap&#39;])</span>
+    <span class="n">markerSize</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;dotsize&#39;</span><span class="p">]</span>
+    <span class="n">alphaValue</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;alphaValue&#39;</span><span class="p">]</span>
+    <span class="n">markerType</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;markerType&#39;</span><span class="p">]</span>
+    <span class="n">markerColor</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;markerColor&#39;</span><span class="p">]</span>
+    <span class="n">cam_names</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;camera_names&#39;</span><span class="p">]</span>
+    
+    <span class="n">images</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">img_path</span><span class="p">,</span><span class="s1">&#39;*.jpg&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Sort the images</span>
+    <span class="n">images</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">,</span> <span class="n">f</span><span class="p">))))</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    for fname in images:</span>
+<span class="sd">        for cam in cam_names:</span>
+<span class="sd">            if cam in fname:</span>
+<span class="sd">                filename = Path(fname).stem</span>
+<span class="sd">                ext = Path(fname).suffix</span>
+<span class="sd">                img = cv2.imread(fname)</span>
+<span class="sd">                gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">camera_pair</span> <span class="o">=</span> <span class="p">[[</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span>
+    <span class="n">stereo_params</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="s1">&#39;stereo_params.pickle&#39;</span><span class="p">))</span>
+    
+    <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">camera_pair</span><span class="p">:</span>
+        <span class="n">map1_x</span><span class="p">,</span><span class="n">map1_y</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">initUndistortRectifyMap</span><span class="p">(</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;cameraMatrix1&quot;</span><span class="p">],</span> <span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;distCoeffs1&quot;</span><span class="p">],</span> <span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;R1&quot;</span><span class="p">],</span> <span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;P1&quot;</span><span class="p">],(</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;image_shape&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_16SC2</span><span class="p">)</span>
+        <span class="n">map2_x</span><span class="p">,</span><span class="n">map2_y</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">initUndistortRectifyMap</span><span class="p">(</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;cameraMatrix2&quot;</span><span class="p">],</span> <span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;distCoeffs2&quot;</span><span class="p">],</span> <span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;R2&quot;</span><span class="p">],</span> <span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;P2&quot;</span><span class="p">],(</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;image_shape&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_16SC2</span><span class="p">)</span>
+        <span class="n">cam1_undistort</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cam2_undistort</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">fname</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+                <span class="n">img1</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+                <span class="n">gray1</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span><span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+                <span class="n">h</span><span class="p">,</span>  <span class="n">w</span> <span class="o">=</span> <span class="n">img1</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">corners1</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">findChessboardCorners</span><span class="p">(</span><span class="n">gray1</span><span class="p">,</span> <span class="p">(</span><span class="n">cbcol</span><span class="p">,</span><span class="n">cbrow</span><span class="p">),</span><span class="kc">None</span><span class="p">,)</span>
+                <span class="n">corners_origin1</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cornerSubPix</span><span class="p">(</span><span class="n">gray1</span><span class="p">,</span><span class="n">corners1</span><span class="p">,(</span><span class="mi">11</span><span class="p">,</span><span class="mi">11</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">criteria</span><span class="p">)</span>
+
+                <span class="c1"># Remapping dataFrame_camera1_undistort</span>
+                <span class="n">im_remapped1</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">remap</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="n">map1_x</span><span class="p">,</span> <span class="n">map1_y</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span><span class="p">)</span>
+                <span class="n">imgpoints_proj_undistort</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">undistortPoints</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">corners_origin1</span><span class="p">,</span> <span class="n">cameraMatrix</span> <span class="o">=</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;cameraMatrix1&quot;</span><span class="p">],</span> <span class="n">distCoeffs</span> <span class="o">=</span> <span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;distCoeffs1&quot;</span><span class="p">],</span><span class="n">P</span><span class="o">=</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;P1&quot;</span><span class="p">],</span><span class="n">R</span><span class="o">=</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;R1&quot;</span><span class="p">])</span>
+                <span class="n">cam1_undistort</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imgpoints_proj_undistort</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path_undistort</span><span class="p">),</span><span class="n">filename</span><span class="o">+</span><span class="s1">&#39;_undistort.jpg&#39;</span><span class="p">),</span><span class="n">im_remapped1</span><span class="p">)</span>
+                <span class="n">imgpoints_proj_undistort</span> <span class="o">=</span> <span class="p">[]</span>
+                
+            <span class="k">elif</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">fname</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+                <span class="n">img2</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+                <span class="n">gray2</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span><span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+                <span class="n">h</span><span class="p">,</span>  <span class="n">w</span> <span class="o">=</span> <span class="n">img2</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">corners2</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">findChessboardCorners</span><span class="p">(</span><span class="n">gray2</span><span class="p">,</span> <span class="p">(</span><span class="n">cbcol</span><span class="p">,</span><span class="n">cbrow</span><span class="p">),</span><span class="kc">None</span><span class="p">,)</span>
+                <span class="n">corners_origin2</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cornerSubPix</span><span class="p">(</span><span class="n">gray2</span><span class="p">,</span><span class="n">corners2</span><span class="p">,(</span><span class="mi">11</span><span class="p">,</span><span class="mi">11</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">criteria</span><span class="p">)</span>
+
+                <span class="c1"># Remapping</span>
+                <span class="n">im_remapped2</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">remap</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="n">map2_x</span><span class="p">,</span> <span class="n">map2_y</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span><span class="p">)</span>
+                <span class="n">imgpoints_proj_undistort2</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">undistortPoints</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">corners_origin2</span><span class="p">,</span> <span class="n">cameraMatrix</span> <span class="o">=</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;cameraMatrix2&quot;</span><span class="p">],</span> <span class="n">distCoeffs</span> <span class="o">=</span> <span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;distCoeffs2&quot;</span><span class="p">],</span><span class="n">P</span><span class="o">=</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;P2&quot;</span><span class="p">],</span><span class="n">R</span><span class="o">=</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;R2&quot;</span><span class="p">])</span>
+                <span class="n">cam2_undistort</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imgpoints_proj_undistort2</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path_undistort</span><span class="p">),</span><span class="n">filename</span><span class="o">+</span><span class="s1">&#39;_undistort.jpg&#39;</span><span class="p">),</span><span class="n">im_remapped2</span><span class="p">)</span>
+                <span class="n">imgpoints_proj_undistort2</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="n">cam1_undistort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cam1_undistort</span><span class="p">)</span>
+        <span class="n">cam2_undistort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cam2_undistort</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All images are undistorted and stored in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">path_undistort</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Use the function ``triangulate`` to undistort the dataframes and compute the triangulation&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">plot</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">f1</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+            <span class="n">f1</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Original Image: Views from &quot;</span><span class="o">+</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; and &quot;</span> <span class="o">+</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+
+            <span class="c1"># Display images in RGB</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">cam1_undistort</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path_undistort</span><span class="p">),</span><span class="s2">&quot;Original_Image.png&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Plot the undistorted corner points </span>
+            <span class="n">f2</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+            <span class="n">f2</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Undistorted corner points on camera-1 and camera-2&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">im_remapped1</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">im_remapped2</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">cam1_undistort</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="n">cam1_undistort</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="n">cam1_undistort</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span> <span class="n">marker</span><span class="o">=</span><span class="n">markerType</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">markerSize</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">markerColor</span><span class="p">,</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alphaValue</span><span class="p">)</span>
+                <span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="n">cam2_undistort</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="n">cam2_undistort</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span> <span class="n">marker</span><span class="o">=</span><span class="n">markerType</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">markerSize</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">markerColor</span><span class="p">,</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alphaValue</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path_undistort</span><span class="p">),</span><span class="s2">&quot;undistorted_points.png&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Triangulate</span>
+            <span class="n">triangulate</span> <span class="o">=</span> <span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">compute_triangulation_calibration_images</span><span class="p">(</span><span class="n">stereo_params</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">cam1_undistort</span><span class="p">,</span> <span class="n">cam2_undistort</span><span class="p">,</span><span class="n">path_undistort</span><span class="p">,</span><span class="n">cfg_3d</span><span class="p">,</span><span class="n">plot</span><span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">write_pickle</span><span class="p">(</span><span class="s1">&#39;triangulate.pickle&#39;</span><span class="p">,</span><span class="n">triangulate</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

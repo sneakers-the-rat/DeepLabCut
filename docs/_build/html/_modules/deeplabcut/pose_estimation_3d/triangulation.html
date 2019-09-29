@@ -1,0 +1,537 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_3d.triangulation &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_3d.triangulation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_3d.triangulation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions_3d</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+<span class="kn">from</span> <span class="nn">matplotlib.axes._axes</span> <span class="k">import</span> <span class="n">_log</span> <span class="k">as</span> <span class="n">matplotlib_axes_logger</span>
+<span class="n">matplotlib_axes_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="triangulate"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_3d.html#deeplabcut.pose_estimation_3d.triangulation.triangulate">[docs]</a><span class="k">def</span> <span class="nf">triangulate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">video_path</span><span class="p">,</span><span class="n">videotype</span><span class="o">=</span><span class="s1">&#39;avi&#39;</span><span class="p">,</span><span class="n">filterpredictions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">filtertype</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">,</span><span class="n">gputouse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">destfolder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">save_as_csv</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function triangulates the detected DLC-keypoints from the two camera views using the camera matrices (derived from calibration) to calculate 3D predictions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    video_path : string/list of list</span>
+<span class="sd">        Full path of the directory where videos are saved. If the user wants to analyze only a pair of videos, the user needs to pass them as a list of list of videos i.e. [[&#39;video1-camera-1.avi&#39;,&#39;video1-camera-2.avi&#39;]]</span>
+
+<span class="sd">    videotype: string, optional</span>
+<span class="sd">        Checks for the extension of the video in case the input to the video is a directory.\n Only videos with this extension are analyzed. The default is ``.avi``</span>
+
+<span class="sd">    filterpredictions: Bool, optional</span>
+<span class="sd">        Filter the predictions with filter specified by &quot;filtertype&quot;. If specified it should be either ``True`` or ``False``.</span>
+
+<span class="sd">    filtertype: string</span>
+<span class="sd">        Select which filter, &#39;arima&#39; or &#39;median&#39; filter.</span>
+
+<span class="sd">    gputouse: int, optional. Natural number indicating the number of your GPU (see number in nvidia-smi). If you do not have a GPU put None.</span>
+<span class="sd">        See: https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries</span>
+
+<span class="sd">    destfolder: string, optional</span>
+<span class="sd">        Specifies the destination folder for analysis data (default is the path of the video)</span>
+<span class="sd">    </span>
+<span class="sd">    save_as_csv: bool, optional</span>
+<span class="sd">        Saves the predictions in a .csv file. The default is ``False``</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Linux/MacOS</span>
+<span class="sd">    To analyze all the videos in the directory:</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.triangulate(config,&#39;/data/project1/videos/&#39;)</span>
+<span class="sd">    </span>
+<span class="sd">    To analyze only a few pairs of videos:</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.triangulate(config,[[&#39;/data/project1/videos/video1-camera-1.avi&#39;,&#39;/data/project1/videos/video1-camera-2.avi&#39;],[&#39;/data/project1/videos/video2-camera-1.avi&#39;,&#39;/data/project1/videos/video2-camera-2.avi&#39;]])</span>
+<span class="sd">    </span>
+
+<span class="sd">    Windows</span>
+<span class="sd">    To analyze all the videos in the directory:</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.triangulate(config,&#39;C:\\yourusername\\rig-95\\Videos&#39;)</span>
+<span class="sd">    </span>
+<span class="sd">    To analyze only a few pair of videos:</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.triangulate(config,[[&#39;C:\\yourusername\\rig-95\\Videos\\video1-camera-1.avi&#39;,&#39;C:\\yourusername\\rig-95\\Videos\\video1-camera-2.avi&#39;],[&#39;C:\\yourusername\\rig-95\\Videos\\video2-camera-1.avi&#39;,&#39;C:\\yourusername\\rig-95\\Videos\\video2-camera-2.avi&#39;]])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow</span> <span class="k">import</span> <span class="n">predict_videos</span>
+    <span class="kn">from</span> <span class="nn">deeplabcut.post_processing</span> <span class="k">import</span> <span class="n">filtering</span>
+
+    <span class="n">cfg_3d</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">cam_names</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;camera_names&#39;</span><span class="p">]</span>
+    <span class="n">pcutoff</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;pcutoff&#39;</span><span class="p">]</span>
+    <span class="n">scorer_3d</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;scorername_3d&#39;</span><span class="p">]</span>
+
+    <span class="n">snapshots</span><span class="o">=</span><span class="p">{}</span>
+    <span class="k">for</span> <span class="n">cam</span> <span class="ow">in</span> <span class="n">cam_names</span><span class="p">:</span>
+        <span class="n">snapshots</span><span class="p">[</span><span class="n">cam</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;config_file_&#39;</span><span class="o">+</span><span class="n">cam</span><span class="p">)]</span>
+        <span class="c1"># Check if the config file exists</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="n">cam</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;It seems the file specified in the variable config_file_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">cam</span><span class="p">))</span><span class="o">+</span><span class="s2">&quot; does not exist. Please edit the config file with correct file path and retry.&quot;</span><span class="p">)</span>
+    <span class="c1">#flag to check if the video_path variable is a string or a list of list</span>
+    <span class="n">flag</span><span class="o">=</span><span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">video_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="n">flag</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">video_list</span> <span class="o">=</span> <span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">get_camerawise_videos</span><span class="p">(</span><span class="n">video_path</span><span class="p">,</span><span class="n">cam_names</span><span class="p">,</span><span class="n">videotype</span><span class="o">=</span><span class="n">videotype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">video_list</span> <span class="o">=</span> <span class="n">video_path</span>
+
+    <span class="k">if</span> <span class="n">video_list</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No videos found in the specified video path.&quot;</span><span class="p">,</span> <span class="n">video_path</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please make sure that the video names are specified with correct camera names as entered in the config file or&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;perhaps the videotype is distinct from the videos in the path, I was looking for:&quot;</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+        
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;List of pairs:&quot;</span><span class="p">,</span> <span class="n">video_list</span><span class="p">)</span>
+    <span class="n">scorer_name</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">run_triangulate</span><span class="o">=</span><span class="kc">False</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">video_list</span><span class="p">)):</span>
+        <span class="n">dataname</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span> <span class="c1">#looping over cameras</span>
+            <span class="k">if</span> <span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">in</span> <span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Analyzing video </span><span class="si">%s</span><span class="s2"> using </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;config_file_&#39;</span><span class="o">+</span><span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">])))</span>
+                <span class="n">config_2d</span> <span class="o">=</span> <span class="n">snapshots</span><span class="p">[</span><span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+                <span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config_2d</span><span class="p">)</span>
+                <span class="n">shuffle</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;shuffle_&#39;</span><span class="o">+</span><span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">])]</span>
+                <span class="n">trainingsetindex</span><span class="o">=</span><span class="n">cfg_3d</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;trainingsetindex_&#39;</span><span class="o">+</span><span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">])]</span>
+                <span class="n">trainFraction</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="n">trainingsetindex</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">flag</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+                    <span class="n">video</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">video_path</span><span class="p">,</span><span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">video_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">video</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">video_path</span><span class="p">,</span><span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">destfolder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">destfolder</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">vname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+                <span class="n">prefix</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">vname</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">vname</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">prefix</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">elif</span> <span class="n">prefix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;_&#39;</span> <span class="ow">or</span> <span class="n">prefix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                    <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                
+                <span class="k">if</span> <span class="n">suffix</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">elif</span> <span class="n">suffix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;_&#39;</span> <span class="ow">or</span> <span class="n">suffix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                    <span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+                <span class="k">if</span> <span class="n">prefix</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="n">output_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">destfolder</span><span class="p">,</span><span class="n">suffix</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">suffix</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">output_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">destfolder</span><span class="p">,</span><span class="n">prefix</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">output_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">destfolder</span><span class="p">,</span><span class="n">prefix</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">suffix</span><span class="p">)</span>
+
+                <span class="n">output_filename</span><span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_filename</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">scorer_3d</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">output_filename</span><span class="o">+</span><span class="s1">&#39;.h5&#39;</span><span class="p">):</span> <span class="c1">#TODO: don&#39;t check twice and load the pickle file to check if the same snapshots + camera matrices were used.</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Already analyzed...Checking the meta data for any change in the camera matrices and/or scorer names&quot;</span><span class="p">,</span><span class="n">vname</span><span class="p">)</span>
+                    <span class="n">pickle_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_filename</span><span class="o">+</span><span class="s1">&#39;_includingmetadata.pickle&#39;</span><span class="p">)</span>
+                    <span class="n">metadata_</span> <span class="o">=</span> <span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">LoadMetadata3d</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">)</span>
+                    <span class="n">img_path</span><span class="p">,</span><span class="n">path_corners</span><span class="p">,</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="n">path_undistort</span><span class="o">=</span><span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">Foldernames3Dproject</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">)</span>
+                    <span class="n">path_stereo_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="s1">&#39;stereo_params.pickle&#39;</span><span class="p">)</span>
+                    <span class="n">stereo_file</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">path_stereo_file</span><span class="p">)</span>
+                    <span class="n">cam_pair</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">if_video_analyzed</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># variable to keep track if the video was already analyzed</span>
+                    <span class="c1"># Check for the camera matrix</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">metadata_</span><span class="p">[</span><span class="s1">&#39;stereo_matrix&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">metadata_</span><span class="p">[</span><span class="s1">&#39;stereo_matrix&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">stereo_file</span><span class="p">[</span><span class="n">cam_pair</span><span class="p">][</span><span class="n">k</span><span class="p">])</span> <span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">run_triangulate</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="c1"># Check for scorer names in the pickle file of 3d output</span>
+                    <span class="n">DLCscorer</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetScorerName</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">trainingsiterations</span><span class="o">=</span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span>
+                    <span class="k">if</span>  <span class="n">metadata_</span><span class="p">[</span><span class="s1">&#39;scorer_name&#39;</span><span class="p">][</span><span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="o">==</span> <span class="n">DLCscorer</span><span class="p">:</span>
+                        <span class="n">if_video_analyzed</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">if_video_analyzed</span><span class="o">=</span><span class="kc">False</span>
+                        <span class="n">run_triangulate</span> <span class="o">=</span> <span class="kc">True</span>
+
+                    <span class="k">if</span> <span class="n">if_video_analyzed</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This file is already analyzed!&quot;</span><span class="p">)</span>
+                        <span class="n">dataname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">destfolder</span><span class="p">,</span><span class="n">vname</span> <span class="o">+</span> <span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">))</span>
+                        <span class="n">scorer_name</span><span class="p">[</span><span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DLCscorer</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Analyze video if score name is different</span>
+                        <span class="n">DLCscorer</span> <span class="o">=</span> <span class="n">predict_videos</span><span class="o">.</span><span class="n">analyze_videos</span><span class="p">(</span><span class="n">config_2d</span><span class="p">,[</span><span class="n">video</span><span class="p">],</span><span class="n">videotype</span><span class="o">=</span><span class="n">videotype</span><span class="p">,</span><span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainingsetindex</span><span class="o">=</span><span class="n">trainingsetindex</span><span class="p">,</span><span class="n">gputouse</span><span class="o">=</span><span class="n">gputouse</span><span class="p">,</span><span class="n">destfolder</span><span class="o">=</span><span class="n">destfolder</span><span class="p">)</span>
+                        <span class="n">scorer_name</span><span class="p">[</span><span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DLCscorer</span>
+                        <span class="n">if_video_analyzed</span><span class="o">=</span><span class="kc">False</span>
+                        <span class="n">run_triangulate</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">if</span> <span class="n">filterpredictions</span><span class="p">:</span>
+                            <span class="n">filtering</span><span class="o">.</span><span class="n">filterpredictions</span><span class="p">(</span><span class="n">config_2d</span><span class="p">,[</span><span class="n">video</span><span class="p">],</span><span class="n">videotype</span><span class="o">=</span><span class="n">videotype</span><span class="p">,</span><span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainingsetindex</span><span class="o">=</span><span class="n">trainingsetindex</span><span class="p">,</span><span class="n">filtertype</span><span class="o">=</span><span class="n">filtertype</span><span class="p">,</span><span class="n">destfolder</span><span class="o">=</span><span class="n">destfolder</span><span class="p">)</span>
+                        <span class="n">dataname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">destfolder</span><span class="p">,</span><span class="n">vname</span> <span class="o">+</span> <span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span> <span class="c1"># need to do the whole jam.</span>
+                    <span class="n">DLCscorer</span> <span class="o">=</span> <span class="n">predict_videos</span><span class="o">.</span><span class="n">analyze_videos</span><span class="p">(</span><span class="n">config_2d</span><span class="p">,[</span><span class="n">video</span><span class="p">],</span><span class="n">videotype</span><span class="o">=</span><span class="n">videotype</span><span class="p">,</span><span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainingsetindex</span><span class="o">=</span><span class="n">trainingsetindex</span><span class="p">,</span><span class="n">gputouse</span><span class="o">=</span><span class="n">gputouse</span><span class="p">,</span><span class="n">destfolder</span><span class="o">=</span><span class="n">destfolder</span><span class="p">)</span>
+                    <span class="n">scorer_name</span><span class="p">[</span><span class="n">cam_names</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DLCscorer</span>
+                    <span class="n">run_triangulate</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="n">filterpredictions</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">destfolder</span><span class="p">)</span>
+                        <span class="n">filtering</span><span class="o">.</span><span class="n">filterpredictions</span><span class="p">(</span><span class="n">config_2d</span><span class="p">,[</span><span class="n">video</span><span class="p">],</span><span class="n">videotype</span><span class="o">=</span><span class="n">videotype</span><span class="p">,</span><span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainingsetindex</span><span class="o">=</span><span class="n">trainingsetindex</span><span class="p">,</span><span class="n">filtertype</span><span class="o">=</span><span class="n">filtertype</span><span class="p">,</span><span class="n">destfolder</span><span class="o">=</span><span class="n">destfolder</span><span class="p">)</span>
+                        <span class="n">dataname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">destfolder</span><span class="p">,</span><span class="n">vname</span> <span class="o">+</span> <span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">run_triangulate</span><span class="p">:</span>
+<span class="c1">#        if len(dataname)&gt;0:</span>
+            <span class="c1">#undistort points for this pair</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Undistorting...&quot;</span><span class="p">)</span>
+            <span class="n">dataFrame_camera1_undistort</span><span class="p">,</span><span class="n">dataFrame_camera2_undistort</span><span class="p">,</span><span class="n">stereomatrix</span><span class="p">,</span><span class="n">path_stereo_file</span> <span class="o">=</span> <span class="n">undistort_points</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">dataname</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span><span class="n">destfolder</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataFrame_camera1_undistort</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataFrame_camera2_undistort</span><span class="p">):</span>
+                <span class="kn">import</span> <span class="nn">warnings</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The number of frames do not match in the two videos. Please make sure that your videos have same number of frames and then retry! Excluding the extra frames from the longer video.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataFrame_camera1_undistort</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataFrame_camera2_undistort</span><span class="p">):</span>
+                    <span class="n">dataFrame_camera1_undistort</span> <span class="o">=</span> <span class="n">dataFrame_camera1_undistort</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">dataFrame_camera2_undistort</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataFrame_camera2_undistort</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataFrame_camera1_undistort</span><span class="p">):</span>
+                    <span class="n">dataFrame_camera2_undistort</span> <span class="o">=</span> <span class="n">dataFrame_camera2_undistort</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">dataFrame_camera1_undistort</span><span class="p">)]</span>
+<span class="c1">#                raise Exception(&quot;The number of frames do not match in the two videos. Please make sure that your videos have same number of frames and then retry!&quot;)</span>
+            <span class="n">X_final</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">triangulate</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">scorer_cam1</span> <span class="o">=</span> <span class="n">dataFrame_camera1_undistort</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">scorer_cam2</span> <span class="o">=</span> <span class="n">dataFrame_camera2_undistort</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">df_3d</span><span class="p">,</span><span class="n">scorer_3d</span><span class="p">,</span><span class="n">bodyparts</span> <span class="o">=</span> <span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">create_empty_df</span><span class="p">(</span><span class="n">dataFrame_camera1_undistort</span><span class="p">,</span><span class="n">scorer_3d</span><span class="p">,</span><span class="n">flag</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+            <span class="n">P1</span> <span class="o">=</span> <span class="n">stereomatrix</span><span class="p">[</span><span class="s1">&#39;P1&#39;</span><span class="p">]</span>
+            <span class="n">P2</span> <span class="o">=</span> <span class="n">stereomatrix</span><span class="p">[</span><span class="s1">&#39;P2&#39;</span><span class="p">]</span>
+            
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Computing the triangulation...&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts</span><span class="p">):</span>
+                <span class="c1"># Extract the indices of frames where the likelihood of a bodypart for both cameras are less than pvalue</span>
+                <span class="n">likelihoods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dataFrame_camera1_undistort</span><span class="p">[</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:],</span> <span class="n">dataFrame_camera2_undistort</span><span class="p">[</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:]])</span>
+                <span class="n">likelihoods</span> <span class="o">=</span> <span class="n">likelihoods</span><span class="o">.</span><span class="n">T</span>
+                
+                <span class="c1">#Extract frames where likelihood for both the views is less than the pcutoff</span>
+                <span class="n">low_likelihood_frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">likelihoods</span> <span class="o">&lt;</span> <span class="n">pcutoff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1">#low_likelihood_frames = np.all(likelihoods &lt; pcutoff, axis=1)</span>
+                
+                <span class="n">low_likelihood_frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">low_likelihood_frames</span><span class="o">==</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">points_cam1_undistort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dataFrame_camera1_undistort</span><span class="p">[</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:],</span> <span class="n">dataFrame_camera1_undistort</span><span class="p">[</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:]])</span>
+                <span class="n">points_cam1_undistort</span> <span class="o">=</span> <span class="n">points_cam1_undistort</span><span class="o">.</span><span class="n">T</span>
+                
+                <span class="c1"># For cam1 camera: Assign nans to x and y values of a bodypart where the likelihood for is less than pvalue</span>
+                <span class="n">points_cam1_undistort</span><span class="p">[</span><span class="n">low_likelihood_frames</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">points_cam1_undistort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">points_cam1_undistort</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+                <span class="n">points_cam2_undistort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dataFrame_camera2_undistort</span><span class="p">[</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:],</span> <span class="n">dataFrame_camera2_undistort</span><span class="p">[</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:]])</span>
+                <span class="n">points_cam2_undistort</span> <span class="o">=</span> <span class="n">points_cam2_undistort</span><span class="o">.</span><span class="n">T</span>
+    
+                <span class="c1"># For cam2 camera: Assign nans to x and y values of a bodypart where the likelihood is less than pvalue</span>
+                <span class="n">points_cam2_undistort</span><span class="p">[</span><span class="n">low_likelihood_frames</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">points_cam2_undistort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">points_cam2_undistort</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+                <span class="n">X_l</span> <span class="o">=</span> <span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">triangulatePoints</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">,</span> <span class="n">points_cam1_undistort</span><span class="p">,</span> <span class="n">points_cam2_undistort</span><span class="p">)</span>
+                
+                <span class="c1">#ToDo: speed up func. below by saving in numpy.array</span>
+                <span class="n">X_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X_l</span><span class="p">)</span>
+            <span class="n">triangulate</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X_final</span><span class="p">)</span>
+            <span class="n">triangulate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">triangulate</span><span class="p">)</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;stereo_matrix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stereomatrix</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;stereo_matrix_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_stereo_file</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;scorer_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">scorer_name</span><span class="p">[</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">scorer_name</span><span class="p">[</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]]}</span>
+    
+            <span class="c1"># Create an empty dataframe to store x,y,z of 3d data</span>
+            <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts</span><span class="p">):</span>
+                <span class="n">df_3d</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:][</span><span class="n">scorer_3d</span><span class="p">,</span><span class="n">bp</span><span class="p">,</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">triangulate</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">bpindex</span><span class="p">,</span><span class="mi">0</span><span class="p">,:]</span>
+                <span class="n">df_3d</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:][</span><span class="n">scorer_3d</span><span class="p">,</span><span class="n">bp</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">triangulate</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">bpindex</span><span class="p">,</span><span class="mi">1</span><span class="p">,:]</span>
+                <span class="n">df_3d</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:][</span><span class="n">scorer_3d</span><span class="p">,</span><span class="n">bp</span><span class="p">,</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">triangulate</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">bpindex</span><span class="p">,</span><span class="mi">2</span><span class="p">,:]</span>
+    
+            <span class="n">df_3d</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">output_filename</span><span class="o">+</span><span class="s1">&#39;.h5&#39;</span><span class="p">),</span><span class="s1">&#39;df_with_missing&#39;</span><span class="p">,</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">SaveMetadata3d</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">output_filename</span><span class="o">+</span><span class="s1">&#39;_includingmetadata.pickle&#39;</span><span class="p">),</span> <span class="n">metadata</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">save_as_csv</span><span class="p">:</span>
+                <span class="n">df_3d</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">output_filename</span><span class="o">+</span><span class="s1">&#39;.csv&#39;</span><span class="p">))</span>
+    
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Triangulated data for video&quot;</span><span class="p">,</span> <span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Results are saved under: &quot;</span><span class="p">,</span><span class="n">destfolder</span><span class="p">)</span>
+            <span class="c1"># have to make the dest folder none so that it can be updated for a new pair of videos</span>
+            <span class="k">if</span> <span class="n">destfolder</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">destfolder</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">video_list</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All videos were analyzed...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Now you can create 3D video(s) using deeplabcut.create_labeled_video_3d&quot;</span><span class="p">)</span></div>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">ToDo: speed up func. below and check only for one cam individually</span>
+<span class="sd">PredicteData = np.zeros((nframes, 3 * len(dlc_cfg[&#39;all_joints_names&#39;])))</span>
+<span class="sd">PredicteData[batch_num*batchsize:batch_num*batchsize+batch_ind, :] = pose[:batch_ind,:]</span>
+<span class="sd">pdindex = pd.MultiIndex.from_product([[DLCscorer], dlc_cfg[&#39;all_joints_names&#39;], [&#39;x&#39;, &#39;y&#39;, &#39;likelihood&#39;]],names=[&#39;scorer&#39;, &#39;bodyparts&#39;, &#39;coords&#39;])</span>
+<span class="sd">auxiliaryfunctions.SaveData(PredicteData[:nframes,:], metadata, dataname, pdindex, framelist,save_as_csv)</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="undistort_points"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_3d.html#deeplabcut.pose_estimation_3d.triangulation.undistort_points">[docs]</a><span class="k">def</span> <span class="nf">undistort_points</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">dataframe</span><span class="p">,</span><span class="n">camera_pair</span><span class="p">,</span><span class="n">destfolder</span><span class="p">):</span>
+    <span class="n">cfg_3d</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">img_path</span><span class="p">,</span><span class="n">path_corners</span><span class="p">,</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="n">path_undistort</span><span class="o">=</span><span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">Foldernames3Dproject</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">    path_undistort = destfolder</span>
+<span class="sd">    filename_cam1 = Path(dataframe[0]).stem</span>
+<span class="sd">    filename_cam2 = Path(dataframe[1]).stem</span>
+
+<span class="sd">    #currently no interm. saving of this due to high speed.</span>
+<span class="sd">    # check if the undistorted files are already present</span>
+<span class="sd">    if os.path.exists(os.path.join(path_undistort,filename_cam1 + &#39;_undistort.h5&#39;)) and os.path.exists(os.path.join(path_undistort,filename_cam2 + &#39;_undistort.h5&#39;)):</span>
+<span class="sd">        print(&quot;The undistorted files are already present at %s&quot; % os.path.join(path_undistort,filename_cam1))</span>
+<span class="sd">        dataFrame_cam1_undistort = pd.read_hdf(os.path.join(path_undistort,filename_cam1 + &#39;_undistort.h5&#39;))</span>
+<span class="sd">        dataFrame_cam2_undistort = pd.read_hdf(os.path.join(path_undistort,filename_cam2 + &#39;_undistort.h5&#39;))</span>
+<span class="sd">    else:</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># Create an empty dataFrame to store the undistorted 2d coordinates and likelihood</span>
+        <span class="n">dataframe_cam1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">dataframe_cam2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">scorer_cam1</span> <span class="o">=</span> <span class="n">dataframe_cam1</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">scorer_cam2</span> <span class="o">=</span> <span class="n">dataframe_cam2</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">stereo_file</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="s1">&#39;stereo_params.pickle&#39;</span><span class="p">))</span>
+        <span class="n">path_stereo_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="s1">&#39;stereo_params.pickle&#39;</span><span class="p">)</span>
+        <span class="n">stereo_file</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">path_stereo_file</span><span class="p">)</span>
+        <span class="n">mtx_l</span> <span class="o">=</span> <span class="n">stereo_file</span><span class="p">[</span><span class="n">camera_pair</span><span class="p">][</span><span class="s1">&#39;cameraMatrix1&#39;</span><span class="p">]</span>
+        <span class="n">dist_l</span> <span class="o">=</span> <span class="n">stereo_file</span><span class="p">[</span><span class="n">camera_pair</span><span class="p">][</span><span class="s1">&#39;distCoeffs1&#39;</span><span class="p">]</span>
+    
+        <span class="n">mtx_r</span> <span class="o">=</span> <span class="n">stereo_file</span><span class="p">[</span><span class="n">camera_pair</span><span class="p">][</span><span class="s1">&#39;cameraMatrix2&#39;</span><span class="p">]</span>
+        <span class="n">dist_r</span> <span class="o">=</span> <span class="n">stereo_file</span><span class="p">[</span><span class="n">camera_pair</span><span class="p">][</span><span class="s1">&#39;distCoeffs2&#39;</span><span class="p">]</span>
+    
+        <span class="n">R1</span> <span class="o">=</span> <span class="n">stereo_file</span><span class="p">[</span><span class="n">camera_pair</span><span class="p">][</span><span class="s1">&#39;R1&#39;</span><span class="p">]</span>
+        <span class="n">P1</span> <span class="o">=</span> <span class="n">stereo_file</span><span class="p">[</span><span class="n">camera_pair</span><span class="p">][</span><span class="s1">&#39;P1&#39;</span><span class="p">]</span>
+    
+        <span class="n">R2</span> <span class="o">=</span> <span class="n">stereo_file</span><span class="p">[</span><span class="n">camera_pair</span><span class="p">][</span><span class="s1">&#39;R2&#39;</span><span class="p">]</span>
+        <span class="n">P2</span> <span class="o">=</span> <span class="n">stereo_file</span><span class="p">[</span><span class="n">camera_pair</span><span class="p">][</span><span class="s1">&#39;P2&#39;</span><span class="p">]</span>
+        
+        <span class="c1"># Create an empty dataFrame to store the undistorted 2d coordinates and likelihood</span>
+        <span class="n">dataFrame_cam1_undistort</span><span class="p">,</span><span class="n">scorer_cam1</span><span class="p">,</span><span class="n">bodyparts</span> <span class="o">=</span> <span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">create_empty_df</span><span class="p">(</span><span class="n">dataframe_cam1</span><span class="p">,</span><span class="n">scorer_cam1</span><span class="p">,</span><span class="n">flag</span><span class="o">=</span><span class="s1">&#39;2d&#39;</span><span class="p">)</span>
+        <span class="n">dataFrame_cam2_undistort</span><span class="p">,</span><span class="n">scorer_cam2</span><span class="p">,</span><span class="n">bodyparts</span> <span class="o">=</span> <span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">create_empty_df</span><span class="p">(</span><span class="n">dataframe_cam2</span><span class="p">,</span><span class="n">scorer_cam2</span><span class="p">,</span><span class="n">flag</span><span class="o">=</span><span class="s1">&#39;2d&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts</span><span class="p">)):</span>
+            <span class="c1"># Undistorting the points from cam1 camera</span>
+            <span class="n">points_cam1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dataframe_cam1</span><span class="p">[</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:],</span>
+                                    <span class="n">dataframe_cam1</span><span class="p">[</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:]])</span>
+            <span class="n">points_cam1</span> <span class="o">=</span> <span class="n">points_cam1</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">points_cam1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">points_cam1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">points_cam1_remapped</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">undistortPoints</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">points_cam1</span><span class="p">,</span> <span class="n">cameraMatrix</span> <span class="o">=</span><span class="n">mtx_l</span><span class="p">,</span> <span class="n">distCoeffs</span> <span class="o">=</span> <span class="n">dist_l</span><span class="p">,</span><span class="n">P</span><span class="o">=</span><span class="n">P1</span><span class="p">,</span><span class="n">R</span><span class="o">=</span><span class="n">R1</span><span class="p">)</span>
+
+            
+            <span class="n">dataFrame_cam1_undistort</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:][</span><span class="n">scorer_cam1</span><span class="p">,</span><span class="n">bp</span><span class="p">,</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">points_cam1_remapped</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dataFrame_cam1_undistort</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:][</span><span class="n">scorer_cam1</span><span class="p">,</span><span class="n">bp</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">points_cam1_remapped</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dataFrame_cam1_undistort</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:][</span><span class="n">scorer_cam1</span><span class="p">,</span><span class="n">bp</span><span class="p">,</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe_cam1</span><span class="p">[</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:]</span>
+
+            <span class="c1"># Undistorting the points from cam2 camera</span>
+            <span class="n">points_cam2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dataframe_cam2</span><span class="p">[</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:],</span><span class="n">dataframe_cam2</span><span class="p">[</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:]])</span>
+            <span class="n">points_cam2</span> <span class="o">=</span> <span class="n">points_cam2</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">points_cam2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">points_cam2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">points_cam2_remapped</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">undistortPoints</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">points_cam2</span><span class="p">,</span> <span class="n">cameraMatrix</span> <span class="o">=</span><span class="n">mtx_r</span><span class="p">,</span> <span class="n">distCoeffs</span> <span class="o">=</span> <span class="n">dist_r</span><span class="p">,</span><span class="n">P</span><span class="o">=</span><span class="n">P2</span><span class="p">,</span><span class="n">R</span><span class="o">=</span><span class="n">R2</span><span class="p">)</span>
+
+            <span class="n">dataFrame_cam2_undistort</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:][</span><span class="n">scorer_cam2</span><span class="p">,</span><span class="n">bp</span><span class="p">,</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">points_cam2_remapped</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dataFrame_cam2_undistort</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:][</span><span class="n">scorer_cam2</span><span class="p">,</span><span class="n">bp</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">points_cam2_remapped</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dataFrame_cam2_undistort</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:][</span><span class="n">scorer_cam2</span><span class="p">,</span><span class="n">bp</span><span class="p">,</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe_cam2</span><span class="p">[</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:]</span>
+
+        <span class="c1"># Save the undistorted files</span>
+        <span class="n">dataFrame_cam1_undistort</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">dataFrame_cam2_undistort</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+    <span class="k">return</span><span class="p">(</span><span class="n">dataFrame_cam1_undistort</span><span class="p">,</span><span class="n">dataFrame_cam2_undistort</span><span class="p">,</span><span class="n">stereo_file</span><span class="p">[</span><span class="n">camera_pair</span><span class="p">],</span><span class="n">path_stereo_file</span><span class="p">)</span></div>
+
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

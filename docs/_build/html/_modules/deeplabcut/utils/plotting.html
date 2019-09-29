@@ -1,0 +1,408 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.utils.plotting &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.utils.plotting</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.utils.plotting</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">####################################################</span>
+<span class="c1"># Dependencies</span>
+<span class="c1">####################################################</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c1"># https://stackoverflow.com/questions/14720331/how-to-generate-random-colors-in-matplotlib</span>
+<div class="viewcode-block" id="get_cmap"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.get_cmap">[docs]</a><span class="k">def</span> <span class="nf">get_cmap</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;hsv&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Returns a function that maps each index in 0, 1, ..., n-1 to a distinct</span>
+<span class="sd">    RGB color; the keyword argument name must be a standard mpl colormap name.&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Histogram"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.Histogram">[docs]</a><span class="k">def</span> <span class="nf">Histogram</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span><span class="n">color</span><span class="p">,</span><span class="n">bins</span><span class="p">):</span>
+    <span class="n">dvector</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+    <span class="n">dvector</span><span class="o">=</span><span class="n">dvector</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">dvector</span><span class="p">)]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">dvector</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span><span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span></div>
+<span class="c1">#    fig.colorbar(im, ax=ax)</span>
+
+<div class="viewcode-block" id="PlottingResults"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.PlottingResults">[docs]</a><span class="k">def</span> <span class="nf">PlottingResults</span><span class="p">(</span><span class="n">video</span><span class="p">,</span><span class="n">tmpfolder</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">scorer</span><span class="p">,</span><span class="n">cfg</span><span class="p">,</span><span class="n">showfigures</span><span class="p">,</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.png&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Plots poses vs time; pose x vs pose y; histogram of differences and likelihoods.&#39;&#39;&#39;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">bodyparts2plot</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;bodyparts&#39;</span><span class="p">]</span>
+    <span class="n">pcutoff</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;pcutoff&#39;</span><span class="p">]</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">get_cmap</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">name</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">])</span>
+    <span class="n">alphavalue</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;alphavalue&#39;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">):</span>
+        <span class="n">Index</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">&gt;</span> <span class="n">pcutoff</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">Index</span><span class="p">],</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">Index</span><span class="p">],</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">(</span><span class="n">bpindex</span><span class="p">),</span><span class="n">alpha</span><span class="o">=</span><span class="n">alphavalue</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+
+    <span class="n">sm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">]),</span> <span class="n">norm</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">sm</span><span class="o">.</span><span class="n">_A</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span><span class="n">ticks</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)))</span>
+    <span class="n">cbar</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;X position in pixels&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Y position in pixels&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpfolder</span><span class="p">,</span><span class="s2">&quot;trajectory&quot;</span><span class="o">+</span><span class="n">suffix</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">Time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bodyparts2plot</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">):</span>
+        <span class="n">Index</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">&gt;</span> <span class="n">pcutoff</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Time</span><span class="p">[</span><span class="n">Index</span><span class="p">],</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">Index</span><span class="p">],</span><span class="s1">&#39;--&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">(</span><span class="n">bpindex</span><span class="p">),</span><span class="n">alpha</span><span class="o">=</span><span class="n">alphavalue</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Time</span><span class="p">[</span><span class="n">Index</span><span class="p">],</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">Index</span><span class="p">],</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">(</span><span class="n">bpindex</span><span class="p">),</span><span class="n">alpha</span><span class="o">=</span><span class="n">alphavalue</span><span class="p">)</span>
+
+    <span class="n">sm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">]),</span> <span class="n">norm</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">sm</span><span class="o">.</span><span class="n">_A</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span><span class="n">ticks</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)))</span>
+    <span class="n">cbar</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Frame Index&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;X-(dashed) and Y- (solid) position in pixels&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpfolder</span><span class="p">,</span><span class="s2">&quot;plot&quot;</span><span class="o">+</span><span class="n">suffix</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">):</span>
+        <span class="n">Index</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">&gt;</span> <span class="n">pcutoff</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Time</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">(</span><span class="n">bpindex</span><span class="p">),</span><span class="n">alpha</span><span class="o">=</span><span class="n">alphavalue</span><span class="p">)</span>
+
+    <span class="n">sm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">]),</span> <span class="n">norm</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">sm</span><span class="o">.</span><span class="n">_A</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span><span class="n">ticks</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)))</span>
+    <span class="n">cbar</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Frame Index&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Likelihood&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpfolder</span><span class="p">,</span><span class="s2">&quot;plot-likelihood&quot;</span><span class="o">+</span><span class="n">suffix</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">Dataframe</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span><span class="mi">100</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">):</span>
+        <span class="n">Index</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">&lt;</span> <span class="n">pcutoff</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">X</span><span class="p">[</span><span class="n">Index</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">Histogram</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">colors</span><span class="p">(</span><span class="n">bpindex</span><span class="p">),</span><span class="n">bins</span><span class="p">)</span>
+        <span class="n">Y</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">Y</span><span class="p">[</span><span class="n">Index</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">Histogram</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span><span class="n">colors</span><span class="p">(</span><span class="n">bpindex</span><span class="p">),</span><span class="n">bins</span><span class="p">)</span>
+
+    <span class="n">sm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">]),</span> <span class="n">norm</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">sm</span><span class="o">.</span><span class="n">_A</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span><span class="n">ticks</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)))</span>
+    <span class="n">cbar</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;DeltaX and DeltaY&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpfolder</span><span class="p">,</span><span class="s2">&quot;hist&quot;</span><span class="o">+</span><span class="n">suffix</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">showfigures</span><span class="o">!=</span><span class="kc">True</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RunTrajectoryAnalysis"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.RunTrajectoryAnalysis">[docs]</a><span class="k">def</span> <span class="nf">RunTrajectoryAnalysis</span><span class="p">(</span><span class="n">video</span><span class="p">,</span><span class="n">basefolder</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">videofolder</span><span class="p">,</span><span class="n">cfg</span><span class="p">,</span><span class="n">showfigures</span><span class="p">,</span><span class="n">filtered</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">vname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
+    <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">attempttomakefolder</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basefolder</span><span class="p">,</span><span class="s1">&#39;plot-poses&#39;</span><span class="p">))</span>
+    <span class="n">tmpfolder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basefolder</span><span class="p">,</span><span class="s1">&#39;plot-poses&#39;</span><span class="p">,</span> <span class="n">vname</span><span class="p">)</span>
+    <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">attempttomakefolder</span><span class="p">(</span><span class="n">tmpfolder</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Loading &quot;</span><span class="p">,</span> <span class="n">video</span><span class="p">,</span> <span class="s2">&quot;and data.&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filtered</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="n">dataname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span> <span class="o">+</span> <span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span>
+            <span class="n">Dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="n">dataname</span><span class="p">))</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.png&#39;</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1">#for filtered output</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">Dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span> <span class="o">+</span> <span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;filtered.h5&#39;</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No filtered predictions found, using frame-by-frame output instead.&quot;</span><span class="p">)</span>
+                <span class="n">Dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span> <span class="o">+</span> <span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">))</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_filtered.png&#39;</span>
+            
+        <span class="n">PlottingResults</span><span class="p">(</span><span class="n">video</span><span class="p">,</span><span class="n">tmpfolder</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">cfg</span><span class="p">,</span><span class="n">showfigures</span><span class="p">,</span><span class="n">suffix</span><span class="p">)</span>
+        
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="n">datanames</span><span class="o">=</span><span class="p">[</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">videofolder</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">vname</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;.h5&quot;</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;resnet&quot;</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">datanames</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The video was not analyzed with this scorer:&quot;</span><span class="p">,</span> <span class="n">DLCscorer</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No other scorers were found, please run AnalysisVideos.py first.&quot;</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">datanames</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The video was not analyzed with this scorer:&quot;</span><span class="p">,</span> <span class="n">DLCscorer</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Other scorers were found, however:&quot;</span><span class="p">,</span> <span class="n">datanames</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating plots for:&quot;</span><span class="p">,</span> <span class="n">datanames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s2">&quot; instead.&quot;</span><span class="p">)</span>
+            
+            <span class="n">Dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="n">datanames</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">PlottingResults</span><span class="p">(</span><span class="n">video</span><span class="p">,</span><span class="n">tmpfolder</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">cfg</span><span class="p">,</span><span class="n">showfigures</span><span class="p">,</span><span class="n">suffix</span><span class="p">)</span></div>
+
+
+<span class="c1">##################################################</span>
+<span class="c1"># Looping analysis over video</span>
+<span class="c1">##################################################</span>
+
+<div class="viewcode-block" id="plot_trajectories"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.plot_trajectories">[docs]</a><span class="k">def</span> <span class="nf">plot_trajectories</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">videos</span><span class="p">,</span><span class="n">videotype</span><span class="o">=</span><span class="s1">&#39;.avi&#39;</span><span class="p">,</span><span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">trainingsetindex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">filtered</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">showfigures</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">destfolder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the trajectories of various bodyparts across the video.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">     config : string</span>
+<span class="sd">    Full path of the config.yaml file as a string.</span>
+<span class="sd">    </span>
+<span class="sd">    videos : list</span>
+<span class="sd">        A list of strings containing the full paths to videos for analysis or a path to the directory, where all the videos with same extension are stored.</span>
+<span class="sd">    </span>
+<span class="sd">    videotype: string, optional</span>
+<span class="sd">        Checks for the extension of the video in case the input to the video is a directory.\n Only videos with this extension are analyzed. The default is ``.avi``</span>
+<span class="sd">    </span>
+<span class="sd">    shuffle: list, optional</span>
+<span class="sd">    List of integers specifying the shuffle indices of the training dataset. The default is [1]</span>
+<span class="sd">    </span>
+<span class="sd">    trainingsetindex: int, optional</span>
+<span class="sd">    Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</span>
+<span class="sd">    </span>
+<span class="sd">    filtered: bool, default false</span>
+<span class="sd">    Boolean variable indicating if filtered output should be plotted rather than frame-by-frame predictions. Filtered version can be calculated with deeplabcut.filterpredictions</span>
+<span class="sd">    </span>
+<span class="sd">    showfigures: bool, default false</span>
+<span class="sd">    If true then plots are also displayed.</span>
+<span class="sd">    </span>
+<span class="sd">    destfolder: string, optional</span>
+<span class="sd">        Specifies the destination folder that was used for storing analysis data (default is the path of the video). </span>
+<span class="sd">    </span>
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    for labeling the frames</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.plot_trajectories(&#39;home/alex/analysis/project/reaching-task/config.yaml&#39;,[&#39;/home/alex/analysis/project/videos/reachingvideo1.avi&#39;])</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">trainFraction</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="n">trainingsetindex</span><span class="p">]</span>
+    <span class="n">DLCscorer</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetScorerName</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">)</span> <span class="c1">#automatically loads corresponding model (even training iteration based on snapshot index)</span>
+    
+    <span class="n">Videos</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">Getlistofvideos</span><span class="p">(</span><span class="n">videos</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">Videos</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">destfolder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">videofolder</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">videofolder</span><span class="o">=</span><span class="n">destfolder</span>
+            
+        <span class="n">videotype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting % &quot;</span><span class="p">,</span> <span class="n">videofolder</span><span class="p">,</span> <span class="n">videos</span><span class="p">)</span>
+        <span class="n">basefolder</span><span class="o">=</span><span class="n">videofolder</span>
+        <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">attempttomakefolder</span><span class="p">(</span><span class="n">basefolder</span><span class="p">)</span>
+        
+        <span class="n">RunTrajectoryAnalysis</span><span class="p">(</span><span class="n">video</span><span class="p">,</span><span class="n">basefolder</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">videofolder</span><span class="p">,</span><span class="n">cfg</span><span class="p">,</span><span class="n">showfigures</span><span class="p">,</span><span class="n">filtered</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Plots created! Please check the directory &quot;plot-poses&quot; within the video directory&#39;</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;video&#39;</span><span class="p">)</span>
+    <span class="n">cli_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

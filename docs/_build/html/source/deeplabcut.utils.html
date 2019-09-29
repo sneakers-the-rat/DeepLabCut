@@ -1,0 +1,993 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.utils package &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deeplabcut.create_project.html">deeplabcut.create_project package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">deeplabcut</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>deeplabcut.utils package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/deeplabcut.utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="deeplabcut-utils-package">
+<h1>deeplabcut.utils package<a class="headerlink" href="#deeplabcut-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deeplabcut.utils.auxfun_models">
+<span id="deeplabcut-utils-auxfun-models-module"></span><h2>deeplabcut.utils.auxfun_models module<a class="headerlink" href="#module-deeplabcut.utils.auxfun_models" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.utils.auxfun_models.Check4weights">
+<code class="descclassname">deeplabcut.utils.auxfun_models.</code><code class="descname">Check4weights</code><span class="sig-paren">(</span><em>modeltype</em>, <em>parent_path</em>, <em>num_shuffles</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxfun_models.html#Check4weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxfun_models.Check4weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets local path to network weights and checks if they are present. If not, downloads them from tensorflow.org</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxfun_models.Downloadweights">
+<code class="descclassname">deeplabcut.utils.auxfun_models.</code><code class="descname">Downloadweights</code><span class="sig-paren">(</span><em>modeltype</em>, <em>model_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxfun_models.html#Downloadweights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxfun_models.Downloadweights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads the ImageNet pretrained weights for ResNet.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxfun_models.download_mpii_weigths">
+<code class="descclassname">deeplabcut.utils.auxfun_models.</code><code class="descname">download_mpii_weigths</code><span class="sig-paren">(</span><em>wd</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxfun_models.html#download_mpii_weigths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxfun_models.download_mpii_weigths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils.auxfun_videos">
+<span id="deeplabcut-utils-auxfun-videos-module"></span><h2>deeplabcut.utils.auxfun_videos module<a class="headerlink" href="#module-deeplabcut.utils.auxfun_videos" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.utils.auxfun_videos.DownSampleVideo">
+<code class="descclassname">deeplabcut.utils.auxfun_videos.</code><code class="descname">DownSampleVideo</code><span class="sig-paren">(</span><em>vname</em>, <em>width=-1</em>, <em>height=200</em>, <em>outsuffix='cropped'</em>, <em>outpath=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxfun_videos.html#DownSampleVideo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxfun_videos.DownSampleVideo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auxiliary function to downsample a video and output it to the same folder with “outsuffix” appended in its name.
+Width and height will control the new dimensions. You can also pass only height or width and set the other one to -1,
+this will keep the aspect ratio identical.</p>
+<p>Returns the full path to the downsampled video!</p>
+<dl class="docutils">
+<dt>vname <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>A string containing the full path of the video.</dd>
+<dt>width: int</dt>
+<dd>width of output video</dd>
+<dt>height: int</dt>
+<dd>height of output video.</dd>
+<dt>outsuffix: str</dt>
+<dd>Suffix for output videoname (see example).</dd>
+<dt>outpath: str</dt>
+<dd>Output path for saving video to (by default will be the same folder as the video)</dd>
+</dl>
+<p>Linux/MacOs
+&gt;&gt;&gt; deeplabcut.DownSampleVideo(‘/data/videos/mouse1.avi’)</p>
+<p>Downsamples the video using default values and saves it in /data/videos as mouse1cropped.avi</p>
+<p>Windows:
+&gt;&gt;&gt; shortenedvideoname=deeplabcut.DownSampleVideo(‘C:yourusernamerig-95Videosreachingvideo1.avi’, width=220,height=320,outsuffix=’cropped’)</p>
+<p>Downsamples the video to a width of 220 and height of 320 and saves it in C:yourusernamerig-95Videos as reachingvideo1cropped.avi</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxfun_videos.ShortenVideo">
+<code class="descclassname">deeplabcut.utils.auxfun_videos.</code><code class="descname">ShortenVideo</code><span class="sig-paren">(</span><em>vname</em>, <em>start='00:00:01'</em>, <em>stop='00:01:00'</em>, <em>outsuffix='short'</em>, <em>outpath=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxfun_videos.html#ShortenVideo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxfun_videos.ShortenVideo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auxiliary function to shorten video and output with outsuffix appended.
+to the same folder from start (hours:minutes:seconds) to stop (hours:minutes:seconds).</p>
+<p>Returns the full path to the shortened video!</p>
+<dl class="docutils">
+<dt>videos <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>A string containing the full paths of the video.</dd>
+<dt>start: hours:minutes:seconds</dt>
+<dd>Time formatted in hours:minutes:seconds, where shortened video shall start.</dd>
+<dt>stop: hours:minutes:seconds</dt>
+<dd>Time formatted in hours:minutes:seconds, where shortened video shall end.</dd>
+<dt>outsuffix: str</dt>
+<dd>Suffix for output videoname (see example).</dd>
+<dt>outpath: str</dt>
+<dd>Output path for saving video to (by default will be the same folder as the video)</dd>
+</dl>
+<p>Linux/MacOs
+&gt;&gt;&gt; deeplabcut.ShortenVideo(‘/data/videos/mouse1.avi’)</p>
+<p>Extracts (sub)video from 1st second to 1st minutes (default values) and saves it in /data/videos as mouse1short.avi</p>
+<p>Windows:
+&gt;&gt;&gt; deeplabcut.ShortenVideo(‘C:yourusernamerig-95Videosreachingvideo1.avi’, start=‘00:17:00’,stop=‘00:22:00’,outsuffix=’brief’)</p>
+<p>Extracts (sub)video from minute 17 to 22 and and saves it in C:yourusernamerig-95Videos as reachingvideo1brief.avi</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils.auxiliaryfunctions">
+<span id="deeplabcut-utils-auxiliaryfunctions-module"></span><h2>deeplabcut.utils.auxiliaryfunctions module<a class="headerlink" href="#module-deeplabcut.utils.auxiliaryfunctions" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.GetDataandMetaDataFilenames">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">GetDataandMetaDataFilenames</code><span class="sig-paren">(</span><em>trainingsetfolder</em>, <em>trainFraction</em>, <em>shuffle</em>, <em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#GetDataandMetaDataFilenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.GetDataandMetaDataFilenames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.GetEvaluationFolder">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">GetEvaluationFolder</code><span class="sig-paren">(</span><em>trainFraction</em>, <em>shuffle</em>, <em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#GetEvaluationFolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.GetEvaluationFolder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.GetModelFolder">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">GetModelFolder</code><span class="sig-paren">(</span><em>trainFraction</em>, <em>shuffle</em>, <em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#GetModelFolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.GetModelFolder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.GetScorerName">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">GetScorerName</code><span class="sig-paren">(</span><em>cfg</em>, <em>shuffle</em>, <em>trainFraction</em>, <em>trainingsiterations='unknown'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#GetScorerName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.GetScorerName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the scorer/network name for a particular shuffle, training fraction, etc.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.GetTrainingSetFolder">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">GetTrainingSetFolder</code><span class="sig-paren">(</span><em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#GetTrainingSetFolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.GetTrainingSetFolder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Training Set folder for config file based on parameters</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.GetVideoList">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">GetVideoList</code><span class="sig-paren">(</span><em>filename</em>, <em>videopath</em>, <em>videtype</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#GetVideoList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.GetVideoList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list of videos in a path (if filetype == all), otherwise just a specific file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.Getlistofvideos">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">Getlistofvideos</code><span class="sig-paren">(</span><em>videos</em>, <em>videotype</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#Getlistofvideos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.Getlistofvideos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.IntersectionofBodyPartsandOnesGivenbyUser">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">IntersectionofBodyPartsandOnesGivenbyUser</code><span class="sig-paren">(</span><em>cfg</em>, <em>comparisonbodyparts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#IntersectionofBodyPartsandOnesGivenbyUser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.IntersectionofBodyPartsandOnesGivenbyUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all body parts when comparisonbodyparts==’all’, otherwise all bpts that are in the intersection of comparisonbodyparts and the actual bodyparts</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.LoadMetadata">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">LoadMetadata</code><span class="sig-paren">(</span><em>metadatafile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#LoadMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.LoadMetadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.LoadVideoMetadata">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">LoadVideoMetadata</code><span class="sig-paren">(</span><em>dataname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#LoadVideoMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.LoadVideoMetadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load meta data from analyzed video, created by predict_videos.py</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.SaveData">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">SaveData</code><span class="sig-paren">(</span><em>PredicteData</em>, <em>metadata</em>, <em>dataname</em>, <em>pdindex</em>, <em>imagenames</em>, <em>save_as_csv</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#SaveData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.SaveData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save predicted data as h5 file and metadata as pickle file; created by predict_videos.py</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.SaveMetadata">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">SaveMetadata</code><span class="sig-paren">(</span><em>metadatafilename</em>, <em>data</em>, <em>trainIndexes</em>, <em>testIndexes</em>, <em>trainFraction</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#SaveMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.SaveMetadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.attempttomakefolder">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">attempttomakefolder</code><span class="sig-paren">(</span><em>foldername</em>, <em>recursive=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#attempttomakefolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.attempttomakefolder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempts to create a folder with specified name. Does nothing if it already exists.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.create_config_template">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">create_config_template</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#create_config_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.create_config_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a template for config.yaml file. This specific order is preserved while saving as yaml file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.create_config_template_3d">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">create_config_template_3d</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#create_config_template_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.create_config_template_3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a template for config.yaml file for 3d project. This specific order is preserved while saving as yaml file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.create_empty_df">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">create_empty_df</code><span class="sig-paren">(</span><em>dataframe</em>, <em>scorer</em>, <em>flag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#create_empty_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.create_empty_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.get_immediate_subdirectories">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">get_immediate_subdirectories</code><span class="sig-paren">(</span><em>a_dir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#get_immediate_subdirectories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.get_immediate_subdirectories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list of immediate subdirectories</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.listfilesofaparticulartypeinfolder">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">listfilesofaparticulartypeinfolder</code><span class="sig-paren">(</span><em>a_dir</em>, <em>afiletype</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#listfilesofaparticulartypeinfolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.listfilesofaparticulartypeinfolder" title="Permalink to this definition">¶</a></dt>
+<dd><p>List files of a particular type in a folder a_dir</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.read_config">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">read_config</code><span class="sig-paren">(</span><em>configname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#read_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.read_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads structured config file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.read_pickle">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">read_pickle</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#read_pickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.read_pickle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.read_plainconfig">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">read_plainconfig</code><span class="sig-paren">(</span><em>filename='pose_cfg.yaml'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#read_plainconfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.read_plainconfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>read unstructured yaml</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.write_config">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">write_config</code><span class="sig-paren">(</span><em>configname</em>, <em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#write_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.write_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write structured config file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.write_config_3d">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">write_config_3d</code><span class="sig-paren">(</span><em>configname</em>, <em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#write_config_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.write_config_3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write structured 3D config file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.write_config_3d_template">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">write_config_3d_template</code><span class="sig-paren">(</span><em>projconfigfile</em>, <em>cfg_file_3d</em>, <em>ruamelFile_3d</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#write_config_3d_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.write_config_3d_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.write_pickle">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">write_pickle</code><span class="sig-paren">(</span><em>filename</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#write_pickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.write_pickle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions.write_plainconfig">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions.</code><code class="descname">write_plainconfig</code><span class="sig-paren">(</span><em>configname</em>, <em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions.html#write_plainconfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions.write_plainconfig" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils.auxiliaryfunctions_3d">
+<span id="deeplabcut-utils-auxiliaryfunctions-3d-module"></span><h2>deeplabcut.utils.auxiliaryfunctions_3d module<a class="headerlink" href="#module-deeplabcut.utils.auxiliaryfunctions_3d" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions_3d.Foldernames3Dproject">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions_3d.</code><code class="descname">Foldernames3Dproject</code><span class="sig-paren">(</span><em>cfg_3d</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions_3d.html#Foldernames3Dproject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions_3d.Foldernames3Dproject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Definitions of subfolders in 3D projects</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions_3d.Get_list_of_triangulated_and_videoFiles">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions_3d.</code><code class="descname">Get_list_of_triangulated_and_videoFiles</code><span class="sig-paren">(</span><em>filepath</em>, <em>videotype</em>, <em>scorer_3d</em>, <em>cam_names</em>, <em>videofolder</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions_3d.html#Get_list_of_triangulated_and_videoFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions_3d.Get_list_of_triangulated_and_videoFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of triangulated h5 and the corresponding video files.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions_3d.LoadMetadata3d">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions_3d.</code><code class="descname">LoadMetadata3d</code><span class="sig-paren">(</span><em>metadatafilename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions_3d.html#LoadMetadata3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions_3d.LoadMetadata3d" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions_3d.SaveMetadata3d">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions_3d.</code><code class="descname">SaveMetadata3d</code><span class="sig-paren">(</span><em>metadatafilename</em>, <em>metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions_3d.html#SaveMetadata3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions_3d.SaveMetadata3d" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions_3d.compute_triangulation_calibration_images">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions_3d.</code><code class="descname">compute_triangulation_calibration_images</code><span class="sig-paren">(</span><em>stereo_matrix</em>, <em>projectedPoints1</em>, <em>projectedPoints2</em>, <em>path_undistort</em>, <em>cfg_3d</em>, <em>plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions_3d.html#compute_triangulation_calibration_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions_3d.compute_triangulation_calibration_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs triangulation of the calibration images.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions_3d.create_empty_df">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions_3d.</code><code class="descname">create_empty_df</code><span class="sig-paren">(</span><em>dataframe</em>, <em>scorer</em>, <em>flag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions_3d.html#create_empty_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions_3d.create_empty_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions_3d.get_camerawise_videos">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions_3d.</code><code class="descname">get_camerawise_videos</code><span class="sig-paren">(</span><em>path</em>, <em>cam_names</em>, <em>videotype</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions_3d.html#get_camerawise_videos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions_3d.get_camerawise_videos" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the list of videos corresponding to the camera names specified in the cam_names.
+e.g. if cam_names = [‘camera-1’,’camera-2’]</p>
+<p>then it will return [[‘somename-camera-1-othername.avi’, ‘somename-camera-2-othername.avi’]]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.auxiliaryfunctions_3d.triangulatePoints">
+<code class="descclassname">deeplabcut.utils.auxiliaryfunctions_3d.</code><code class="descname">triangulatePoints</code><span class="sig-paren">(</span><em>P1</em>, <em>P2</em>, <em>x1</em>, <em>x2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/auxiliaryfunctions_3d.html#triangulatePoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.auxiliaryfunctions_3d.triangulatePoints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils.conversioncode">
+<span id="deeplabcut-utils-conversioncode-module"></span><h2>deeplabcut.utils.conversioncode module<a class="headerlink" href="#module-deeplabcut.utils.conversioncode" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.utils.conversioncode.analyze_videos_converth5_to_csv">
+<code class="descclassname">deeplabcut.utils.conversioncode.</code><code class="descname">analyze_videos_converth5_to_csv</code><span class="sig-paren">(</span><em>videopath</em>, <em>videotype='.avi'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/conversioncode.html#analyze_videos_converth5_to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.conversioncode.analyze_videos_converth5_to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>By default the output poses (when running analyze_videos) are stored as MultiIndex Pandas Array, which contains the name of the network, body part name, (x, y) label position</p>
+<p>in pixels, and the likelihood for each frame per body part. These arrays are stored in an efficient Hierarchical Data Format (HDF)</p>
+<p>in the same directory, where the video is stored. If the flag save_as_csv is set to True, the data is also exported as comma-separated value file. However,
+if the flag was <em>not</em> set, then this function allows the conversion of all h5 files to csv files (without having to analyze the videos again)!</p>
+<p>This functions converts hdf (h5) files to the comma-separated values format (.csv), which in turn can be imported in many programs, such as MATLAB, R, Prism, etc.</p>
+<dl class="docutils">
+<dt>videopath <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>A strings containing the full paths to videos for analysis or a path to the directory where all the videos with same extension are stored.</dd>
+<dt>videotype: string, optional</dt>
+<dd>Checks for the extension of the video in case the input to the video is a directory.</dd>
+</dl>
+</div></blockquote>
+<p>Only videos with this extension are analyzed. The default is <code class="docutils literal notranslate"><span class="pre">.avi</span></code></p>
+<blockquote>
+<div>Converts all pose-output files belonging to mp4 videos in the folder ‘/media/alex/experimentaldata/cheetahvideos’ to csv files.
+deeplabcut.analyze_videos_converth5_to_csv(‘/media/alex/experimentaldata/cheetahvideos’,’.mp4’)</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.conversioncode.convertcsv2h5">
+<code class="descclassname">deeplabcut.utils.conversioncode.</code><code class="descname">convertcsv2h5</code><span class="sig-paren">(</span><em>config</em>, <em>userfeedback=True</em>, <em>scorer=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/conversioncode.html#convertcsv2h5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.conversioncode.convertcsv2h5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert (image) annotation files in folder labeled-data from csv to h5.
+This function allows the user to manually edit the csv (e.g. to correct the scorer name and then convert it into hdf format).
+WARNING: conversion might corrupt the data.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+<dt>userfeedback: bool, optional</dt>
+<dd>If true the user will be asked specifically for each folder in labeled-data if the containing csv shall be converted to hdf format.</dd>
+<dt>scorer: string, optional</dt>
+<dd>If a string is given, then the scorer/annotator in all csv and hdf files that are changed, will be overwritten with this name.</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Convert csv annotation files for reaching-task project into hdf.
+&gt;&gt;&gt; deeplabcut.convertcsv2h5(‘/analysis/project/reaching-task/config.yaml’)</p>
+<p>Convert csv annotation files for reaching-task project into hdf while changing the scorer/annotator in all annotation files to Albert!
+&gt;&gt;&gt; deeplabcut.convertcsv2h5(‘/analysis/project/reaching-task/config.yaml’,scorer=’Albert’)
+——–</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.conversioncode.convertpaths_to_unixstyle">
+<code class="descclassname">deeplabcut.utils.conversioncode.</code><code class="descname">convertpaths_to_unixstyle</code><span class="sig-paren">(</span><em>Data</em>, <em>fn</em>, <em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/conversioncode.html#convertpaths_to_unixstyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.conversioncode.convertpaths_to_unixstyle" title="Permalink to this definition">¶</a></dt>
+<dd><p>auxiliary function that converts paths in annotation files:
+labeled-datavideoimgXXX.png to labeled-data/video/imgXXX.png</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.conversioncode.merge_windowsannotationdataONlinuxsystem">
+<code class="descclassname">deeplabcut.utils.conversioncode.</code><code class="descname">merge_windowsannotationdataONlinuxsystem</code><span class="sig-paren">(</span><em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/conversioncode.html#merge_windowsannotationdataONlinuxsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.conversioncode.merge_windowsannotationdataONlinuxsystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>If a project was created on Windows (and labeled there,) but ran on unix then the data folders
+corresponding in the keys in cfg[‘video_sets’] are not found. This function gets them directly by
+looping over all folders in labeled-data</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.conversioncode.pathmagic">
+<code class="descclassname">deeplabcut.utils.conversioncode.</code><code class="descname">pathmagic</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/conversioncode.html#pathmagic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.conversioncode.pathmagic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils.frameselectiontools">
+<span id="deeplabcut-utils-frameselectiontools-module"></span><h2>deeplabcut.utils.frameselectiontools module<a class="headerlink" href="#module-deeplabcut.utils.frameselectiontools" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.utils.frameselectiontools.KmeansbasedFrameselection">
+<code class="descclassname">deeplabcut.utils.frameselectiontools.</code><code class="descname">KmeansbasedFrameselection</code><span class="sig-paren">(</span><em>clip</em>, <em>numframes2pick</em>, <em>start</em>, <em>stop</em>, <em>Index=None</em>, <em>step=1</em>, <em>resizewidth=30</em>, <em>batchsize=100</em>, <em>max_iter=50</em>, <em>color=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/frameselectiontools.html#KmeansbasedFrameselection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.frameselectiontools.KmeansbasedFrameselection" title="Permalink to this definition">¶</a></dt>
+<dd><p>This code downsamples the video to a width of resizewidth.</p>
+<p>The video is extracted as a numpy array, which is then clustered with kmeans, whereby each frames is treated as a vector.
+Frames from different clusters are then selected for labeling. This procedure makes sure that the frames “look different”,
+i.e. different postures etc. On large videos this code is slow.</p>
+<p>Consider not extracting the frames from the whole video but rather set start and stop to a period around interesting behavior.</p>
+<p>Note: this method can return fewer images than numframes2pick.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.frameselectiontools.KmeansbasedFrameselectioncv2">
+<code class="descclassname">deeplabcut.utils.frameselectiontools.</code><code class="descname">KmeansbasedFrameselectioncv2</code><span class="sig-paren">(</span><em>cap</em>, <em>numframes2pick</em>, <em>start</em>, <em>stop</em>, <em>crop</em>, <em>coords</em>, <em>Index=None</em>, <em>step=1</em>, <em>resizewidth=30</em>, <em>batchsize=100</em>, <em>max_iter=50</em>, <em>color=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/frameselectiontools.html#KmeansbasedFrameselectioncv2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.frameselectiontools.KmeansbasedFrameselectioncv2" title="Permalink to this definition">¶</a></dt>
+<dd><p>This code downsamples the video to a width of resizewidth.
+The video is extracted as a numpy array, which is then clustered with kmeans, whereby each frames is treated as a vector.
+Frames from different clusters are then selected for labeling. This procedure makes sure that the frames “look different”,
+i.e. different postures etc. On large videos this code is slow.</p>
+<p>Consider not extracting the frames from the whole video but rather set start and stop to a period around interesting behavior.</p>
+<p>Note: this method can return fewer images than numframes2pick.</p>
+<p>Attention: the flow of commands was not optimized for readability, but rather speed. This is why it might appear tedious and repetetive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.frameselectiontools.UniformFrames">
+<code class="descclassname">deeplabcut.utils.frameselectiontools.</code><code class="descname">UniformFrames</code><span class="sig-paren">(</span><em>clip</em>, <em>numframes2pick</em>, <em>start</em>, <em>stop</em>, <em>Index=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/frameselectiontools.html#UniformFrames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.frameselectiontools.UniformFrames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporally uniformly sampling frames in interval (start,stop).
+Visual information of video is irrelevant for this method. This code is fast and sufficient (to extract distinct frames),
+when behavioral videos naturally covers many states.</p>
+<p>The variable Index allows to pass on a subindex for the frames.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.frameselectiontools.UniformFramescv2">
+<code class="descclassname">deeplabcut.utils.frameselectiontools.</code><code class="descname">UniformFramescv2</code><span class="sig-paren">(</span><em>cap</em>, <em>numframes2pick</em>, <em>start</em>, <em>stop</em>, <em>Index=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/frameselectiontools.html#UniformFramescv2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.frameselectiontools.UniformFramescv2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporally uniformly sampling frames in interval (start,stop).
+Visual information of video is irrelevant for this method. This code is fast and sufficient (to extract distinct frames),
+when behavioral videos naturally covers many states.</p>
+<p>The variable Index allows to pass on a subindex for the frames.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils.make_labeled_video">
+<span id="deeplabcut-utils-make-labeled-video-module"></span><h2>deeplabcut.utils.make_labeled_video module<a class="headerlink" href="#module-deeplabcut.utils.make_labeled_video" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<p>Hao Wu, <a class="reference external" href="mailto:hwu01&#37;&#52;&#48;g&#46;harvard&#46;edu">hwu01<span>&#64;</span>g<span>&#46;</span>harvard<span>&#46;</span>edu</a> contributed the original OpenCV class!
+You can find the directory for ffmpeg bindings by: “find / | grep ffmpeg” and then setting it.</p>
+<dl class="function">
+<dt id="deeplabcut.utils.make_labeled_video.CreateVideo">
+<code class="descclassname">deeplabcut.utils.make_labeled_video.</code><code class="descname">CreateVideo</code><span class="sig-paren">(</span><em>clip</em>, <em>Dataframe</em>, <em>pcutoff</em>, <em>dotsize</em>, <em>colormap</em>, <em>DLCscorer</em>, <em>bodyparts2plot</em>, <em>trailpoints</em>, <em>cropping</em>, <em>x1</em>, <em>x2</em>, <em>y1</em>, <em>y2</em>, <em>bodyparts2connect</em>, <em>skeleton_color</em>, <em>draw_skeleton</em>, <em>displaycropped</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/make_labeled_video.html#CreateVideo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.make_labeled_video.CreateVideo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creating individual frames with labeled body parts and making a video</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.make_labeled_video.CreateVideoSlow">
+<code class="descclassname">deeplabcut.utils.make_labeled_video.</code><code class="descname">CreateVideoSlow</code><span class="sig-paren">(</span><em>videooutname</em>, <em>clip</em>, <em>Dataframe</em>, <em>tmpfolder</em>, <em>dotsize</em>, <em>colormap</em>, <em>alphavalue</em>, <em>pcutoff</em>, <em>trailpoints</em>, <em>cropping</em>, <em>x1</em>, <em>x2</em>, <em>y1</em>, <em>y2</em>, <em>delete</em>, <em>DLCscorer</em>, <em>bodyparts2plot</em>, <em>outputframerate</em>, <em>Frames2plot</em>, <em>bodyparts2connect</em>, <em>skeleton_color</em>, <em>draw_skeleton</em>, <em>displaycropped</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/make_labeled_video.html#CreateVideoSlow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.make_labeled_video.CreateVideoSlow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creating individual frames with labeled body parts and making a video</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.make_labeled_video.create_labeled_video">
+<code class="descclassname">deeplabcut.utils.make_labeled_video.</code><code class="descname">create_labeled_video</code><span class="sig-paren">(</span><em>config</em>, <em>videos</em>, <em>videotype='avi'</em>, <em>shuffle=1</em>, <em>trainingsetindex=0</em>, <em>filtered=False</em>, <em>save_frames=False</em>, <em>Frames2plot=None</em>, <em>delete=False</em>, <em>displayedbodyparts='all'</em>, <em>codec='mp4v'</em>, <em>outputframerate=None</em>, <em>destfolder=None</em>, <em>draw_skeleton=False</em>, <em>trailpoints=0</em>, <em>displaycropped=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/make_labeled_video.html#create_labeled_video"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.make_labeled_video.create_labeled_video" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><blockquote>
+<div><p>Labels the bodyparts in a video. Make sure the video is already analyzed by the function ‘analyze_video’</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+<dt>videos <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>A list of strings containing the full paths to videos for analysis or a path to the directory, where all the videos with same extension are stored.</dd>
+<dt>videotype: string, optional</dt>
+<dd>Checks for the extension of the video in case the input to the video is a directory.</dd>
+</dl>
+</div></blockquote>
+<p>Only videos with this extension are analyzed. The default is <code class="docutils literal notranslate"><span class="pre">.avi</span></code></p>
+<blockquote>
+<div><dl class="docutils">
+<dt>shuffle <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd>Number of shuffles of training dataset. Default is set to 1.</dd>
+<dt>trainingsetindex: int, optional</dt>
+<dd>Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</dd>
+<dt>filtered: bool, default false</dt>
+<dd>Boolean variable indicating if filtered output should be plotted rather than frame-by-frame predictions. Filtered version can be calculated with deeplabcut.filterpredictions</dd>
+<dt>videotype: string, optional</dt>
+<dd>Checks for the extension of the video in case the input is a directory.</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+<p>Only videos with this extension are analyzed. The default is <code class="docutils literal notranslate"><span class="pre">.avi</span></code></p>
+<blockquote>
+<div><dl class="docutils">
+<dt>save_frames: bool</dt>
+<dd>If true creates each frame individual and then combines into a video. This variant is relatively slow as
+it stores all individual frames. However, it uses matplotlib to create the frames and is therefore much more flexible (one can set transparency of markers, crop, and easily customize).</dd>
+<dt>Frames2plot: List of indices</dt>
+<dd>If not None &amp; save_frames=True then the frames corresponding to the index will be plotted. For example, Frames2plot=[0,11] will plot the first and the 12th frame.</dd>
+<dt>delete: bool</dt>
+<dd>If true then the individual frames created during the video generation will be deleted.</dd>
+<dt>displayedbodyparts: list of strings, optional</dt>
+<dd>This select the body parts that are plotted in the video. Either <code class="docutils literal notranslate"><span class="pre">all</span></code>, then all body parts
+from config.yaml are used orr a list of strings that are a subset of the full list.
+E.g. [‘hand’,’Joystick’] for the demo Reaching-Mackenzie-2018-08-30/config.yaml to select only these two body parts.</dd>
+</dl>
+<p>codec: codec for labeled video. Options see <a class="reference external" href="http://www.fourcc.org/codecs.php">http://www.fourcc.org/codecs.php</a> [depends on your ffmpeg installation.]</p>
+<p>outputframerate: positive number, output frame rate for labeled video (only available for the mode with saving frames.) By default: None, which results in the original video rate.</p>
+<dl class="docutils">
+<dt>destfolder: string, optional</dt>
+<dd>Specifies the destination folder that was used for storing analysis data (default is the path of the video).</dd>
+<dt>draw_skeleton: bool</dt>
+<dd>If <code class="docutils literal notranslate"><span class="pre">True</span></code> adds a line connecting the body parts making a skeleton on on each frame. The body parts to be connected and the color of these connecting lines are specified in the config file. By default: <code class="docutils literal notranslate"><span class="pre">False</span></code></dd>
+<dt>trailpoints: int</dt>
+<dd>Number of revious frames whose body parts are plotted in a frame (for displaying history). Default is set to 0.</dd>
+<dt>displaycropped: bool, optional</dt>
+<dd>Specifies whether only cropped frame is displayed (with labels analyzed therein), or the original frame with the labels analyzed in the cropped subset.</dd>
+</dl>
+<p>If you want to create the labeled video for only 1 video
+&gt;&gt;&gt; deeplabcut.create_labeled_video(‘/analysis/project/reaching-task/config.yaml’,[‘/analysis/project/videos/reachingvideo1.avi’])
+——–</p>
+<p>If you want to create the labeled video for only 1 video and store the individual frames
+&gt;&gt;&gt; deeplabcut.create_labeled_video(‘/analysis/project/reaching-task/config.yaml’,[‘/analysis/project/videos/reachingvideo1.avi’],save_frames=True)
+——–</p>
+<p>If you want to create the labeled video for multiple videos
+&gt;&gt;&gt; deeplabcut.create_labeled_video(‘/analysis/project/reaching-task/config.yaml’,[‘/analysis/project/videos/reachingvideo1.avi’,’/analysis/project/videos/reachingvideo2.avi’])
+——–</p>
+<p>If you want to create the labeled video for all the videos (as .avi extension) in a directory.
+&gt;&gt;&gt; deeplabcut.create_labeled_video(‘/analysis/project/reaching-task/config.yaml’,[‘/analysis/project/videos/’])</p>
+<p>If you want to create the labeled video for all the videos (as .mp4 extension) in a directory.
+&gt;&gt;&gt; deeplabcut.create_labeled_video(‘/analysis/project/reaching-task/config.yaml’,[‘/analysis/project/videos/’],videotype=’mp4’)</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.make_labeled_video.get_cmap">
+<code class="descclassname">deeplabcut.utils.make_labeled_video.</code><code class="descname">get_cmap</code><span class="sig-paren">(</span><em>n</em>, <em>name='hsv'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/make_labeled_video.html#get_cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.make_labeled_video.get_cmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a function that maps each index in 0, 1, …, n-1 to a distinct
+RGB color; the keyword argument name must be a standard mpl colormap name.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils.plotting">
+<span id="deeplabcut-utils-plotting-module"></span><h2>deeplabcut.utils.plotting module<a class="headerlink" href="#module-deeplabcut.utils.plotting" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.utils.plotting.Histogram">
+<code class="descclassname">deeplabcut.utils.plotting.</code><code class="descname">Histogram</code><span class="sig-paren">(</span><em>vector</em>, <em>color</em>, <em>bins</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/plotting.html#Histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.plotting.Histogram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.plotting.PlottingResults">
+<code class="descclassname">deeplabcut.utils.plotting.</code><code class="descname">PlottingResults</code><span class="sig-paren">(</span><em>video</em>, <em>tmpfolder</em>, <em>Dataframe</em>, <em>scorer</em>, <em>cfg</em>, <em>showfigures</em>, <em>suffix='.png'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/plotting.html#PlottingResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.plotting.PlottingResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots poses vs time; pose x vs pose y; histogram of differences and likelihoods.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.plotting.RunTrajectoryAnalysis">
+<code class="descclassname">deeplabcut.utils.plotting.</code><code class="descname">RunTrajectoryAnalysis</code><span class="sig-paren">(</span><em>video</em>, <em>basefolder</em>, <em>DLCscorer</em>, <em>videofolder</em>, <em>cfg</em>, <em>showfigures</em>, <em>filtered=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/plotting.html#RunTrajectoryAnalysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.plotting.RunTrajectoryAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.plotting.get_cmap">
+<code class="descclassname">deeplabcut.utils.plotting.</code><code class="descname">get_cmap</code><span class="sig-paren">(</span><em>n</em>, <em>name='hsv'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/plotting.html#get_cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.plotting.get_cmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a function that maps each index in 0, 1, …, n-1 to a distinct
+RGB color; the keyword argument name must be a standard mpl colormap name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.plotting.plot_trajectories">
+<code class="descclassname">deeplabcut.utils.plotting.</code><code class="descname">plot_trajectories</code><span class="sig-paren">(</span><em>config</em>, <em>videos</em>, <em>videotype='.avi'</em>, <em>shuffle=1</em>, <em>trainingsetindex=0</em>, <em>filtered=False</em>, <em>showfigures=False</em>, <em>destfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/plotting.html#plot_trajectories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.plotting.plot_trajectories" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Plots the trajectories of various bodyparts across the video.</p>
+<blockquote>
+<div>config : string</div></blockquote>
+<p>Full path of the config.yaml file as a string.</p>
+<dl class="docutils">
+<dt>videos <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>A list of strings containing the full paths to videos for analysis or a path to the directory, where all the videos with same extension are stored.</dd>
+<dt>videotype: string, optional</dt>
+<dd>Checks for the extension of the video in case the input to the video is a directory.</dd>
+</dl>
+</div></blockquote>
+<p>Only videos with this extension are analyzed. The default is <code class="docutils literal notranslate"><span class="pre">.avi</span></code></p>
+<blockquote>
+<div><p>shuffle: list, optional
+List of integers specifying the shuffle indices of the training dataset. The default is [1]</p>
+<p>trainingsetindex: int, optional
+Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</p>
+<p>filtered: bool, default false
+Boolean variable indicating if filtered output should be plotted rather than frame-by-frame predictions. Filtered version can be calculated with deeplabcut.filterpredictions</p>
+<p>showfigures: bool, default false
+If true then plots are also displayed.</p>
+<dl class="docutils">
+<dt>destfolder: string, optional</dt>
+<dd>Specifies the destination folder that was used for storing analysis data (default is the path of the video).</dd>
+</dl>
+<p>for labeling the frames
+&gt;&gt;&gt; deeplabcut.plot_trajectories(‘home/alex/analysis/project/reaching-task/config.yaml’,[‘/home/alex/analysis/project/videos/reachingvideo1.avi’])
+——–</p>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils.select_crop_parameters">
+<span id="deeplabcut-utils-select-crop-parameters-module"></span><h2>deeplabcut.utils.select_crop_parameters module<a class="headerlink" href="#module-deeplabcut.utils.select_crop_parameters" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="class">
+<dt id="deeplabcut.utils.select_crop_parameters.ImagePanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.utils.select_crop_parameters.</code><code class="descname">ImagePanel</code><span class="sig-paren">(</span><em>parent</em>, <em>config</em>, <em>gui_size</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/select_crop_parameters.html#ImagePanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.select_crop_parameters.ImagePanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Panel</span></code></p>
+<dl class="method">
+<dt id="deeplabcut.utils.select_crop_parameters.ImagePanel.getfigure">
+<code class="descname">getfigure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/select_crop_parameters.html#ImagePanel.getfigure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.select_crop_parameters.ImagePanel.getfigure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the figure, axes and canvas</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.utils.select_crop_parameters.MainFrame">
+<em class="property">class </em><code class="descclassname">deeplabcut.utils.select_crop_parameters.</code><code class="descname">MainFrame</code><span class="sig-paren">(</span><em>parent</em>, <em>config</em>, <em>image</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/select_crop_parameters.html#MainFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.select_crop_parameters.MainFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Frame</span></code></p>
+<p>Contains the main GUI and button boxes</p>
+<dl class="method">
+<dt id="deeplabcut.utils.select_crop_parameters.MainFrame.helpButton">
+<code class="descname">helpButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/select_crop_parameters.html#MainFrame.helpButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.select_crop_parameters.MainFrame.helpButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens Instructions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.select_crop_parameters.MainFrame.line_select_callback">
+<code class="descname">line_select_callback</code><span class="sig-paren">(</span><em>eclick</em>, <em>erelease</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/select_crop_parameters.html#MainFrame.line_select_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.select_crop_parameters.MainFrame.line_select_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>eclick and erelease are the press and release events</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.select_crop_parameters.MainFrame.quitButton">
+<code class="descname">quitButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/select_crop_parameters.html#MainFrame.quitButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.select_crop_parameters.MainFrame.quitButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quits the GUI</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.select_crop_parameters.MainFrame.show_image">
+<code class="descname">show_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/select_crop_parameters.html#MainFrame.show_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.select_crop_parameters.MainFrame.show_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.utils.select_crop_parameters.WidgetPanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.utils.select_crop_parameters.</code><code class="descname">WidgetPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/select_crop_parameters.html#WidgetPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.select_crop_parameters.WidgetPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Panel</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.select_crop_parameters.show">
+<code class="descclassname">deeplabcut.utils.select_crop_parameters.</code><code class="descname">show</code><span class="sig-paren">(</span><em>config</em>, <em>image</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/select_crop_parameters.html#show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.select_crop_parameters.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils.video_processor">
+<span id="deeplabcut-utils-video-processor-module"></span><h2>deeplabcut.utils.video_processor module<a class="headerlink" href="#module-deeplabcut.utils.video_processor" title="Permalink to this headline">¶</a></h2>
+<p>Author: Hao Wu
+<a class="reference external" href="mailto:hwu01&#37;&#52;&#48;g&#46;harvard&#46;edu">hwu01<span>&#64;</span>g<span>&#46;</span>harvard<span>&#46;</span>edu</a></p>
+<p>This is the helper class for video reading and saving in DeepLabCut.
+Updated by AM</p>
+<p>You can set various codecs below,
+fourcc = cv2.VideoWriter_fourcc(<a href="#id1"><span class="problematic" id="id2">*</span></a>’MJPG’)
+i.e. ‘XVID’</p>
+<dl class="class">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor">
+<em class="property">class </em><code class="descclassname">deeplabcut.utils.video_processor.</code><code class="descname">VideoProcessor</code><span class="sig-paren">(</span><em>fname=''</em>, <em>sname=''</em>, <em>nframes=-1</em>, <em>fps=30</em>, <em>codec='X264'</em>, <em>sh=''</em>, <em>sw=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for a video processing unit, implementation is required for video loading and saving</p>
+<p>sh and sw are the output height and width respectively.</p>
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>implement your own</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.counter">
+<code class="descname">counter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.counter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.counter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.create_video">
+<code class="descname">create_video</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.create_video"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.create_video" title="Permalink to this definition">¶</a></dt>
+<dd><p>implement your own</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.fps">
+<code class="descname">fps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.fps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.fps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.frame_count">
+<code class="descname">frame_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.frame_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.frame_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.get_info">
+<code class="descname">get_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>implement your own</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.get_video">
+<code class="descname">get_video</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.get_video"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.get_video" title="Permalink to this definition">¶</a></dt>
+<dd><p>implement your own</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.height">
+<code class="descname">height</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.height"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.load_frame">
+<code class="descname">load_frame</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.load_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.load_frame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.save_frame">
+<code class="descname">save_frame</code><span class="sig-paren">(</span><em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.save_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.save_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>implement your own</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessor.width">
+<code class="descname">width</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessor.width"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessor.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.utils.video_processor.VideoProcessorCV">
+<em class="property">class </em><code class="descclassname">deeplabcut.utils.video_processor.</code><code class="descname">VideoProcessorCV</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessorCV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessorCV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#deeplabcut.utils.video_processor.VideoProcessor" title="deeplabcut.utils.video_processor.VideoProcessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">deeplabcut.utils.video_processor.VideoProcessor</span></code></a></p>
+<p>OpenCV implementation of VideoProcessor
+requires opencv-python==3.4.0.12</p>
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessorCV.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessorCV.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessorCV.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>implement your own</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessorCV.create_video">
+<code class="descname">create_video</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessorCV.create_video"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessorCV.create_video" title="Permalink to this definition">¶</a></dt>
+<dd><p>implement your own</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessorCV.get_info">
+<code class="descname">get_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessorCV.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessorCV.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>implement your own</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessorCV.get_video">
+<code class="descname">get_video</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessorCV.get_video"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessorCV.get_video" title="Permalink to this definition">¶</a></dt>
+<dd><p>implement your own</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.utils.video_processor.VideoProcessorCV.save_frame">
+<code class="descname">save_frame</code><span class="sig-paren">(</span><em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/video_processor.html#VideoProcessorCV.save_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.video_processor.VideoProcessorCV.save_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>implement your own</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils.visualization">
+<span id="deeplabcut-utils-visualization-module"></span><h2>deeplabcut.utils.visualization module<a class="headerlink" href="#module-deeplabcut.utils.visualization" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.utils.visualization.MakeLabeledImage">
+<code class="descclassname">deeplabcut.utils.visualization.</code><code class="descname">MakeLabeledImage</code><span class="sig-paren">(</span><em>DataCombined, imagenr, pcutoff, imagebasefolder, Scorers, bodyparts, colors, cfg, labels=['+', '.', 'x'], scaling=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/visualization.html#MakeLabeledImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.visualization.MakeLabeledImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creating a labeled image with the original human labels, as well as the DeepLabCut’s!</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.visualization.PlottingandSaveLabeledFrame">
+<code class="descclassname">deeplabcut.utils.visualization.</code><code class="descname">PlottingandSaveLabeledFrame</code><span class="sig-paren">(</span><em>DataCombined</em>, <em>ind</em>, <em>trainIndices</em>, <em>cfg</em>, <em>colors</em>, <em>comparisonbodyparts</em>, <em>DLCscorer</em>, <em>foldername</em>, <em>scaling=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/visualization.html#PlottingandSaveLabeledFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.visualization.PlottingandSaveLabeledFrame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.utils.visualization.get_cmap">
+<code class="descclassname">deeplabcut.utils.visualization.</code><code class="descname">get_cmap</code><span class="sig-paren">(</span><em>n</em>, <em>name='hsv'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/utils/visualization.html#get_cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.utils.visualization.get_cmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a function that maps each index in 0, 1, …, n-1 to a distinct
+RGB color; the keyword argument name must be a standard mpl colormap name.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deeplabcut.utils" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

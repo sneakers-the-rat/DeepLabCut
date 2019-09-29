@@ -1,0 +1,594 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+<span class="sd">Please see AUTHORS for contributors.</span>
+
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">wx</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.create_project</span> <span class="k">import</span> <span class="n">add</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">io</span>
+<span class="kn">from</span> <span class="nn">skimage.util</span> <span class="k">import</span> <span class="n">img_as_ubyte</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="k">import</span> <span class="n">Figure</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="k">import</span> <span class="n">make_axes_locatable</span>
+<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">mcolors</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">patches</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_wxagg</span> <span class="k">import</span> <span class="n">FigureCanvasWxAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
+<span class="kn">from</span> <span class="nn">matplotlib.widgets</span> <span class="k">import</span> <span class="n">RectangleSelector</span>
+
+<span class="c1"># ###########################################################################</span>
+<span class="c1"># Class for GUI MainFrame</span>
+<span class="c1"># ###########################################################################</span>
+<div class="viewcode-block" id="ImagePanel"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.ImagePanel">[docs]</a><span class="k">class</span> <span class="nc">ImagePanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">video</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">gui_size</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">h</span><span class="o">=</span><span class="n">gui_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+        <span class="n">w</span><span class="o">=</span><span class="n">gui_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">3</span>
+        <span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">SUNKEN_BORDER</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">w</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sizer</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">BoxSizer</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">LEFT</span> <span class="o">|</span> <span class="n">wx</span><span class="o">.</span><span class="n">TOP</span> <span class="o">|</span> <span class="n">wx</span><span class="o">.</span><span class="n">GROW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Fit</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ImagePanel.getfigure"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.ImagePanel.getfigure">[docs]</a>    <span class="k">def</span> <span class="nf">getfigure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the figure, axes and canvas</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImagePanel.getColorIndices"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.ImagePanel.getColorIndices">[docs]</a>    <span class="k">def</span> <span class="nf">getColorIndices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">img</span><span class="p">,</span><span class="n">bodyparts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the colormaps ticks and . The order of ticks labels is reversed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="c1">#        im = io.imread(img)</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">img</span><span class="p">),</span> <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
+        <span class="n">ticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">img</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">img</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts</span><span class="p">))[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">norm</span><span class="p">,</span> <span class="n">ticks</span></div></div>
+
+
+
+<div class="viewcode-block" id="WidgetPanel"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.WidgetPanel">[docs]</a><span class="k">class</span> <span class="nc">WidgetPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">SUNKEN_BORDER</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="MainFrame"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame">[docs]</a><span class="k">class</span> <span class="nc">MainFrame</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Contains the main GUI and button boxes&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">video</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">scorer</span><span class="p">,</span><span class="n">savelabeled</span><span class="p">):</span>
+<span class="c1"># Settting the GUI size and panels design</span>
+        <span class="n">displays</span> <span class="o">=</span> <span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Display</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Display</span><span class="o">.</span><span class="n">GetCount</span><span class="p">()))</span> <span class="c1"># Gets the number of displays</span>
+        <span class="n">screenSizes</span> <span class="o">=</span> <span class="p">[</span><span class="n">display</span><span class="o">.</span><span class="n">GetGeometry</span><span class="p">()</span><span class="o">.</span><span class="n">GetSize</span><span class="p">()</span> <span class="k">for</span> <span class="n">display</span> <span class="ow">in</span> <span class="n">displays</span><span class="p">]</span> <span class="c1"># Gets the size of each display</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># For display 1.</span>
+        <span class="n">screenWidth</span> <span class="o">=</span> <span class="n">screenSizes</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">screenHeight</span> <span class="o">=</span> <span class="n">screenSizes</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">screenWidth</span><span class="o">*</span><span class="mf">0.7</span><span class="p">,</span><span class="n">screenHeight</span><span class="o">*</span><span class="mf">0.85</span><span class="p">)</span>
+
+        <span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">ID_ANY</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;DeepLabCut2.0 - Manual Outlier Frame Extraction&#39;</span><span class="p">,</span>
+                            <span class="n">size</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">Size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_size</span><span class="p">),</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">DefaultPosition</span><span class="p">,</span> <span class="n">style</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">RESIZE_BORDER</span><span class="o">|</span><span class="n">wx</span><span class="o">.</span><span class="n">DEFAULT_FRAME_STYLE</span><span class="o">|</span><span class="n">wx</span><span class="o">.</span><span class="n">TAB_TRAVERSAL</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CreateStatusBar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span><span class="o">.</span><span class="n">SetStatusText</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">SetSizeHints</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_size</span><span class="p">))</span> <span class="c1">#  This sets the minimum size of the GUI. It can scale now!</span>
+        
+<span class="c1">###################################################################################################################################################</span>
+<span class="c1"># Spliting the frame into top and bottom panels. Bottom panels contains the widgets. The top panel is for showing images and plotting!</span>
+        <span class="n">topSplitter</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">SplitterWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_panel</span> <span class="o">=</span> <span class="n">ImagePanel</span><span class="p">(</span><span class="n">topSplitter</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span><span class="n">video</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span> <span class="o">=</span> <span class="n">WidgetPanel</span><span class="p">(</span><span class="n">topSplitter</span><span class="p">)</span>
+        
+        <span class="n">topSplitter</span><span class="o">.</span><span class="n">SplitHorizontally</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_panel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span><span class="n">sashPosition</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.83</span><span class="p">)</span><span class="c1">#0.9</span>
+        <span class="n">topSplitter</span><span class="o">.</span><span class="n">SetSashGravity</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">sizer</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">BoxSizer</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+        <span class="n">sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">topSplitter</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">EXPAND</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="n">sizer</span><span class="p">)</span>
+
+<span class="c1">###################################################################################################################################################</span>
+<span class="c1"># Add Buttons to the WidgetPanel and bind them to their respective functions.</span>
+
+        <span class="n">widgetsizer</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">WrapSizer</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_button_sizer</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">BoxSizer</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">help_button_sizer</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">BoxSizer</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">ID_ANY</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Help&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">help_button_sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="c1">#        widgetsizer.Add(self.help , 1, wx.ALL, 15)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">help</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">helpButton</span><span class="p">)</span>
+
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">help_button_sizer</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">wx</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">grab</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">ID_ANY</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Grab Frames&quot;</span><span class="p">)</span>
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grab</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grab</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grabFrame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grab</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">AddStretchSpacer</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">ID_ANY</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">minValue</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxValue</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">style</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">SL_HORIZONTAL</span> <span class="o">|</span> <span class="n">wx</span><span class="o">.</span><span class="n">SL_AUTOTICKS</span> <span class="o">|</span> <span class="n">wx</span><span class="o">.</span><span class="n">SL_LABELS</span> <span class="p">)</span>
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_SLIDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">OnSliderScroll</span><span class="p">)</span>
+        
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">AddStretchSpacer</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_frames_sizer</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">BoxSizer</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_frames_sizer</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">BoxSizer</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_frames_sizer</span><span class="o">.</span><span class="n">AddSpacer</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+<span class="c1">#        self.startFrame = wx.SpinCtrl(self.widget_panel, value=&#39;0&#39;, size=(100, -1), min=0, max=120)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">SpinCtrl</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="c1">#,style=wx.SP_VERTICAL)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_frames_sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">EXPAND</span><span class="o">|</span><span class="n">wx</span><span class="o">.</span><span class="n">ALIGN_LEFT</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">start_text</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">StaticText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Start Frame Index&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_frames_sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">start_text</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">EXPAND</span><span class="o">|</span><span class="n">wx</span><span class="o">.</span><span class="n">ALIGN_LEFT</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkBox</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">CheckBox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">ID_ANY</span><span class="p">,</span><span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Range of frames&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkBox</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_CHECKBOX</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">activate_frame_range</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_frames_sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkBox</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">EXPAND</span><span class="o">|</span><span class="n">wx</span><span class="o">.</span><span class="n">ALIGN_LEFT</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+<span class="c1">#        </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_frames_sizer</span><span class="o">.</span><span class="n">AddSpacer</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endFrame</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">SpinCtrl</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">160</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="c1">#, min=1, max=120)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endFrame</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_frames_sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endFrame</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">EXPAND</span><span class="o">|</span><span class="n">wx</span><span class="o">.</span><span class="n">ALIGN_LEFT</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">end_text</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">StaticText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Number of Frames&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_frames_sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">end_text</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">EXPAND</span><span class="o">|</span><span class="n">wx</span><span class="o">.</span><span class="n">ALIGN_LEFT</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateFrame</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">ID_ANY</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Update&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_frames_sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updateFrame</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">EXPAND</span><span class="o">|</span><span class="n">wx</span><span class="o">.</span><span class="n">ALIGN_LEFT</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateFrame</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateSlider</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateFrame</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_frames_sizer</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">wx</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">AddStretchSpacer</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end_frames_sizer</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">wx</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">AddStretchSpacer</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">quit</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">wx</span><span class="o">.</span><span class="n">ID_ANY</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Quit&quot;</span><span class="p">)</span>
+        <span class="n">widgetsizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quit</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quit</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quitButton</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quit</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="n">widgetsizer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="o">.</span><span class="n">SetSizerAndFit</span><span class="p">(</span><span class="n">widgetsizer</span><span class="p">)</span>
+        
+        
+<span class="c1"># Variables initialization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numberFrames</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extract_range_frame</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">firstFrame</span>  <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># self.cropping = False</span>
+
+<span class="c1"># Read confing file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;Task&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainFraction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainFraction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainFraction</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">videos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;video_sets&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bodyparts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;bodyparts&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colormap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colormap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colormap</span><span class="o">.</span><span class="n">reversed</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">markerSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;dotsize&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;alphavalue&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterationindex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cropping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">videos</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_source</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">shuffle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dataframe</span> <span class="o">=</span> <span class="n">Dataframe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scorer</span> <span class="o">=</span> <span class="n">scorer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">savelabeled</span> <span class="o">=</span> <span class="n">savelabeled</span>
+        
+<span class="c1"># Read the video file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vid</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_source</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">videoPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_source</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numberFrames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_COUNT</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strwidth</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numberFrames</span><span class="p">)))</span>
+<span class="c1"># Set the values of slider and range of frames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span><span class="o">.</span><span class="n">SetMax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numberFrames</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">SetMax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numberFrames</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endFrame</span><span class="o">.</span><span class="n">SetMax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numberFrames</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_SPINCTRL</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">updateSlider</span><span class="p">)</span><span class="c1">#wx.EVT_SPIN</span>
+<span class="c1"># Set the status bar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span><span class="o">.</span><span class="n">SetStatusText</span><span class="p">(</span><span class="s1">&#39;Working on video: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_source</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+<span class="c1"># Adding the video file to the config file.</span>
+        <span class="k">if</span>  <span class="ow">not</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_source</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_names</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">add</span><span class="o">.</span><span class="n">add_new_videos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">,[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_source</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_source</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_labels</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_panel</span><span class="o">.</span><span class="n">Layout</span><span class="p">()</span>
+<div class="viewcode-block" id="MainFrame.quitButton"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame.quitButton">[docs]</a>    <span class="k">def</span> <span class="nf">quitButton</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Quits the GUI</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span><span class="o">.</span><span class="n">SetStatusText</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">dlg</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">MessageDialog</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="s2">&quot;Are you sure?&quot;</span><span class="p">,</span> <span class="s2">&quot;Quit!&quot;</span><span class="p">,</span><span class="n">wx</span><span class="o">.</span><span class="n">YES_NO</span> <span class="o">|</span> <span class="n">wx</span><span class="o">.</span><span class="n">ICON_WARNING</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">dlg</span><span class="o">.</span><span class="n">ShowModal</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="n">wx</span><span class="o">.</span><span class="n">ID_YES</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Quitting for now!&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Destroy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainFrame.updateSlider"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame.updateSlider">[docs]</a>    <span class="k">def</span> <span class="nf">updateSlider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span><span class="o">.</span><span class="n">GetValue</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">GetValue</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">delaxes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grab</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grabFrame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">GetValue</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_labels</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="MainFrame.activate_frame_range"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame.activate_frame_range">[docs]</a>    <span class="k">def</span> <span class="nf">activate_frame_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Activates the frame range boxes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkSlider</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">GetEventObject</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkSlider</span><span class="o">.</span><span class="n">GetValue</span><span class="p">()</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extract_range_frame</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">GetValue</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endFrame</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateFrame</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grab</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extract_range_frame</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endFrame</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateFrame</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grab</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+    
+    
+<div class="viewcode-block" id="MainFrame.line_select_callback"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame.line_select_callback">[docs]</a>    <span class="k">def</span> <span class="nf">line_select_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">eclick</span><span class="p">,</span> <span class="n">erelease</span><span class="p">):</span>
+        <span class="s1">&#39;eclick and erelease are the press and release events&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_x1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_y1</span> <span class="o">=</span> <span class="n">eclick</span><span class="o">.</span><span class="n">xdata</span><span class="p">,</span> <span class="n">eclick</span><span class="o">.</span><span class="n">ydata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_y2</span> <span class="o">=</span> <span class="n">erelease</span><span class="o">.</span><span class="n">xdata</span><span class="p">,</span> <span class="n">erelease</span><span class="o">.</span><span class="n">ydata</span></div>
+
+            
+<div class="viewcode-block" id="MainFrame.OnSliderScroll"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame.OnSliderScroll">[docs]</a>    <span class="k">def</span> <span class="nf">OnSliderScroll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Slider to scroll through the video</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">delaxes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grab</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grabFrame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">GetValue</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startFrame</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_labels</span><span class="p">()</span></div>
+    
+
+<div class="viewcode-block" id="MainFrame.update"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the image with the current slider index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grab</span><span class="o">.</span><span class="n">Enable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grab</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grabFrame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_panel</span><span class="o">.</span><span class="n">getfigure</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vid</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">)</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vid</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">frame</span><span class="o">=</span><span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cropping</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">])</span>
+                <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]),:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span><span class="n">cmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colormap</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numberFrames</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid frame&quot;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="MainFrame.chooseFrame"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame.chooseFrame">[docs]</a>    <span class="k">def</span> <span class="nf">chooseFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vid</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">frame</span><span class="o">=</span><span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cropping</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">])</span>
+            <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]),:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;labeled-data&#39;</span> <span class="o">/</span> <span class="n">fname</span><span class="o">.</span><span class="n">stem</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">machinefile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">output_path</span><span class="p">),</span><span class="s1">&#39;machinelabels-iter&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterationindex</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.h5&#39;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
+        <span class="n">DF</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dataframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">]]</span>
+        <span class="n">DF</span><span class="o">.</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;labeled-data&#39;</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="s2">&quot;img&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strwidth</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.png&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">DF</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">img_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/img&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numberFrames</span><span class="p">))))</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span>
+        <span class="n">labeled_img_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/img&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numberFrames</span><span class="p">))))</span> <span class="o">+</span> <span class="s1">&#39;labeled.png&#39;</span>
+
+<span class="c1"># Check for it output path and a machine label file exist</span>
+        <span class="k">if</span> <span class="n">output_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machinefile</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">img_name</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">savelabeled</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">labeled_img_name</span><span class="p">,</span><span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+            <span class="n">Data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machinefile</span><span class="p">,</span><span class="s1">&#39;df_with_missing&#39;</span><span class="p">)</span>
+            <span class="n">DataCombined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">Data</span><span class="p">,</span><span class="n">DF</span><span class="p">])</span>
+            <span class="n">DataCombined</span> <span class="o">=</span> <span class="n">DataCombined</span><span class="p">[</span><span class="o">~</span><span class="n">DataCombined</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)]</span>
+            <span class="n">DataCombined</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machinefile</span><span class="p">,</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;df_with_missing&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">DataCombined</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">output_path</span><span class="p">),</span><span class="s1">&#39;machinelabels.csv&#39;</span><span class="p">))</span>
+<span class="c1"># If machine label file does not exist then create one</span>
+        <span class="k">elif</span> <span class="n">output_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machinefile</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">savelabeled</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">labeled_img_name</span><span class="p">,</span><span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">img_name</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+            <span class="n">DF</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machinefile</span><span class="p">,</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;df_with_missing&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">DF</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">output_path</span><span class="p">),</span> <span class="s2">&quot;machinelabels.csv&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> path not found. Please make sure that the video was added to the config file using the function &#39;deeplabcut.add_new_videos&#39;.Quitting for now!&quot;</span> <span class="o">%</span><span class="n">output_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Destroy</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="MainFrame.grabFrame"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame.grabFrame">[docs]</a>    <span class="k">def</span> <span class="nf">grabFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the frame and saves in the current directory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_range_frame</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">num_frames_extract</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endFrame</span><span class="o">.</span><span class="n">GetValue</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="o">+</span><span class="n">num_frames_extract</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vid</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chooseFrame</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vid</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chooseFrame</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MainFrame.plot_labels"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame.plot_labels">[docs]</a>    <span class="k">def</span> <span class="nf">plot_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots the labels of the analyzed video</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vid</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">)</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vid</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">colorIndex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_panel</span><span class="o">.</span><span class="n">getColorIndices</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">bodyparts</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="n">frame</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+            <span class="n">divider</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
+            <span class="n">cax</span> <span class="o">=</span> <span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="n">cbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">,</span><span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colorIndex</span><span class="p">)</span>
+            <span class="n">cbar</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bodyparts</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bodyparts</span><span class="p">):</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colormap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colorIndex</span><span class="p">[</span><span class="n">bpindex</span><span class="p">]))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Dataframe</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">Dataframe</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">currFrame</span><span class="p">],</span><span class="mf">1.0</span><span class="p">]</span>
+                <span class="n">circle</span> <span class="o">=</span> <span class="p">[</span><span class="n">patches</span><span class="o">.</span><span class="n">Circle</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">markerSize</span><span class="p">,</span> <span class="n">fc</span> <span class="o">=</span> <span class="n">color</span> <span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">circle</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="MainFrame.helpButton"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.MainFrame.helpButton">[docs]</a>    <span class="k">def</span> <span class="nf">helpButton</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Opens Instructions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wx</span><span class="o">.</span><span class="n">MessageBox</span><span class="p">(</span><span class="s2">&quot;1. Use the checkbox &#39;Crop?&#39; at the bottom left if you need to crop the frame. In this case use the left mouse button to draw a box corresponding to the region of interest. Click the &#39;Set cropping parameters&#39; button to add the video with the chosen crop parameters to the config file.</span><span class="se">\n\n</span><span class="s2">2. Use the slider to select a frame in the entire video. </span><span class="se">\n\n</span><span class="s2">3. Click Grab Frames button to save the specific frame.</span><span class="se">\n\n</span><span class="s2">4. In events where you need to extract a range frames, then use the checkbox &#39;Range of frames&#39; to select the starting frame index and the number of frames to extract. </span><span class="se">\n</span><span class="s2"> Click the update button to see the frame. Click Grab Frames to select the range of frames. </span><span class="se">\n</span><span class="s2"> Click OK to continue&quot;</span><span class="p">,</span> <span class="s1">&#39;Instructions to use!&#39;</span><span class="p">,</span> <span class="n">wx</span><span class="o">.</span><span class="n">OK</span> <span class="o">|</span> <span class="n">wx</span><span class="o">.</span><span class="n">ICON_INFORMATION</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="show"><a class="viewcode-back" href="../../../source/deeplabcut.refine_training_dataset.html#deeplabcut.refine_training_dataset.outlier_frame_extraction_toolbox.show">[docs]</a><span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">video</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">scorer</span><span class="p">,</span><span class="n">savelabeled</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">imageio</span>
+    <span class="n">imageio</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">ffmpeg</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">App</span><span class="p">()</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">MainFrame</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">video</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">scorer</span><span class="p">,</span><span class="n">savelabeled</span><span class="p">)</span><span class="o">.</span><span class="n">Show</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">MainLoop</span><span class="p">()</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span><span class="s1">&#39;video&#39;</span><span class="p">,</span><span class="s1">&#39;shuffle&#39;</span><span class="p">,</span><span class="s1">&#39;Dataframe&#39;</span><span class="p">,</span><span class="s1">&#39;scorer&#39;</span><span class="p">,</span><span class="s1">&#39;savelabeled&#39;</span><span class="p">)</span>
+    <span class="n">cli_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

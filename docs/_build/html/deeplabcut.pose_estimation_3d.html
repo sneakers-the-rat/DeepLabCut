@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_3d package &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="deeplabcut.pose_estimation_tensorflow package" href="deeplabcut.pose_estimation_tensorflow.html" />
+    <link rel="prev" title="deeplabcut.generate_training_dataset package" href="deeplabcut.generate_training_dataset.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deeplabcut.create_project.html">deeplabcut.create_project package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">deeplabcut</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="deeplabcut.html">deeplabcut package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="deeplabcut.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.create_project.html">deeplabcut.create_project package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.generate_training_dataset.html">deeplabcut.generate_training_dataset package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">deeplabcut.pose_estimation_3d package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.html">deeplabcut.pose_estimation_tensorflow package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.post_processing.html">deeplabcut.post_processing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.refine_training_dataset.html">deeplabcut.refine_training_dataset package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.utils.html">deeplabcut.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#module-deeplabcut.cli">deeplabcut.cli module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#module-deeplabcut.version">deeplabcut.version module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#module-deeplabcut">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">deeplabcut</a> &raquo;</li>
+        
+          <li><a href="deeplabcut.html">deeplabcut package</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_3d package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/deeplabcut.pose_estimation_3d.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="deeplabcut-pose-estimation-3d-package">
+<h1>deeplabcut.pose_estimation_3d package<a class="headerlink" href="#deeplabcut-pose-estimation-3d-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_3d.camera_calibration">
+<span id="deeplabcut-pose-estimation-3d-camera-calibration-module"></span><h2>deeplabcut.pose_estimation_3d.camera_calibration module<a class="headerlink" href="#module-deeplabcut.pose_estimation_3d.camera_calibration" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_3d.camera_calibration.calibrate_cameras">
+<code class="descclassname">deeplabcut.pose_estimation_3d.camera_calibration.</code><code class="descname">calibrate_cameras</code><span class="sig-paren">(</span><em>config</em>, <em>cbrow=8</em>, <em>cbcol=6</em>, <em>calibrate=False</em>, <em>alpha=0.4</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_3d/camera_calibration.html#calibrate_cameras"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_3d.camera_calibration.calibrate_cameras" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function extracts the corners points from the calibration images, calibrates the camera and stores the calibration files in the project folder (defined in the config file).</p>
+<p>Make sure you have around 20-60 pairs of calibration images. The function should be used iteratively to select the right set of calibration images.</p>
+<p>A pair of calibration image is considered “correct”, if the corners are detected correctly in both the images. It may happen that during the first run of this function,
+the extracted corners are incorrect or the order of detected corners does not align for the corresponding views (i.e. camera-1 and camera-2 images).</p>
+<p>In such a case, remove those pairs of images and re-run this function. Once the right number of calibration images are selected,
+use the parameter <code class="docutils literal notranslate"><span class="pre">calibrate=True</span></code> to calibrate the cameras.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>config</strong> (<em>string</em>) – Full path of the config.yaml file as a string.</li>
+<li><strong>cbrow</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Integer specifying the number of rows in the calibration image.</li>
+<li><strong>cbcol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Integer specifying the number of columns in the calibration image.</li>
+<li><strong>calibrate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If this is set to True, the cameras are calibrated with the current set of calibration images. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>
+Set it to True, only after checking the results of the corner detection method and removing dysfunctional images!</li>
+<li><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Floating point number between 0 and 1 specifying the free scaling parameter. When alpha = 0, the rectified images with only valid pixels are stored
+i.e. the rectified images are zoomed in. When alpha = 1, all the pixels from the original images are retained.
+For more details: <a class="reference external" href="https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html">https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html</a></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>Linux/MacOs/Windows
+&gt;&gt;&gt; deeplabcut.calibrate_camera(config)</p>
+<p>Once the right set of calibration images are selected,
+&gt;&gt;&gt; deeplabcut.calibrate_camera(config,calibrate=True)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_3d.camera_calibration.check_undistortion">
+<code class="descclassname">deeplabcut.pose_estimation_3d.camera_calibration.</code><code class="descname">check_undistortion</code><span class="sig-paren">(</span><em>config</em>, <em>cbrow=8</em>, <em>cbcol=6</em>, <em>plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_3d/camera_calibration.html#check_undistortion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_3d.camera_calibration.check_undistortion" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function undistorts the calibration images based on the camera matrices and stores them in the project folder(defined in the config file)
+to visually check if the camera matrices are correct.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>config</strong> (<em>string</em>) – Full path of the config.yaml file as a string.</li>
+<li><strong>cbrow</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Int specifying the number of rows in the calibration image.</li>
+<li><strong>cbcol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Int specifying the number of columns in the calibration image.</li>
+<li><strong>plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If this is set to True, the results of undistortion are saved as plots. The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>; if provided it must be either <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>Linux/MacOs/Windows
+&gt;&gt;&gt; deeplabcut.check_undistortion(config, cbrow = 8,cbcol = 6)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_3d.plotting3D">
+<span id="deeplabcut-pose-estimation-3d-plotting3d-module"></span><h2>deeplabcut.pose_estimation_3d.plotting3D module<a class="headerlink" href="#module-deeplabcut.pose_estimation_3d.plotting3D" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_3d.plotting3D.create_labeled_video_3d">
+<code class="descclassname">deeplabcut.pose_estimation_3d.plotting3D.</code><code class="descname">create_labeled_video_3d</code><span class="sig-paren">(</span><em>config, path, videofolder=None, start=0, end=None, trailpoints=0, videotype='avi', view=[-113, -270], xlim=[None, None], ylim=[None, None], zlim=[None, None], draw_skeleton=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_3d/plotting3D.html#create_labeled_video_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_3d.plotting3D.create_labeled_video_3d" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Creates a video with views from the two cameras and the 3d reconstruction for a selected number of frames.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+<dt>path <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>A list of strings containing the full paths to triangulated files for analysis or a path to the directory, where all the triangulated files are stored.</dd>
+<dt>videofolder: string</dt>
+<dd>Full path of the folder where the videos are stored. Use this if the vidoes are stored in a different location other than where the triangulation files are stored. By default is <code class="docutils literal notranslate"><span class="pre">None</span></code> and therefore looks for video files in the directory where the triangulation file is stored.</dd>
+<dt>start: int</dt>
+<dd>Integer specifying the start of frame index to select. Default is set to 0.</dd>
+<dt>end: int</dt>
+<dd>Integer specifying the end of frame index to select. Default is set to None, where all the frames of the video are used for creating the labeled video.</dd>
+<dt>trailpoints: int</dt>
+<dd>Number of revious frames whose body parts are plotted in a frame (for displaying history). Default is set to 0.</dd>
+<dt>videotype: string, optional</dt>
+<dd>Checks for the extension of the video in case the input is a directory.</dd>
+</dl>
+</div></blockquote>
+<p>Only videos with this extension are analyzed. The default is <code class="docutils literal notranslate"><span class="pre">.avi</span></code></p>
+<blockquote>
+<div><dl class="docutils">
+<dt>view: list</dt>
+<dd>A list that sets the elevation angle in z plane and azimuthal angle in x,y plane of 3d view. Useful for rotating the axis for 3d view</dd>
+<dt>xlim: list</dt>
+<dd>A list of integers specifying the limits for xaxis of 3d view. By default it is set to [None,None], where the x limit is set by taking the minimum and maximum value of the x coordinates for all the bodyparts.</dd>
+<dt>ylim: list</dt>
+<dd>A list of integers specifying the limits for yaxis of 3d view. By default it is set to [None,None], where the y limit is set by taking the minimum and maximum value of the y coordinates for all the bodyparts.</dd>
+<dt>zlim: list</dt>
+<dd>A list of integers specifying the limits for zaxis of 3d view. By default it is set to [None,None], where the z limit is set by taking the minimum and maximum value of the z coordinates for all the bodyparts.</dd>
+<dt>draw_skeleton: bool</dt>
+<dd>If <code class="docutils literal notranslate"><span class="pre">True</span></code> adds a line connecting the body parts making a skeleton on on each frame. The body parts to be connected and the color of these connecting lines are specified in the config file. By default: <code class="docutils literal notranslate"><span class="pre">True</span></code></dd>
+</dl>
+<p>Linux/MacOs
+&gt;&gt;&gt; deeplabcut.create_labeled_video_3d(config,[‘/data/project1/videos/3d.h5’],start=100, end=500)</p>
+<p>To create labeled videos for all the triangulated files in the folder
+&gt;&gt;&gt; deeplabcut.create_labeled_video_3d(config,[‘/data/project1/videos’],start=100, end=500)</p>
+<p>To set the xlim, ylim, zlim and rotate the view of the 3d axis
+&gt;&gt;&gt; deeplabcut.create_labeled_video_3d(config,[‘/data/project1/videos’],start=100, end=500,view=[30,90],xlim=[-12,12],ylim=[15,25],zlim=[20,30])</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_3d.plotting3D.plot2D">
+<code class="descclassname">deeplabcut.pose_estimation_3d.plotting3D.</code><code class="descname">plot2D</code><span class="sig-paren">(</span><em>cfg_3d</em>, <em>k</em>, <em>bodyparts2plot</em>, <em>vid_cam1</em>, <em>vid_cam2</em>, <em>bodyparts2connect</em>, <em>df_cam1_view</em>, <em>df_cam2_view</em>, <em>xyz_pts</em>, <em>pcutoff</em>, <em>markerSize</em>, <em>alphaValue</em>, <em>color</em>, <em>path_h5_file</em>, <em>file_name</em>, <em>skeleton_color</em>, <em>view</em>, <em>draw_skeleton</em>, <em>trailpoints</em>, <em>xlim</em>, <em>ylim</em>, <em>zlim</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_3d/plotting3D.html#plot2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_3d.plotting3D.plot2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates 2D gif for a selected number of frames</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_3d.triangulation">
+<span id="deeplabcut-pose-estimation-3d-triangulation-module"></span><h2>deeplabcut.pose_estimation_3d.triangulation module<a class="headerlink" href="#module-deeplabcut.pose_estimation_3d.triangulation" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_3d.triangulation.triangulate">
+<code class="descclassname">deeplabcut.pose_estimation_3d.triangulation.</code><code class="descname">triangulate</code><span class="sig-paren">(</span><em>config</em>, <em>video_path</em>, <em>videotype='avi'</em>, <em>filterpredictions=True</em>, <em>filtertype='median'</em>, <em>gputouse=None</em>, <em>destfolder=None</em>, <em>save_as_csv=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_3d/triangulation.html#triangulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_3d.triangulation.triangulate" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>This function triangulates the detected DLC-keypoints from the two camera views using the camera matrices (derived from calibration) to calculate 3D predictions.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+<dt>video_path <span class="classifier-delimiter">:</span> <span class="classifier">string/list of list</span></dt>
+<dd>Full path of the directory where videos are saved. If the user wants to analyze only a pair of videos, the user needs to pass them as a list of list of videos i.e. [[‘video1-camera-1.avi’,’video1-camera-2.avi’]]</dd>
+<dt>videotype: string, optional</dt>
+<dd>Checks for the extension of the video in case the input to the video is a directory.</dd>
+</dl>
+</div></blockquote>
+<p>Only videos with this extension are analyzed. The default is <code class="docutils literal notranslate"><span class="pre">.avi</span></code></p>
+<blockquote>
+<div><dl class="docutils">
+<dt>filterpredictions: Bool, optional</dt>
+<dd>Filter the predictions with filter specified by “filtertype”. If specified it should be either <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>.</dd>
+<dt>filtertype: string</dt>
+<dd>Select which filter, ‘arima’ or ‘median’ filter.</dd>
+<dt>gputouse: int, optional. Natural number indicating the number of your GPU (see number in nvidia-smi). If you do not have a GPU put None.</dt>
+<dd>See: <a class="reference external" href="https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries">https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries</a></dd>
+<dt>destfolder: string, optional</dt>
+<dd>Specifies the destination folder for analysis data (default is the path of the video)</dd>
+<dt>save_as_csv: bool, optional</dt>
+<dd>Saves the predictions in a .csv file. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code></dd>
+</dl>
+<p>Linux/MacOS
+To analyze all the videos in the directory:
+&gt;&gt;&gt; deeplabcut.triangulate(config,’/data/project1/videos/’)</p>
+<p>To analyze only a few pairs of videos:
+&gt;&gt;&gt; deeplabcut.triangulate(config,[[‘/data/project1/videos/video1-camera-1.avi’,’/data/project1/videos/video1-camera-2.avi’],[‘/data/project1/videos/video2-camera-1.avi’,’/data/project1/videos/video2-camera-2.avi’]])</p>
+<p>Windows
+To analyze all the videos in the directory:
+&gt;&gt;&gt; deeplabcut.triangulate(config,’C:yourusernamerig-95Videos’)</p>
+<p>To analyze only a few pair of videos:
+&gt;&gt;&gt; deeplabcut.triangulate(config,[[‘C:yourusernamerig-95Videosvideo1-camera-1.avi’,’C:yourusernamerig-95Videosvideo1-camera-2.avi’],[‘C:yourusernamerig-95Videosvideo2-camera-1.avi’,’C:yourusernamerig-95Videosvideo2-camera-2.avi’]])</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_3d.triangulation.undistort_points">
+<code class="descclassname">deeplabcut.pose_estimation_3d.triangulation.</code><code class="descname">undistort_points</code><span class="sig-paren">(</span><em>config</em>, <em>dataframe</em>, <em>camera_pair</em>, <em>destfolder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_3d/triangulation.html#undistort_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_3d.triangulation.undistort_points" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_3d">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deeplabcut.pose_estimation_3d" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="deeplabcut.pose_estimation_tensorflow.html" class="btn btn-neutral float-right" title="deeplabcut.pose_estimation_tensorflow package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="deeplabcut.generate_training_dataset.html" class="btn btn-neutral float-left" title="deeplabcut.generate_training_dataset package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

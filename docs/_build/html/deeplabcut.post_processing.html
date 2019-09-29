@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.post_processing package &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="deeplabcut.refine_training_dataset package" href="deeplabcut.refine_training_dataset.html" />
+    <link rel="prev" title="deeplabcut.pose_estimation_tensorflow.util package" href="deeplabcut.pose_estimation_tensorflow.util.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deeplabcut.create_project.html">deeplabcut.create_project package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">deeplabcut</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="deeplabcut.html">deeplabcut package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="deeplabcut.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.create_project.html">deeplabcut.create_project package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.generate_training_dataset.html">deeplabcut.generate_training_dataset package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.pose_estimation_3d.html">deeplabcut.pose_estimation_3d package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.html">deeplabcut.pose_estimation_tensorflow package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">deeplabcut.post_processing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.refine_training_dataset.html">deeplabcut.refine_training_dataset package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.utils.html">deeplabcut.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#module-deeplabcut.cli">deeplabcut.cli module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#module-deeplabcut.version">deeplabcut.version module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#module-deeplabcut">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">deeplabcut</a> &raquo;</li>
+        
+          <li><a href="deeplabcut.html">deeplabcut package</a> &raquo;</li>
+        
+      <li>deeplabcut.post_processing package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/deeplabcut.post_processing.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="deeplabcut-post-processing-package">
+<h1>deeplabcut.post_processing package<a class="headerlink" href="#deeplabcut-post-processing-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deeplabcut.post_processing.analyze_skeleton">
+<span id="deeplabcut-post-processing-analyze-skeleton-module"></span><h2>deeplabcut.post_processing.analyze_skeleton module<a class="headerlink" href="#module-deeplabcut.post_processing.analyze_skeleton" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="deeplabcut.post_processing.analyze_skeleton.analyzebone">
+<code class="descclassname">deeplabcut.post_processing.analyze_skeleton.</code><code class="descname">analyzebone</code><span class="sig-paren">(</span><em>bp1</em>, <em>bp2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/post_processing/analyze_skeleton.html#analyzebone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.post_processing.analyze_skeleton.analyzebone" title="Permalink to this definition">¶</a></dt>
+<dd><p>[Computes length and orientation of the bone at each frame]</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>bp1 {[type]} – [description]
+bp2 {[type]} – [description]</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.post_processing.analyze_skeleton.analyzeskeleton">
+<code class="descclassname">deeplabcut.post_processing.analyze_skeleton.</code><code class="descname">analyzeskeleton</code><span class="sig-paren">(</span><em>config</em>, <em>videos</em>, <em>videotype='avi'</em>, <em>shuffle=1</em>, <em>trainingsetindex=0</em>, <em>save_as_csv=False</em>, <em>destfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/post_processing/analyze_skeleton.html#analyzeskeleton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.post_processing.analyze_skeleton.analyzeskeleton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts length and orientation of each “bone” of the skeleton as defined in the config file.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+<dt>videos <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>A list of strings containing the full paths to videos for analysis or a path to the directory, where all the videos with same extension are stored.</dd>
+<dt>shuffle <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd>The shufle index of training dataset. The extracted frames will be stored in the labeled-dataset for
+the corresponding shuffle of training dataset. Default is set to 1</dd>
+<dt>trainingsetindex: int, optional</dt>
+<dd>Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</dd>
+<dt>save_as_csv: bool, optional</dt>
+<dd>Saves the predictions in a .csv file. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>; if provided it must be either <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code></dd>
+<dt>destfolder: string, optional</dt>
+<dd>Specifies the destination folder for analysis data (default is the path of the video). Note that for subsequent analysis this
+folder also needs to be passed.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.post_processing.analyze_skeleton.angle_between_points_2d_anticlockwise">
+<code class="descclassname">deeplabcut.post_processing.analyze_skeleton.</code><code class="descname">angle_between_points_2d_anticlockwise</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/post_processing/analyze_skeleton.html#angle_between_points_2d_anticlockwise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.post_processing.analyze_skeleton.angle_between_points_2d_anticlockwise" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>angle_between_points_2d_clockwise [Determines the angle of a straight line drawn between point one and two.</dt>
+<dd>The number returned, which is a double in degrees, tells us how much we have to rotate
+a horizontal line anti-clockwise for it to match the line between the two points.]</dd>
+<dt>Arguments:</dt>
+<dd>p1 {[np.ndarray, list]} – np.array or list [ with the X and Y coordinates of the point]
+p2 {[np.ndarray, list]} – np.array or list [ with the X and Y coordinates of the point]</dd>
+<dt>Returns:</dt>
+<dd>[int] – [clockwise angle between p1, p2 using the inner product and the deterinant of the two vectors]</dd>
+<dt>Testing:  - to check:     print(zero, ninety, oneeighty, twoseventy)</dt>
+<dd><div class="first last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span> <span class="o">=</span> <span class="n">angle_between_points_2d_clockwise</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ninety</span> <span class="o">=</span> <span class="n">angle_between_points_2d_clockwise</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">oneeighty</span> <span class="o">=</span> <span class="n">angle_between_points_2d_clockwise</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">twoseventy</span> <span class="o">=</span> <span class="n">angle_between_points_2d_clockwise</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ninety2</span> <span class="o">=</span> <span class="n">angle_between_points_2d_clockwise</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ninety2</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.post_processing.analyze_skeleton.calc_angle_between_vectors_of_points_2d">
+<code class="descclassname">deeplabcut.post_processing.analyze_skeleton.</code><code class="descname">calc_angle_between_vectors_of_points_2d</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/post_processing/analyze_skeleton.html#calc_angle_between_vectors_of_points_2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.post_processing.analyze_skeleton.calc_angle_between_vectors_of_points_2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>calc_angle_between_vectors_of_points_2d [calculates the clockwise angle between each set of point for two 2d arrays of points]</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>v1 {[np.ndarray]} – [2d array with X,Y position at each timepoint]
+v2 {[np.ndarray]} – [2d array with X,Y position at each timepoint]</dd>
+<dt>Returns:</dt>
+<dd>[np.ndarray] – [1d array with clockwise angle between pairwise points in v1,v2]</dd>
+</dl>
+<p>Testing:
+&gt;&gt;&gt; v1 = np.zeros((2, 4))
+&gt;&gt;&gt; v1[1, :] = [1, 1, 1, 1, ]
+&gt;&gt;&gt; v2 = np.zeros((2, 4))
+&gt;&gt;&gt; v2[0, :] = [0, 1, 0, -1]
+&gt;&gt;&gt; v2[1, :] = [1, 0, -1, 0]
+&gt;&gt;&gt; a = calc_angle_between_vectors_of_points_2d(v2, v1)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.post_processing.analyze_skeleton.calc_distance_between_points_two_vectors_2d">
+<code class="descclassname">deeplabcut.post_processing.analyze_skeleton.</code><code class="descname">calc_distance_between_points_two_vectors_2d</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/post_processing/analyze_skeleton.html#calc_distance_between_points_two_vectors_2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.post_processing.analyze_skeleton.calc_distance_between_points_two_vectors_2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>calc_distance_between_points_two_vectors_2d [pairwise distance between vectors points]</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>v1 {[np.array]} – [description]
+v2 {[type]} – [description]</dd>
+<dt>Raises:</dt>
+<dd>ValueError – [description]
+ValueError – [description]
+ValueError – [description]</dd>
+<dt>Returns:</dt>
+<dd>[type] – [description]</dd>
+</dl>
+<p>testing:
+&gt;&gt;&gt; v1 = np.zeros((2, 5))
+&gt;&gt;&gt; v2 = np.zeros((2, 5))
+&gt;&gt;&gt; v2[1, :]  = [0, 10, 25, 50, 100]
+&gt;&gt;&gt; d = calc_distance_between_points_two_vectors_2d(v1.T, v2.T)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.post_processing.filtering">
+<span id="deeplabcut-post-processing-filtering-module"></span><h2>deeplabcut.post_processing.filtering module<a class="headerlink" href="#module-deeplabcut.post_processing.filtering" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.post_processing.filtering.filterpredictions">
+<code class="descclassname">deeplabcut.post_processing.filtering.</code><code class="descname">filterpredictions</code><span class="sig-paren">(</span><em>config</em>, <em>video</em>, <em>videotype='avi'</em>, <em>shuffle=1</em>, <em>trainingsetindex=0</em>, <em>filtertype='median'</em>, <em>windowlength=5</em>, <em>p_bound=0.001</em>, <em>ARdegree=3</em>, <em>MAdegree=1</em>, <em>alpha=0.01</em>, <em>save_as_csv=True</em>, <em>destfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/post_processing/filtering.html#filterpredictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.post_processing.filtering.filterpredictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits frame-by-frame pose predictions with ARIMA model (filtertype=’arima’) or median filter (default).</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+<dt>video <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the video to extract the frame from. Make sure that this video is already analyzed.</dd>
+<dt>shuffle <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd>The shufle index of training dataset. The extracted frames will be stored in the labeled-dataset for
+the corresponding shuffle of training dataset. Default is set to 1</dd>
+<dt>trainingsetindex: int, optional</dt>
+<dd>Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</dd>
+<dt>filtertype: string</dt>
+<dd>Select which filter, ‘arima’ or ‘median’ filter.</dd>
+<dt>windowlength: int</dt>
+<dd>For filtertype=’median’ filters the input array using a local window-size given by windowlength. The array will automatically be zero-padded.
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.medfilt.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.medfilt.html</a> The windowlenght should be an odd number.</dd>
+<dt>p_bound: float between 0 and 1, optional</dt>
+<dd>For filtertype ‘arima’ this parameter defines the likelihood below,
+below which a body part will be consided as missing data for filtering purposes.</dd>
+<dt>ARdegree: int, optional</dt>
+<dd>For filtertype ‘arima’ Autoregressive degree of Sarimax model degree.
+see <a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html">https://www.statsmodels.org/dev/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html</a></dd>
+<dt>MAdegree: int</dt>
+<dd>For filtertype ‘arima’ Moving Avarage degree of Sarimax model degree.
+See <a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html">https://www.statsmodels.org/dev/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html</a></dd>
+<dt>alpha: float</dt>
+<dd>Significance level for detecting outliers based on confidence interval of fitted SARIMAX model.</dd>
+<dt>save_as_csv: bool, optional</dt>
+<dd>Saves the predictions in a .csv file. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>; if provided it must be either <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code></dd>
+<dt>destfolder: string, optional</dt>
+<dd>Specifies the destination folder for analysis data (default is the path of the video). Note that for subsequent analysis this
+folder also needs to be passed.</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Arima model:
+deeplabcut.filterpredictions(‘C:myprojectreaching-taskconfig.yaml’,[‘C:myprojecttrailtracking-tasktest.mp4’],shuffle=3,filterype=’arima’,ARdegree=5,MAdegree=2)</p>
+<p>Use median filter over 10bins:
+deeplabcut.filterpredictions(‘C:myprojectreaching-taskconfig.yaml’,[‘C:myprojecttrailtracking-tasktest.mp4’],shuffle=3,windowlength=10)</p>
+<p>One can then use the filtered rather than the frame-by-frame predictions by calling:</p>
+<p>deeplabcut.plot_trajectories(‘C:myprojectreaching-taskconfig.yaml’,[‘C:myprojecttrailtracking-tasktest.mp4’],shuffle=3,filtered=True)</p>
+<p>Returns filtered pandas array with the same structure as normal output of network.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.post_processing">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deeplabcut.post_processing" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="deeplabcut.refine_training_dataset.html" class="btn btn-neutral float-right" title="deeplabcut.refine_training_dataset package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="deeplabcut.pose_estimation_tensorflow.util.html" class="btn btn-neutral float-left" title="deeplabcut.pose_estimation_tensorflow.util package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

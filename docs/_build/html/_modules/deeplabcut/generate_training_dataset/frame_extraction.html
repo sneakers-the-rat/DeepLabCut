@@ -1,0 +1,459 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.generate_training_dataset.frame_extraction &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.generate_training_dataset.frame_extraction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.generate_training_dataset.frame_extraction</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="extract_frames"><a class="viewcode-back" href="../../../source/deeplabcut.generate_training_dataset.html#deeplabcut.generate_training_dataset.frame_extraction.extract_frames">[docs]</a><span class="k">def</span> <span class="nf">extract_frames</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;automatic&#39;</span><span class="p">,</span><span class="n">algo</span><span class="o">=</span><span class="s1">&#39;kmeans&#39;</span><span class="p">,</span><span class="n">crop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">userfeedback</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">cluster_step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">cluster_resizewidth</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span><span class="n">cluster_color</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">opencv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">slider_width</span><span class="o">=</span><span class="mi">25</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts frames from the videos in the config.yaml file. Only the videos in the config.yaml will be used to select the frames.\n</span>
+<span class="sd">    Use the function ``add_new_video`` at any stage of the project to add new videos to the config file and extract their frames.</span>
+<span class="sd">    </span>
+<span class="sd">    The provided function either selects frames from the videos in a randomly and temporally uniformly distributed way (uniform), \n </span>
+<span class="sd">    by clustering based on visual appearance (k-means), or by manual selection. </span>
+<span class="sd">    </span>
+<span class="sd">    Three important parameters for automatic extraction: numframes2pick, start and stop are set in the config file. </span>
+<span class="sd">    </span>
+<span class="sd">    Please refer to the user guide for more details on methods and parameters https://www.biorxiv.org/content/biorxiv/early/2018/11/24/476531.full.pdf</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+<span class="sd">        </span>
+<span class="sd">    mode : string</span>
+<span class="sd">        String containing the mode of extraction. It must be either ``automatic`` or ``manual``.</span>
+<span class="sd">        </span>
+<span class="sd">    algo : string </span>
+<span class="sd">        String specifying the algorithm to use for selecting the frames. Currently, deeplabcut supports either ``kmeans`` or ``uniform`` based selection. This flag is</span>
+<span class="sd">        only required for ``automatic`` mode and the default is ``uniform``. For uniform, frames are picked in temporally uniform way, kmeans performs clustering on downsampled frames (see user guide for details).</span>
+<span class="sd">        Note: color information is discarded for kmeans, thus e.g. for camouflaged octopus clustering one might want to change this. </span>
+<span class="sd">        </span>
+<span class="sd">    crop : bool, optional</span>
+<span class="sd">        If this is set to True, a user interface pops up with a frame to select the cropping parameters. Use the left click to draw a cropping area and hit the button set cropping parameters to save the cropping parameters for a video.</span>
+<span class="sd">        The default is ``False``; if provided it must be either ``True`` or ``False``.</span>
+<span class="sd">            </span>
+<span class="sd">    userfeedback: bool, optional</span>
+<span class="sd">        If this is set to false during automatic mode then frames for all videos are extracted. The user can set this to true, which will result in a dialog,</span>
+<span class="sd">        where the user is asked for each video if (additional/any) frames from this video should be extracted. Use this, e.g. if you have already labeled</span>
+<span class="sd">        some folders and want to extract data for new videos. </span>
+<span class="sd">    </span>
+<span class="sd">    cluster_resizewidth: number, default: 30</span>
+<span class="sd">        For k-means one can change the width to which the images are downsampled (aspect ratio is fixed).</span>
+<span class="sd">    </span>
+<span class="sd">    cluster_step: number, default: 1</span>
+<span class="sd">        By default each frame is used for clustering, but for long videos one could only use every nth frame (set by: cluster_step). This saves memory before clustering can start, however, </span>
+<span class="sd">        reading the individual frames takes longer due to the skipping.</span>
+<span class="sd">    </span>
+<span class="sd">    cluster_color: bool, default: False</span>
+<span class="sd">        If false then each downsampled image is treated as a grayscale vector (discarding color information). If true, then the color channels are considered. This increases </span>
+<span class="sd">        the computational complexity. </span>
+<span class="sd">    </span>
+<span class="sd">    opencv: bool, default: True</span>
+<span class="sd">        Uses openCV for loading &amp; extractiong (otherwise moviepy (legacy))</span>
+<span class="sd">        </span>
+<span class="sd">    slider_width: number, default: 25</span>
+<span class="sd">        Width of the video frames slider, in percent of window</span>
+<span class="sd">        </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    for selecting frames automatically with &#39;kmeans&#39; and want to crop the frames.</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.extract_frames(&#39;/analysis/project/reaching-task/config.yaml&#39;,&#39;automatic&#39;,&#39;kmeans&#39;,True)</span>
+<span class="sd">    --------</span>
+<span class="sd">    for selecting frames automatically with &#39;kmeans&#39; and considering the color information.</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.extract_frames(&#39;/analysis/project/reaching-task/config.yaml&#39;,&#39;automatic&#39;,&#39;kmeans&#39;,cluster_color=True)</span>
+<span class="sd">    --------</span>
+<span class="sd">    for selecting frames automatically with &#39;uniform&#39; and want to crop the frames.</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.extract_frames(&#39;/analysis/project/reaching-task/config.yaml&#39;,&#39;automatic&#39;,crop=True)</span>
+<span class="sd">    --------</span>
+<span class="sd">    for selecting frames manually,</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.extract_frames(&#39;/analysis/project/reaching-task/config.yaml&#39;,&#39;manual&#39;)</span>
+<span class="sd">    --------</span>
+<span class="sd">    for selecting frames manually, with a 60% wide frames slider</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.extract_frames(&#39;/analysis/project/reaching-task/config.yaml&#39;,&#39;manual&#39;, slider_width=60)</span>
+<span class="sd">    </span>
+<span class="sd">    While selecting the frames manually, you do not need to specify the ``crop`` parameter in the command. Rather, you will get a prompt in the graphic user interface to choose </span>
+<span class="sd">    if you need to crop or not.</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+    <span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">io</span>
+    <span class="kn">from</span> <span class="nn">skimage.util</span> <span class="k">import</span> <span class="n">img_as_ubyte</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">patches</span>
+    <span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">frameselectiontools</span>
+    <span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+    <span class="kn">from</span> <span class="nn">matplotlib.widgets</span> <span class="k">import</span> <span class="n">RectangleSelector</span>
+
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;manual&quot;</span><span class="p">:</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">wd</span><span class="p">))</span>
+        <span class="kn">from</span> <span class="nn">deeplabcut.generate_training_dataset</span> <span class="k">import</span> <span class="n">frame_extraction_toolbox</span>
+        <span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">select_crop_parameters</span>
+        <span class="n">frame_extraction_toolbox</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">slider_width</span><span class="p">)</span>
+        
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;automatic&quot;</span><span class="p">:</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Config file read successfully.&quot;</span><span class="p">)</span>
+        
+        <span class="n">numframes2pick</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;numframes2pick&#39;</span><span class="p">]</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]</span>
+        
+        <span class="c1"># Check for variable correctness</span>
+        <span class="k">if</span> <span class="n">start</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">stop</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">start</span><span class="o">&lt;</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">stop</span><span class="o">&lt;</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">start</span><span class="o">&gt;=</span><span class="n">stop</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Erroneous start or stop values. Please correct it in the config file.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">numframes2pick</span><span class="o">&lt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">int</span><span class="p">(</span><span class="n">numframes2pick</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Perhaps consider extracting more, or a natural number of frames.&quot;</span><span class="p">)</span>
+        
+        <span class="n">videos</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;video_sets&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">opencv</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">cv2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">moviepy.editor</span> <span class="k">import</span> <span class="n">VideoFileClip</span>
+        <span class="k">for</span> <span class="n">vindex</span><span class="p">,</span><span class="n">video</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">videos</span><span class="p">):</span>
+            <span class="c1">#plt.close(&quot;all&quot;)</span>
+            <span class="k">global</span> <span class="n">coords</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;video_sets&#39;</span><span class="p">][</span><span class="n">video</span><span class="p">][</span><span class="s1">&#39;crop&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">userfeedback</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Do you want to extract (perhaps additional) frames for video:&quot;</span><span class="p">,</span> <span class="n">video</span><span class="p">,</span> <span class="s2">&quot;?&quot;</span><span class="p">)</span>
+                <span class="n">askuser</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;yes/no&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">askuser</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+                
+            <span class="k">if</span> <span class="n">askuser</span><span class="o">==</span><span class="s1">&#39;y&#39;</span> <span class="ow">or</span> <span class="n">askuser</span><span class="o">==</span><span class="s1">&#39;yes&#39;</span> <span class="ow">or</span> <span class="n">askuser</span><span class="o">==</span><span class="s1">&#39;Ja&#39;</span> <span class="ow">or</span> <span class="n">askuser</span><span class="o">==</span><span class="s1">&#39;ha&#39;</span><span class="p">:</span> <span class="c1"># multilanguage support :)</span>
+                <span class="k">if</span> <span class="n">opencv</span><span class="p">:</span>
+                    <span class="n">cap</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
+                    <span class="n">fps</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="c1">#https://docs.opencv.org/2.4/modules/highgui/doc/reading_and_writing_images_and_video.html#videocapture-get</span>
+                    <span class="n">nframes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">7</span><span class="p">))</span>
+                    <span class="n">duration</span><span class="o">=</span><span class="n">nframes</span><span class="o">*</span><span class="mf">1.</span><span class="o">/</span><span class="n">fps</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#Moviepy:</span>
+                    <span class="n">clip</span> <span class="o">=</span> <span class="n">VideoFileClip</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
+                    <span class="n">fps</span><span class="o">=</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span>
+                    <span class="n">duration</span><span class="o">=</span><span class="n">clip</span><span class="o">.</span><span class="n">duration</span>
+                    <span class="n">nframes</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">duration</span><span class="o">*</span><span class="mf">1.</span><span class="o">/</span><span class="n">fps</span><span class="p">))</span>
+                <span class="n">indexlength</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">nframes</span><span class="p">)))</span>
+                <span class="k">if</span> <span class="n">crop</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">select_crop_parameters</span>
+                    <span class="k">if</span> <span class="n">opencv</span><span class="p">:</span>
+                        <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">start</span><span class="o">*</span><span class="n">duration</span><span class="p">)</span>
+                        <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                            <span class="n">image</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">image</span> <span class="o">=</span> <span class="n">clip</span><span class="o">.</span><span class="n">get_frame</span><span class="p">(</span><span class="n">start</span><span class="o">*</span><span class="n">clip</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span> <span class="c1">#frame is accessed by index *1./clip.fps (fps cancels)</span>
+                    
+                    <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
+                    <span class="n">output_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;labeled-data&#39;</span> <span class="o">/</span> <span class="n">fname</span><span class="o">.</span><span class="n">stem</span>
+                    
+                    <span class="k">if</span> <span class="n">output_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="p">:</span>
+                        <span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="c1"># Call the GUI to select the cropping parameters</span>
+                        <span class="n">coords</span> <span class="o">=</span> <span class="n">select_crop_parameters</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">image</span><span class="p">)</span>
+                        <span class="c1"># Update the config.yaml file with current cropping parameters</span>
+                        <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;video_sets&#39;</span><span class="p">][</span><span class="n">video</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;crop&#39;</span><span class="p">:</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">3</span><span class="p">])]))}</span>
+                        <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">write_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span><span class="n">cfg</span><span class="p">)</span>
+
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_path</span><span class="p">))</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="c1">#check if empty</span>
+                                <span class="c1">#store full frame from random location (good for augmentation)</span>
+                                <span class="n">index</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="o">*</span><span class="n">duration</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span><span class="o">*</span><span class="n">duration</span><span class="o">*</span><span class="p">(</span><span class="n">stop</span><span class="o">-</span><span class="n">start</span><span class="p">))</span>
+                                <span class="k">if</span> <span class="n">opencv</span><span class="p">:</span>
+                                    <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">index</span><span class="p">)</span>
+                                    <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                                    <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                                        <span class="n">image</span><span class="o">=</span><span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">image</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">get_frame</span><span class="p">(</span><span class="n">index</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">))</span>
+                                    <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">y1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span><span class="n">y2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span><span class="n">x1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">x2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="c1">#now crop clip</span>
+                                    
+                                <span class="n">saveimg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/img&#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">indexlength</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span>
+                                <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">saveimg</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+
+                        <span class="k">else</span><span class="p">:</span>
+                              <span class="n">askuser</span><span class="o">=</span><span class="nb">input</span> <span class="p">(</span><span class="s2">&quot;The directory already contains some frames. Do you want to add to it?(yes/no): &quot;</span><span class="p">)</span>
+                              <span class="k">if</span> <span class="n">askuser</span><span class="o">==</span><span class="s1">&#39;y&#39;</span> <span class="ow">or</span> <span class="n">askuser</span><span class="o">==</span><span class="s1">&#39;yes&#39;</span> <span class="ow">or</span> <span class="n">askuser</span><span class="o">==</span><span class="s1">&#39;Y&#39;</span> <span class="ow">or</span> <span class="n">askuser</span><span class="o">==</span><span class="s1">&#39;Yes&#39;</span><span class="p">:</span>
+                                  <span class="c1">#clip=clip.crop(y1 = int(coords[2]),y2 = int(coords[3]),x1 = int(coords[0]), x2 = int(coords[1]))</span>
+                                  <span class="n">index</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="o">*</span><span class="n">duration</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span><span class="o">*</span><span class="n">duration</span><span class="o">*</span><span class="p">(</span><span class="n">stop</span><span class="o">-</span><span class="n">start</span><span class="p">))</span>
+                                  <span class="k">if</span> <span class="n">opencv</span><span class="p">:</span>
+                                    <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">index</span><span class="p">)</span>
+                                    <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                                    <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                                        <span class="n">image</span><span class="o">=</span><span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+                                  <span class="k">else</span><span class="p">:</span>
+                                      <span class="n">image</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">get_frame</span><span class="p">(</span><span class="n">index</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">))</span>
+                                      <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">y1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span><span class="n">y2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span><span class="n">x1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">x2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                            
+                                  <span class="n">saveimg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/img&#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">indexlength</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span>
+                                  <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">saveimg</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+                                  <span class="k">pass</span>
+                              <span class="k">else</span><span class="p">:</span>
+                                  <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Delete the frames and try again later!&quot;</span><span class="p">)</span>
+                    
+                            
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">numframes2pick</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;numframes2pick&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># without cropping a full size frame will not be extracted &gt;&gt; thus one more frame should be selected in next stage.</span>
+                    
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting frames based on </span><span class="si">%s</span><span class="s2"> ...&quot;</span> <span class="o">%</span><span class="n">algo</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">algo</span> <span class="o">==</span><span class="s1">&#39;uniform&#39;</span><span class="p">:</span> <span class="c1">#extract n-1 frames (0 was already stored)</span>
+                    <span class="k">if</span> <span class="n">opencv</span><span class="p">:</span>
+                        <span class="n">frames2pick</span><span class="o">=</span><span class="n">frameselectiontools</span><span class="o">.</span><span class="n">UniformFramescv2</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span><span class="n">numframes2pick</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">stop</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">frames2pick</span><span class="o">=</span><span class="n">frameselectiontools</span><span class="o">.</span><span class="n">UniformFrames</span><span class="p">(</span><span class="n">clip</span><span class="p">,</span><span class="n">numframes2pick</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">stop</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">algo</span> <span class="o">==</span><span class="s1">&#39;kmeans&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">opencv</span><span class="p">:</span>
+                        <span class="n">frames2pick</span><span class="o">=</span><span class="n">frameselectiontools</span><span class="o">.</span><span class="n">KmeansbasedFrameselectioncv2</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span><span class="n">numframes2pick</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">stop</span><span class="p">,</span><span class="n">crop</span><span class="p">,</span><span class="n">coords</span><span class="p">,</span><span class="n">step</span><span class="o">=</span><span class="n">cluster_step</span><span class="p">,</span><span class="n">resizewidth</span><span class="o">=</span><span class="n">cluster_resizewidth</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">cluster_color</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">frames2pick</span><span class="o">=</span><span class="n">frameselectiontools</span><span class="o">.</span><span class="n">KmeansbasedFrameselection</span><span class="p">(</span><span class="n">clip</span><span class="p">,</span><span class="n">numframes2pick</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">stop</span><span class="p">,</span><span class="n">step</span><span class="o">=</span><span class="n">cluster_step</span><span class="p">,</span><span class="n">resizewidth</span><span class="o">=</span><span class="n">cluster_resizewidth</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">cluster_color</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please implement this method yourself and send us a pull request! Otherwise, choose &#39;uniform&#39; or &#39;kmeans&#39;.&quot;</span><span class="p">)</span>
+                    <span class="n">frames2pick</span><span class="o">=</span><span class="p">[]</span>
+                
+                <span class="n">output_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;labeled-data&#39;</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+                <span class="k">if</span> <span class="n">opencv</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">frames2pick</span><span class="p">:</span>
+                            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">index</span><span class="p">)</span> <span class="c1">#extract a particular frame</span>
+                            <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                                <span class="n">image</span><span class="o">=</span><span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+                                <span class="n">img_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/img&#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">indexlength</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span>
+                                <span class="k">if</span> <span class="n">crop</span><span class="p">:</span>
+                                    <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">img_name</span><span class="p">,</span><span class="n">image</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span><span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span><span class="nb">int</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]),:])</span> <span class="c1">#y1 = int(coords[2]),y2 = int(coords[3]),x1 = int(coords[0]), x2 = int(coords[1]</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">img_name</span><span class="p">,</span><span class="n">image</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Frame&quot;</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="s2">&quot; not found!&quot;</span><span class="p">)</span>
+                    <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">frames2pick</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">image</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">get_frame</span><span class="p">(</span><span class="n">index</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">))</span>
+                            <span class="n">img_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/img&#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">indexlength</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span>
+                            <span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">img_name</span><span class="p">,</span><span class="n">image</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="c1">#constant image</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Seems like black/constant images are extracted from your video. Perhaps consider using opencv under the hood, by setting: opencv=True&quot;</span><span class="p">)</span>
+                                
+                        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Frame # &quot;</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="s2">&quot; does not exist.&quot;</span><span class="p">)</span>
+                    
+                    <span class="c1">#close video. </span>
+                    <span class="n">clip</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="k">del</span> <span class="n">clip</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid MODE. Choose either &#39;manual&#39; or &#39;automatic&#39;. Check ``help(deeplabcut.extract_frames)`` on python and ``deeplabcut.extract_frames?`` </span><span class="se">\</span>
+<span class="s2">              for ipython/jupyter notebook for more details.&quot;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Frames were selected.</span><span class="se">\n</span><span class="s2">You can now label the frames using the function &#39;label_frames&#39; (if you extracted enough frames for all videos).&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="line_select_callback"><a class="viewcode-back" href="../../../source/deeplabcut.generate_training_dataset.html#deeplabcut.generate_training_dataset.frame_extraction.line_select_callback">[docs]</a><span class="k">def</span> <span class="nf">line_select_callback</span><span class="p">(</span><span class="n">eclick</span><span class="p">,</span> <span class="n">erelease</span><span class="p">):</span>
+        <span class="s1">&#39;eclick and erelease are the press and release events&#39;</span>
+        <span class="k">global</span> <span class="n">coords</span>
+        <span class="n">new_x1</span><span class="p">,</span> <span class="n">new_y1</span> <span class="o">=</span> <span class="n">eclick</span><span class="o">.</span><span class="n">xdata</span><span class="p">,</span> <span class="n">eclick</span><span class="o">.</span><span class="n">ydata</span>
+        <span class="n">new_x2</span><span class="p">,</span> <span class="n">new_y2</span> <span class="o">=</span> <span class="n">erelease</span><span class="o">.</span><span class="n">xdata</span><span class="p">,</span> <span class="n">erelease</span><span class="o">.</span><span class="n">ydata</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_x1</span><span class="p">)),</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_x2</span><span class="p">)),</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_y1</span><span class="p">)),</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_y2</span><span class="p">))]</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

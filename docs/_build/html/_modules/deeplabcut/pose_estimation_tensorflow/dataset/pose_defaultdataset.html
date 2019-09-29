@@ -1,0 +1,489 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Adapted from DeeperCut by Eldar Insafutdinov</span>
+<span class="sd">https://github.com/eldar/pose-tensorflow</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Adapted from DeeperCut by Eldar Insafutdinov</span>
+<span class="sd">https://github.com/eldar/pose-tensorflow</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">random</span> <span class="k">as</span> <span class="nn">rand</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">array</span> <span class="k">as</span> <span class="n">arr</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">concatenate</span> <span class="k">as</span> <span class="n">cat</span>
+
+<span class="kn">import</span> <span class="nn">scipy.io</span> <span class="k">as</span> <span class="nn">sio</span>
+<span class="kn">from</span> <span class="nn">scipy.misc</span> <span class="k">import</span> <span class="n">imread</span><span class="p">,</span> <span class="n">imresize</span>
+
+<span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset</span> <span class="k">import</span> <span class="n">Batch</span><span class="p">,</span> <span class="n">data_to_input</span><span class="p">,</span> <span class="n">mirror_joints_map</span><span class="p">,</span> <span class="n">CropImage</span><span class="p">,</span> <span class="n">DataItem</span>
+<span class="c1">#from dataset.pose_dataset import Batch, data_to_input, mirror_joints_map, CropImage, DataItem</span>
+
+<div class="viewcode-block" id="PoseDataset"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset">[docs]</a><span class="k">class</span> <span class="nc">PoseDataset</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_images</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">mirror</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">symmetric_joints</span> <span class="o">=</span> <span class="n">mirror_joints_map</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">all_joints</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">num_joints</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curr_img</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_shuffle</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">shuffle</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PoseDataset.load_dataset"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.load_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">project_path</span><span class="p">,</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="c1"># Load Matlab file dataset annotation</span>
+        <span class="n">mlab</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span> <span class="o">=</span> <span class="n">mlab</span>
+        <span class="n">mlab</span> <span class="o">=</span> <span class="n">mlab</span><span class="p">[</span><span class="s1">&#39;dataset&#39;</span><span class="p">]</span>
+
+        <span class="n">num_images</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="c1">#        print(&#39;Dataset has {} images&#39;.format(num_images))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">has_gt</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span><span class="p">):</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="n">mlab</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+
+            <span class="n">item</span> <span class="o">=</span> <span class="n">DataItem</span><span class="p">()</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">image_id</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">im_path</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">im_size</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">joints</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1">#                print(sample)</span>
+                <span class="n">joint_id</span> <span class="o">=</span> <span class="n">joints</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># make sure joint ids are 0-indexed</span>
+                <span class="k">if</span> <span class="n">joint_id</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">((</span><span class="n">joint_id</span> <span class="o">&lt;</span> <span class="n">cfg</span><span class="o">.</span><span class="n">num_joints</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">())</span>
+                <span class="n">joints</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">joint_id</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">joints</span> <span class="o">=</span> <span class="p">[</span><span class="n">joints</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">has_gt</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="c1">#if cfg.crop:</span>
+            <span class="c1">#    crop = sample[3][0] - 1</span>
+            <span class="c1">#    item.crop = extend_crop(crop, cfg.crop_pad, item.im_size)</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_gt</span> <span class="o">=</span> <span class="n">has_gt</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="PoseDataset.set_test_mode"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.set_test_mode">[docs]</a>    <span class="k">def</span> <span class="nf">set_test_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_mode</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_gt</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">test_mode</span></div>
+
+<div class="viewcode-block" id="PoseDataset.set_shuffle"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.set_shuffle">[docs]</a>    <span class="k">def</span> <span class="nf">set_shuffle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">shuffle</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">shuffle</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">mirror</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_images</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PoseDataset.mirror_joint_coords"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.mirror_joint_coords">[docs]</a>    <span class="k">def</span> <span class="nf">mirror_joint_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">joints</span><span class="p">,</span> <span class="n">image_width</span><span class="p">):</span>
+        <span class="c1"># horizontally flip the x-coordinate, keep y unchanged</span>
+        <span class="n">joints</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">image_width</span> <span class="o">-</span> <span class="n">joints</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">joints</span></div>
+
+<div class="viewcode-block" id="PoseDataset.mirror_joints"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.mirror_joints">[docs]</a>    <span class="k">def</span> <span class="nf">mirror_joints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">joints</span><span class="p">,</span> <span class="n">symmetric_joints</span><span class="p">,</span> <span class="n">image_width</span><span class="p">):</span>
+        <span class="c1"># joint ids are 0 indexed</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">joints</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_joint_coords</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">image_width</span><span class="p">)</span>
+        <span class="c1"># swap the joint_id for a symmetric one</span>
+        <span class="n">joint_id</span> <span class="o">=</span> <span class="n">joints</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">symmetric_joints</span><span class="p">[</span><span class="n">joint_id</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="PoseDataset.shuffle_images"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.shuffle_images">[docs]</a>    <span class="k">def</span> <span class="nf">shuffle_images</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">num_images</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_images</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">mirror</span><span class="p">:</span>
+            <span class="n">image_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">num_images</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mirrored</span> <span class="o">=</span> <span class="n">image_indices</span> <span class="o">&gt;=</span> <span class="n">num_images</span>
+            <span class="n">image_indices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mirrored</span><span class="p">]</span> <span class="o">=</span> <span class="n">image_indices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mirrored</span><span class="p">]</span> <span class="o">-</span> <span class="n">num_images</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_indices</span> <span class="o">=</span> <span class="n">image_indices</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">num_images</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PoseDataset.num_training_samples"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.num_training_samples">[docs]</a>    <span class="k">def</span> <span class="nf">num_training_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_images</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">mirror</span><span class="p">:</span>
+            <span class="n">num</span> <span class="o">*=</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">num</span></div>
+
+<div class="viewcode-block" id="PoseDataset.next_training_sample"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.next_training_sample">[docs]</a>    <span class="k">def</span> <span class="nf">next_training_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_img</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">shuffle</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_images</span><span class="p">()</span>
+
+        <span class="n">curr_img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_img</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curr_img</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">curr_img</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_training_samples</span><span class="p">()</span>
+
+        <span class="n">imidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_indices</span><span class="p">[</span><span class="n">curr_img</span><span class="p">]</span>
+        <span class="n">mirror</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">mirror</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirrored</span><span class="p">[</span><span class="n">curr_img</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">imidx</span><span class="p">,</span> <span class="n">mirror</span></div>
+
+<div class="viewcode-block" id="PoseDataset.get_training_sample"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.get_training_sample">[docs]</a>    <span class="k">def</span> <span class="nf">get_training_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imidx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">imidx</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="PoseDataset.get_scale"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.get_scale">[docs]</a>    <span class="k">def</span> <span class="nf">get_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">global_scale</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;scale_jitter_lo&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;scale_jitter_up&#39;</span><span class="p">):</span>
+            <span class="n">scale_jitter</span> <span class="o">=</span> <span class="n">rand</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">scale_jitter_lo</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">scale_jitter_up</span><span class="p">)</span>
+            <span class="n">scale</span> <span class="o">*=</span> <span class="n">scale_jitter</span>
+        <span class="k">return</span> <span class="n">scale</span></div>
+
+<div class="viewcode-block" id="PoseDataset.next_batch"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.next_batch">[docs]</a>    <span class="k">def</span> <span class="nf">next_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">imidx</span><span class="p">,</span> <span class="n">mirror</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_training_sample</span><span class="p">()</span>
+            <span class="n">data_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_training_sample</span><span class="p">(</span><span class="n">imidx</span><span class="p">)</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scale</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid_size</span><span class="p">(</span><span class="n">data_item</span><span class="o">.</span><span class="n">im_size</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_batch</span><span class="p">(</span><span class="n">data_item</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">mirror</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PoseDataset.is_valid_size"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.is_valid_size">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+        <span class="n">im_width</span> <span class="o">=</span> <span class="n">image_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">im_height</span> <span class="o">=</span> <span class="n">image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">max_input_size</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="n">im_height</span> <span class="o">&lt;</span> <span class="n">max_input_size</span> <span class="ow">or</span> <span class="n">im_width</span> <span class="o">&lt;</span> <span class="n">max_input_size</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;max_input_size&#39;</span><span class="p">):</span>
+            <span class="n">max_input_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_input_size</span>
+            <span class="n">input_width</span> <span class="o">=</span> <span class="n">im_width</span> <span class="o">*</span> <span class="n">scale</span>
+            <span class="n">input_height</span> <span class="o">=</span> <span class="n">im_height</span> <span class="o">*</span> <span class="n">scale</span>
+            <span class="k">if</span> <span class="n">input_height</span> <span class="o">*</span> <span class="n">input_width</span> <span class="o">&gt;</span> <span class="n">max_input_size</span> <span class="o">*</span> <span class="n">max_input_size</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="PoseDataset.make_batch"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.make_batch">[docs]</a>    <span class="k">def</span> <span class="nf">make_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_item</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">mirror</span><span class="p">):</span>
+        <span class="n">im_file</span> <span class="o">=</span> <span class="n">data_item</span><span class="o">.</span><span class="n">im_path</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;image </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">im_file</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;mirror </span><span class="si">%r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">mirror</span><span class="p">)</span>
+        
+        <span class="c1">#print(im_file, os.getcwd())</span>
+        <span class="c1">#print(self.cfg.project_path)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">project_path</span><span class="p">,</span><span class="n">im_file</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_gt</span><span class="p">:</span>
+            <span class="n">joints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data_item</span><span class="o">.</span><span class="n">joints</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">crop</span><span class="p">:</span> <span class="c1">#adapted cropping for DLC</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span><span class="o">&lt;</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">cropratio</span><span class="p">:</span>
+                <span class="c1">#1. get center of joints</span>
+                <span class="n">j</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">joints</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="c1">#pick a random joint</span>
+                <span class="c1"># draw random crop dimensions &amp; subtract joint points</span>
+                <span class="c1">#print(joints,j,&#39;ahah&#39;)</span>
+                <span class="n">joints</span><span class="p">,</span><span class="n">image</span><span class="o">=</span><span class="n">CropImage</span><span class="p">(</span><span class="n">joints</span><span class="p">,</span><span class="n">image</span><span class="p">,</span><span class="n">joints</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">joints</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
+                
+                <span class="c1">#if self.has_gt:</span>
+                <span class="c1">#    joints[0,:, 1] -= x0</span>
+                <span class="c1">#    joints[0,:, 2] -= y0</span>
+                <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">                print(joints)</span>
+<span class="sd">                import matplotlib.pyplot as plt</span>
+<span class="sd">                plt.clf()</span>
+<span class="sd">                plt.imshow(image)</span>
+<span class="sd">                plt.plot(joints[0,:,1],joints[0,:,2],&#39;.&#39;)</span>
+<span class="sd">                plt.savefig(&quot;abc&quot;+str(np.random.randint(int(1e6)))+&quot;.png&quot;)</span>
+<span class="sd">                &#39;&#39;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span> <span class="c1">#no cropping!</span>
+                
+        <span class="n">img</span> <span class="o">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span> <span class="k">if</span> <span class="n">scale</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">image</span>
+        <span class="n">scaled_img_size</span> <span class="o">=</span> <span class="n">arr</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">mirror</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+        <span class="n">batch</span> <span class="o">=</span> <span class="p">{</span><span class="n">Batch</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span> <span class="n">img</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_gt</span><span class="p">:</span>
+            <span class="n">stride</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">stride</span>
+
+            <span class="k">if</span> <span class="n">mirror</span><span class="p">:</span>
+                <span class="n">joints</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mirror_joints</span><span class="p">(</span><span class="n">person_joints</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetric_joints</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">person_joints</span> <span class="ow">in</span>
+                          <span class="n">joints</span><span class="p">]</span>
+
+            <span class="n">sm_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">scaled_img_size</span> <span class="o">/</span> <span class="p">(</span><span class="n">stride</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+
+            <span class="n">scaled_joints</span> <span class="o">=</span> <span class="p">[</span><span class="n">person_joints</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">person_joints</span> <span class="ow">in</span> <span class="n">joints</span><span class="p">]</span>
+
+            <span class="n">joint_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">person_joints</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">person_joints</span> <span class="ow">in</span> <span class="n">joints</span><span class="p">]</span>
+            <span class="n">part_score_targets</span><span class="p">,</span> <span class="n">part_score_weights</span><span class="p">,</span> <span class="n">locref_targets</span><span class="p">,</span> <span class="n">locref_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_target_part_scoremap</span><span class="p">(</span>
+                <span class="n">joint_id</span><span class="p">,</span> <span class="n">scaled_joints</span><span class="p">,</span> <span class="n">data_item</span><span class="p">,</span> <span class="n">sm_size</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span>
+
+            <span class="n">batch</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="n">Batch</span><span class="o">.</span><span class="n">part_score_targets</span><span class="p">:</span> <span class="n">part_score_targets</span><span class="p">,</span>
+                <span class="n">Batch</span><span class="o">.</span><span class="n">part_score_weights</span><span class="p">:</span> <span class="n">part_score_weights</span><span class="p">,</span>
+                <span class="n">Batch</span><span class="o">.</span><span class="n">locref_targets</span><span class="p">:</span> <span class="n">locref_targets</span><span class="p">,</span>
+                <span class="n">Batch</span><span class="o">.</span><span class="n">locref_mask</span><span class="p">:</span> <span class="n">locref_mask</span>
+            <span class="p">})</span>
+
+        <span class="n">batch</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">data_to_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+        <span class="n">batch</span><span class="p">[</span><span class="n">Batch</span><span class="o">.</span><span class="n">data_item</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_item</span>
+
+        <span class="k">return</span> <span class="n">batch</span></div>
+
+<div class="viewcode-block" id="PoseDataset.compute_target_part_scoremap"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.compute_target_part_scoremap">[docs]</a>    <span class="k">def</span> <span class="nf">compute_target_part_scoremap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">joint_id</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">data_item</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+        <span class="n">stride</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">stride</span>
+        <span class="n">dist_thresh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">pos_dist_thresh</span> <span class="o">*</span> <span class="n">scale</span>
+        <span class="n">num_joints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">num_joints</span>
+        <span class="n">half_stride</span> <span class="o">=</span> <span class="n">stride</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">scmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">cat</span><span class="p">([</span><span class="n">size</span><span class="p">,</span> <span class="n">arr</span><span class="p">([</span><span class="n">num_joints</span><span class="p">])]))</span>
+        <span class="n">locref_size</span> <span class="o">=</span> <span class="n">cat</span><span class="p">([</span><span class="n">size</span><span class="p">,</span> <span class="n">arr</span><span class="p">([</span><span class="n">num_joints</span> <span class="o">*</span> <span class="mi">2</span><span class="p">])])</span>
+        <span class="n">locref_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">locref_size</span><span class="p">)</span>
+        <span class="n">locref_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">locref_size</span><span class="p">)</span>
+
+        <span class="n">locref_scale</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">locref_stdev</span>
+        <span class="n">dist_thresh_sq</span> <span class="o">=</span> <span class="n">dist_thresh</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="n">width</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">person_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">j_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">joint_id</span><span class="p">[</span><span class="n">person_id</span><span class="p">]):</span>
+                <span class="n">joint_pt</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">person_id</span><span class="p">][</span><span class="n">k</span><span class="p">,</span> <span class="p">:]</span>
+                <span class="n">j_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asscalar</span><span class="p">(</span><span class="n">joint_pt</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">j_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asscalar</span><span class="p">(</span><span class="n">joint_pt</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="c1"># don&#39;t loop over entire heatmap, but just relevant locations</span>
+                <span class="n">j_x_sm</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">j_x</span> <span class="o">-</span> <span class="n">half_stride</span><span class="p">)</span> <span class="o">/</span> <span class="n">stride</span><span class="p">)</span>
+                <span class="n">j_y_sm</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">j_y</span> <span class="o">-</span> <span class="n">half_stride</span><span class="p">)</span> <span class="o">/</span> <span class="n">stride</span><span class="p">)</span>
+                <span class="n">min_x</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">j_x_sm</span> <span class="o">-</span> <span class="n">dist_thresh</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="n">max_x</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">j_x_sm</span> <span class="o">+</span> <span class="n">dist_thresh</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">min_y</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">j_y_sm</span> <span class="o">-</span> <span class="n">dist_thresh</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="n">max_y</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">j_y_sm</span> <span class="o">+</span> <span class="n">dist_thresh</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">height</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_y</span><span class="p">,</span> <span class="n">max_y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>  <span class="c1"># range(height):</span>
+                    <span class="n">pt_y</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="n">stride</span> <span class="o">+</span> <span class="n">half_stride</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_x</span><span class="p">,</span> <span class="n">max_x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>  <span class="c1"># range(width):</span>
+                        <span class="c1"># pt = arr([i*stride+half_stride, j*stride+half_stride])</span>
+                        <span class="c1"># diff = joint_pt - pt</span>
+                        <span class="c1"># The code above is too slow in python</span>
+                        <span class="n">pt_x</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">stride</span> <span class="o">+</span> <span class="n">half_stride</span>
+                        <span class="n">dx</span> <span class="o">=</span> <span class="n">j_x</span> <span class="o">-</span> <span class="n">pt_x</span>
+                        <span class="n">dy</span> <span class="o">=</span> <span class="n">j_y</span> <span class="o">-</span> <span class="n">pt_y</span>
+                        <span class="n">dist</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">**</span> <span class="mi">2</span>
+                        <span class="c1"># print(la.norm(diff))</span>
+                        <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">dist_thresh_sq</span><span class="p">:</span>
+                            <span class="n">scmap</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                            <span class="n">locref_mask</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_id</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                            <span class="n">locref_mask</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_id</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                            <span class="n">locref_map</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_id</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">locref_scale</span>
+                            <span class="n">locref_map</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_id</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">locref_scale</span>
+
+        <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_scmap_weights</span><span class="p">(</span><span class="n">scmap</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">joint_id</span><span class="p">,</span> <span class="n">data_item</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">scmap</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">locref_map</span><span class="p">,</span> <span class="n">locref_mask</span></div>
+
+<div class="viewcode-block" id="PoseDataset.compute_scmap_weights"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset.PoseDataset.compute_scmap_weights">[docs]</a>    <span class="k">def</span> <span class="nf">compute_scmap_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scmap_shape</span><span class="p">,</span> <span class="n">joint_id</span><span class="p">,</span> <span class="n">data_item</span><span class="p">):</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">weigh_only_present_joints</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">scmap_shape</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">person_joint_id</span> <span class="ow">in</span> <span class="n">joint_id</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">j_id</span> <span class="ow">in</span> <span class="n">person_joint_id</span><span class="p">:</span>
+                    <span class="n">weights</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">j_id</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">scmap_shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">weights</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

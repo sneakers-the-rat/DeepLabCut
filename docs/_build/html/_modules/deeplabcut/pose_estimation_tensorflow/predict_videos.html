@@ -1,0 +1,836 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_tensorflow.predict_videos &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_tensorflow.predict_videos</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_tensorflow.predict_videos</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">####################################################</span>
+<span class="c1"># Dependencies</span>
+<span class="c1">####################################################</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.nnet</span> <span class="k">import</span> <span class="n">predict</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.config</span> <span class="k">import</span> <span class="n">load_config</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset</span> <span class="k">import</span> <span class="n">data_to_input</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">from</span> <span class="nn">skimage.util</span> <span class="k">import</span> <span class="n">img_as_ubyte</span>
+
+<span class="c1">####################################################</span>
+<span class="c1"># Loading data, and defining model folder</span>
+<span class="c1">####################################################</span>
+
+<div class="viewcode-block" id="analyze_videos"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.predict_videos.analyze_videos">[docs]</a><span class="k">def</span> <span class="nf">analyze_videos</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">videos</span><span class="p">,</span><span class="n">videotype</span><span class="o">=</span><span class="s1">&#39;avi&#39;</span><span class="p">,</span><span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">trainingsetindex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">gputouse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">save_as_csv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">destfolder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cropping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">get_nframesfrommetadata</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Makes prediction based on a trained network. The index of the trained network is specified by parameters in the config file (in particular the variable &#39;snapshotindex&#39;)</span>
+
+<span class="sd">    You can crop the video (before analysis), by changing &#39;cropping&#39;=True and setting &#39;x1&#39;,&#39;x2&#39;,&#39;y1&#39;,&#39;y2&#39; in the config file. The same cropping parameters will then be used for creating the video.</span>
+<span class="sd">    Note: you can also pass cropping = [x1,x2,y1,y2] coordinates directly, that then will be used for all videos. You can of course loop over videos &amp; pass specific coordinates for each case.</span>
+
+<span class="sd">    Output: The labels are stored as MultiIndex Pandas Array, which contains the name of the network, body part name, (x, y) label position \n</span>
+<span class="sd">            in pixels, and the likelihood for each frame per body part. These arrays are stored in an efficient Hierarchical Data Format (HDF) \n</span>
+<span class="sd">            in the same directory, where the video is stored. However, if the flag save_as_csv is set to True, the data can also be exported in \n</span>
+<span class="sd">            comma-separated values format (.csv), which in turn can be imported in many programs, such as MATLAB, R, Prism, etc.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    videos : list</span>
+<span class="sd">        A list of strings containing the full paths to videos for analysis or a path to the directory, where all the videos with same extension are stored.</span>
+
+<span class="sd">    videotype: string, optional</span>
+<span class="sd">        Checks for the extension of the video in case the input to the video is a directory.\n Only videos with this extension are analyzed. The default is ``.avi``</span>
+
+<span class="sd">    shuffle: int, optional</span>
+<span class="sd">        An integer specifying the shuffle index of the training dataset used for training the network. The default is 1.</span>
+
+<span class="sd">    trainingsetindex: int, optional</span>
+<span class="sd">        Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</span>
+
+<span class="sd">    gputouse: int, optional. Natural number indicating the number of your GPU (see number in nvidia-smi). If you do not have a GPU put None.</span>
+<span class="sd">    See: https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries</span>
+
+<span class="sd">    save_as_csv: bool, optional</span>
+<span class="sd">        Saves the predictions in a .csv file. The default is ``False``; if provided it must be either ``True`` or ``False``</span>
+
+<span class="sd">    destfolder: string, optional</span>
+<span class="sd">        Specifies the destination folder for analysis data (default is the path of the video). Note that for subsequent analysis this</span>
+<span class="sd">        folder also needs to be passed.</span>
+
+<span class="sd">    get_nframesfrommetadata: bool, Default true.</span>
+<span class="sd">        Some videos have wrong metadata (and thus the frame number is not accurate). If this is set to False, then the</span>
+<span class="sd">        video is loaded frame by frame and the number of frames is counted. This makes sure that for broken metadata</span>
+<span class="sd">        the output file is correct. See https://github.com/AlexEMG/DeepLabCut/issues/422</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    Windows example for analyzing 1 video</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.analyze_videos(&#39;C:\\myproject\\reaching-task\\config.yaml&#39;,[&#39;C:\\yourusername\\rig-95\\Videos\\reachingvideo1.avi&#39;])</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    If you want to analyze only 1 video</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.analyze_videos(&#39;/analysis/project/reaching-task/config.yaml&#39;,[&#39;/analysis/project/videos/reachingvideo1.avi&#39;])</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    If you want to analyze all videos of type avi in a folder:</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.analyze_videos(&#39;/analysis/project/reaching-task/config.yaml&#39;,[&#39;/analysis/project/videos&#39;],videotype=&#39;.avi&#39;)</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    If you want to analyze multiple videos</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.analyze_videos(&#39;/analysis/project/reaching-task/config.yaml&#39;,[&#39;/analysis/project/videos/reachingvideo1.avi&#39;,&#39;/analysis/project/videos/reachingvideo2.avi&#39;])</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    If you want to analyze multiple videos with shuffle = 2</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.analyze_videos(&#39;/analysis/project/reaching-task/config.yaml&#39;,[&#39;/analysis/project/videos/reachingvideo1.avi&#39;,&#39;/analysis/project/videos/reachingvideo2.avi&#39;], shuffle=2)</span>
+
+<span class="sd">    --------</span>
+<span class="sd">    If you want to analyze multiple videos with shuffle = 2 and save results as an additional csv file too</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.analyze_videos(&#39;/analysis/project/reaching-task/config.yaml&#39;,[&#39;/analysis/project/videos/reachingvideo1.avi&#39;,&#39;/analysis/project/videos/reachingvideo2.avi&#39;], shuffle=2,save_as_csv=True)</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;TF_CUDNN_USE_AUTOTUNE&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TF_CUDNN_USE_AUTOTUNE&#39;</span><span class="p">]</span> <span class="c1">#was potentially set during training</span>
+
+    <span class="k">if</span> <span class="n">gputouse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#gpu selection</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CUDA_VISIBLE_DEVICES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gputouse</span><span class="p">)</span>
+
+    <span class="n">vers</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">12</span><span class="p">:</span>
+        <span class="n">TF</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">TF</span><span class="o">=</span><span class="n">tf</span>
+
+    <span class="n">TF</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+    <span class="n">start_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="c1">#record cwd to return to this directory in the end</span>
+
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">cropping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">cropping</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overwriting cropping parameters:&quot;</span><span class="p">,</span> <span class="n">cropping</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;These are used for all videos, but won&#39;t be save to the cfg file.&quot;</span><span class="p">)</span>
+
+    <span class="n">trainFraction</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="n">trainingsetindex</span><span class="p">]</span>
+
+    <span class="n">modelfolder</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;project_path&quot;</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetModelFolder</span><span class="p">(</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">cfg</span><span class="p">)))</span>
+    <span class="n">path_test_config</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">modelfolder</span><span class="p">)</span> <span class="o">/</span> <span class="s1">&#39;test&#39;</span> <span class="o">/</span> <span class="s1">&#39;pose_cfg.yaml&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dlc_cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path_test_config</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;It seems the model for shuffle </span><span class="si">%s</span><span class="s2"> and trainFraction </span><span class="si">%s</span><span class="s2"> does not exist.&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">))</span>
+
+    <span class="c1"># Check which snapshots are available and sort them by # iterations</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">Snapshots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">modelfolder</span> <span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">))</span><span class="k">if</span> <span class="s2">&quot;index&quot;</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Snapshots not found! It seems the dataset for shuffle </span><span class="si">%s</span><span class="s2"> has not been trained/does not exist.</span><span class="se">\n</span><span class="s2"> Please train it before using it to analyze videos.</span><span class="se">\n</span><span class="s2"> Use the function &#39;train_network&#39; to train the network for shuffle </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">shuffle</span><span class="p">,</span><span class="n">shuffle</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;snapshotindex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Snapshotindex is set to &#39;all&#39; in the config.yaml file. Running video analysis with all snapshots is very costly! Use the function &#39;evaluate_network&#39; to choose the best the snapshot. For now, changing snapshot index to -1!&quot;</span><span class="p">)</span>
+        <span class="n">snapshotindex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">snapshotindex</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;snapshotindex&#39;</span><span class="p">]</span>
+
+    <span class="n">increasing_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">Snapshots</span><span class="p">])</span>
+    <span class="n">Snapshots</span> <span class="o">=</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">increasing_indices</span><span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">snapshotindex</span><span class="p">],</span> <span class="s2">&quot;for model&quot;</span><span class="p">,</span> <span class="n">modelfolder</span><span class="p">)</span>
+
+    <span class="c1">##################################################</span>
+    <span class="c1"># Load and setup CNN part detector</span>
+    <span class="c1">##################################################</span>
+
+    <span class="c1"># Check if data already was generated:</span>
+    <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;init_weights&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">modelfolder</span> <span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">snapshotindex</span><span class="p">])</span>
+    <span class="n">trainingsiterations</span> <span class="o">=</span> <span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;init_weights&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1">#update batchsize (based on parameters in config.yaml)</span>
+    <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span>
+
+    <span class="c1"># update number of outputs</span>
+    <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1">#print(&#39;num_outputs = &#39;, dlc_cfg[&#39;num_outputs&#39;])</span>
+
+    <span class="c1"># Name for scorer:</span>
+    <span class="n">DLCscorer</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetScorerName</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">trainingsiterations</span><span class="o">=</span><span class="n">trainingsiterations</span><span class="p">)</span>
+
+    <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">predict</span><span class="o">.</span><span class="n">setup_pose_prediction</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">)</span>
+
+    <span class="n">xyz_labs_orig</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;likelihood&#39;</span><span class="p">]</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">])]</span>
+    <span class="n">suffix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="c1"># first one has empty suffix for backwards compatibility</span>
+    <span class="n">xyz_labs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">+</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">suffix</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xyz_labs_orig</span><span class="p">]</span>
+
+    <span class="n">pdindex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([[</span><span class="n">DLCscorer</span><span class="p">],</span>
+                                          <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;all_joints_names&#39;</span><span class="p">],</span>
+                                          <span class="n">xyz_labs</span><span class="p">],</span>
+                                         <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;scorer&#39;</span><span class="p">,</span> <span class="s1">&#39;bodyparts&#39;</span><span class="p">,</span> <span class="s1">&#39;coords&#39;</span><span class="p">])</span>
+
+    <span class="c1">##################################################</span>
+    <span class="c1"># Datafolder</span>
+    <span class="c1">##################################################</span>
+    <span class="n">Videos</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">Getlistofvideos</span><span class="p">(</span><span class="n">videos</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Videos</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="c1">#looping over videos</span>
+        <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">Videos</span><span class="p">:</span>
+            <span class="n">AnalyzeVideo</span><span class="p">(</span><span class="n">video</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">cfg</span><span class="p">,</span><span class="n">dlc_cfg</span><span class="p">,</span><span class="n">sess</span><span class="p">,</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span><span class="n">pdindex</span><span class="p">,</span><span class="n">save_as_csv</span><span class="p">,</span> <span class="n">destfolder</span><span class="p">,</span><span class="n">get_nframesfrommetadata</span><span class="p">)</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">start_path</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The videos are analyzed. Now your research can truly start! </span><span class="se">\n</span><span class="s2"> You can create labeled videos with &#39;create_labeled_video&#39;.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;If the tracking is not satisfactory for some videos, consider expanding the training set. You can use the function &#39;extract_outlier_frames&#39; to extract any outlier frames!&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No video was found in the path/ or single video with path:&quot;</span><span class="p">,</span> <span class="n">videos</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Perhaps the videotype is distinct from the videos in the path, I was looking for:&quot;</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">DLCscorer</span></div>
+
+
+<div class="viewcode-block" id="GetPoseF"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.predict_videos.GetPoseF">[docs]</a><span class="k">def</span> <span class="nf">GetPoseF</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span><span class="n">cap</span><span class="p">,</span><span class="n">nframes</span><span class="p">,</span><span class="n">batchsize</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Batchwise prediction of pose &#39;&#39;&#39;</span>
+
+    <span class="n">PredicteData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nframes</span><span class="p">,</span> <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;all_joints_names&#39;</span><span class="p">])))</span>
+    <span class="n">batch_ind</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># keeps track of which image within a batch should be written to</span>
+    <span class="n">batch_num</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># keeps track of which batch you are at</span>
+    <span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">4</span><span class="p">)),</span><span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cropping based on the x1 = </span><span class="si">%s</span><span class="s2"> x2 = </span><span class="si">%s</span><span class="s2"> y1 = </span><span class="si">%s</span><span class="s2"> y2 = </span><span class="si">%s</span><span class="s2">. You can adjust the cropping coordinates in the config.yaml file.&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">],</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">],</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]))</span>
+        <span class="n">nx</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span>
+        <span class="n">ny</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nx</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">ny</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Please check the order of cropping parameter!&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">pass</span> <span class="c1">#good cropping box</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Please check the boundary of cropping!&#39;</span><span class="p">)</span>
+
+    <span class="n">frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">batchsize</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;ubyte&#39;</span><span class="p">)</span> <span class="c1"># this keeps all frames in a batch</span>
+    <span class="n">pbar</span><span class="o">=</span><span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">nframes</span><span class="p">)</span>
+    <span class="n">counter</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">step</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nframes</span><span class="o">/</span><span class="mi">100</span><span class="p">))</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">counter</span><span class="o">%</span><span class="n">step</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="n">frame</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]:</span>
+                    <span class="n">frames</span><span class="p">[</span><span class="n">batch_ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]:</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]:</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">]])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">frames</span><span class="p">[</span><span class="n">batch_ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">batch_ind</span><span class="o">==</span><span class="n">batchsize</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">pose</span> <span class="o">=</span> <span class="n">predict</span><span class="o">.</span><span class="n">getposeNP</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+                    <span class="n">PredicteData</span><span class="p">[</span><span class="n">batch_num</span><span class="o">*</span><span class="n">batchsize</span><span class="p">:(</span><span class="n">batch_num</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">batchsize</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pose</span>
+                    <span class="n">batch_ind</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">batch_num</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                   <span class="n">batch_ind</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nframes</span> <span class="o">=</span> <span class="n">counter</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Detected frames: &quot;</span><span class="p">,</span> <span class="n">nframes</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">batch_ind</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">pose</span> <span class="o">=</span> <span class="n">predict</span><span class="o">.</span><span class="n">getposeNP</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span> <span class="c1">#process the whole batch (some frames might be from previous batch!)</span>
+                    <span class="n">PredicteData</span><span class="p">[</span><span class="n">batch_num</span><span class="o">*</span><span class="n">batchsize</span><span class="p">:</span><span class="n">batch_num</span><span class="o">*</span><span class="n">batchsize</span><span class="o">+</span><span class="n">batch_ind</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[:</span><span class="n">batch_ind</span><span class="p">,:]</span>
+                <span class="k">break</span>
+            <span class="n">counter</span><span class="o">+=</span><span class="mi">1</span>
+
+    <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">PredicteData</span><span class="p">,</span><span class="n">nframes</span></div>
+
+
+<div class="viewcode-block" id="GetPoseS"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.predict_videos.GetPoseS">[docs]</a><span class="k">def</span> <span class="nf">GetPoseS</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span><span class="n">cap</span><span class="p">,</span><span class="n">nframes</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Non batch wise pose estimation for video cap.&#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cropping based on the x1 = </span><span class="si">%s</span><span class="s2"> x2 = </span><span class="si">%s</span><span class="s2"> y1 = </span><span class="si">%s</span><span class="s2"> y2 = </span><span class="si">%s</span><span class="s2">. You can adjust the cropping coordinates in the config.yaml file.&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">],</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">],</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]))</span>
+        <span class="n">nx</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span>
+        <span class="n">ny</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nx</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">ny</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Please check the order of cropping parameter!&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">pass</span> <span class="c1">#good cropping box</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Please check the boundary of cropping!&#39;</span><span class="p">)</span>
+
+    <span class="n">PredicteData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nframes</span><span class="p">,</span> <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;all_joints_names&#39;</span><span class="p">])))</span>
+
+    <span class="n">pbar</span><span class="o">=</span><span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">nframes</span><span class="p">)</span>
+    <span class="n">counter</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">step</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nframes</span><span class="o">/</span><span class="mi">100</span><span class="p">))</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">counter</span><span class="o">%</span><span class="n">step</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+
+            <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="n">frame</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]:</span>
+                    <span class="n">frame</span><span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]:</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]:</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">]])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">frame</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+                <span class="n">pose</span> <span class="o">=</span> <span class="n">predict</span><span class="o">.</span><span class="n">getpose</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+                <span class="n">PredicteData</span><span class="p">[</span><span class="n">counter</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pose</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># NOTE: thereby cfg[&#39;all_joints_names&#39;] should be same order as bodyparts!</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nframes</span><span class="o">=</span><span class="n">counter</span>
+                <span class="k">break</span>
+            <span class="n">counter</span><span class="o">+=</span><span class="mi">1</span>
+
+    <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">PredicteData</span><span class="p">,</span><span class="n">nframes</span></div>
+
+<div class="viewcode-block" id="bruteforce_countframes_bydecoding"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.predict_videos.bruteforce_countframes_bydecoding">[docs]</a><span class="k">def</span> <span class="nf">bruteforce_countframes_bydecoding</span><span class="p">(</span><span class="n">cap</span><span class="p">):</span>
+    <span class="n">counter</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">()):</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="n">counter</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="c1">#reset cap to frame 0!</span>
+    <span class="k">return</span> <span class="n">counter</span></div>
+
+
+<div class="viewcode-block" id="AnalyzeVideo"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.predict_videos.AnalyzeVideo">[docs]</a><span class="k">def</span> <span class="nf">AnalyzeVideo</span><span class="p">(</span><span class="n">video</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">cfg</span><span class="p">,</span><span class="n">dlc_cfg</span><span class="p">,</span><span class="n">sess</span><span class="p">,</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span><span class="n">pdindex</span><span class="p">,</span><span class="n">save_as_csv</span><span class="p">,</span> <span class="n">destfolder</span><span class="p">,</span><span class="n">get_nframesfrommetadata</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Helper function for analyzing a video &#39;&#39;&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting to analyze % &quot;</span><span class="p">,</span> <span class="n">video</span><span class="p">)</span>
+    <span class="n">vname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+    <span class="k">if</span> <span class="n">destfolder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">destfolder</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">dataname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">destfolder</span><span class="p">,</span><span class="n">vname</span> <span class="o">+</span> <span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Attempt to load data...</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">dataname</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Video already analyzed!&quot;</span><span class="p">,</span> <span class="n">dataname</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Loading &quot;</span><span class="p">,</span> <span class="n">video</span><span class="p">)</span>
+        <span class="n">cap</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">get_nframesfrommetadata</span><span class="p">:</span>
+            <span class="n">nframes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">7</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1">#actually decode and check</span>
+            <span class="n">nframes_metadata</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">7</span><span class="p">))</span>
+            <span class="n">nframes</span><span class="o">=</span><span class="n">bruteforce_countframes_bydecoding</span><span class="p">(</span><span class="n">cap</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Metadata:&quot;</span><span class="p">,</span><span class="n">nframes_metadata</span><span class="p">,</span><span class="s2">&quot;Counted:&quot;</span><span class="p">,</span><span class="n">nframes</span><span class="p">)</span>
+            <span class="n">nframes</span><span class="o">+=</span><span class="mi">5</span> <span class="c1">#adding buffer! [will be cropped anyway if too long]</span>
+            <span class="n">cap</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">video</span><span class="p">)</span> <span class="c1">#reopen video</span>
+
+        <span class="n">fps</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="c1">#https://docs.opencv.org/2.4/modules/highgui/doc/reading_and_writing_images_and_video.html#videocapture-get</span>
+        <span class="n">duration</span><span class="o">=</span><span class="n">nframes</span><span class="o">*</span><span class="mf">1.</span><span class="o">/</span><span class="n">fps</span>
+        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">4</span><span class="p">)),</span><span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>
+
+        <span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="o">=</span><span class="n">size</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Duration of video [s]: &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;, recorded with &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">fps</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s2">&quot;fps!&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall # of frames: &quot;</span><span class="p">,</span> <span class="n">nframes</span><span class="p">,</span><span class="s2">&quot; found with (before cropping) frame dimensions: &quot;</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span><span class="n">ny</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting to extract posture&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">PredicteData</span><span class="p">,</span><span class="n">nframes</span><span class="o">=</span><span class="n">GetPoseF</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span><span class="n">cap</span><span class="p">,</span><span class="n">nframes</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">PredicteData</span><span class="p">,</span><span class="n">nframes</span><span class="o">=</span><span class="n">GetPoseS</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span><span class="n">cap</span><span class="p">,</span><span class="n">nframes</span><span class="p">)</span>
+
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ny</span><span class="p">]</span>
+
+        <span class="n">dictionary</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="n">start</span><span class="p">,</span>
+            <span class="s2">&quot;stop&quot;</span><span class="p">:</span> <span class="n">stop</span><span class="p">,</span>
+            <span class="s2">&quot;run_duration&quot;</span><span class="p">:</span> <span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">,</span>
+            <span class="s2">&quot;Scorer&quot;</span><span class="p">:</span> <span class="n">DLCscorer</span><span class="p">,</span>
+            <span class="s2">&quot;DLC-model-config file&quot;</span><span class="p">:</span> <span class="n">dlc_cfg</span><span class="p">,</span>
+            <span class="s2">&quot;fps&quot;</span><span class="p">:</span> <span class="n">fps</span><span class="p">,</span>
+            <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">dlc_cfg</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;num_outputs&quot;</span><span class="p">:</span> <span class="n">dlc_cfg</span><span class="p">[</span><span class="s2">&quot;num_outputs&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;frame_dimensions&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span>
+            <span class="s2">&quot;nframes&quot;</span><span class="p">:</span> <span class="n">nframes</span><span class="p">,</span>
+            <span class="s2">&quot;iteration (active-learning)&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;iteration&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;training set fraction&quot;</span><span class="p">:</span> <span class="n">trainFraction</span><span class="p">,</span>
+            <span class="s2">&quot;cropping&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">],</span>
+            <span class="s2">&quot;cropping_parameters&quot;</span><span class="p">:</span> <span class="n">coords</span>
+        <span class="p">}</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">dictionary</span><span class="p">}</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving results in </span><span class="si">%s</span><span class="s2">...&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">SaveData</span><span class="p">(</span><span class="n">PredicteData</span><span class="p">[:</span><span class="n">nframes</span><span class="p">,:],</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">dataname</span><span class="p">,</span> <span class="n">pdindex</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">nframes</span><span class="p">),</span><span class="n">save_as_csv</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GetPosesofFrames"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.predict_videos.GetPosesofFrames">[docs]</a><span class="k">def</span> <span class="nf">GetPosesofFrames</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span><span class="n">directory</span><span class="p">,</span><span class="n">framelist</span><span class="p">,</span><span class="n">nframes</span><span class="p">,</span><span class="n">batchsize</span><span class="p">,</span><span class="n">rgb</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Batchwise prediction of pose  for framelist in directory&#39;&#39;&#39;</span>
+    <span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">io</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting to extract posture&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rgb</span><span class="p">:</span>
+        <span class="n">im</span><span class="o">=</span><span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span><span class="n">framelist</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">im</span><span class="o">=</span><span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span><span class="n">framelist</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="p">,</span><span class="n">nc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall # of frames: &quot;</span><span class="p">,</span> <span class="n">nframes</span><span class="p">,</span><span class="s2">&quot; found with (before cropping) frame dimensions: &quot;</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span><span class="n">ny</span><span class="p">)</span>
+
+    <span class="n">PredicteData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nframes</span><span class="p">,</span> <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;all_joints_names&#39;</span><span class="p">])))</span>
+    <span class="n">batch_ind</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># keeps track of which image within a batch should be written to</span>
+    <span class="n">batch_num</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># keeps track of which batch you are at</span>
+
+    <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cropping based on the x1 = </span><span class="si">%s</span><span class="s2"> x2 = </span><span class="si">%s</span><span class="s2"> y1 = </span><span class="si">%s</span><span class="s2"> y2 = </span><span class="si">%s</span><span class="s2">. You can adjust the cropping coordinates in the config.yaml file.&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">],</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">],</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]))</span>
+        <span class="n">nx</span><span class="p">,</span><span class="n">ny</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nx</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">ny</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Please check the order of cropping parameter!&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">im</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="ow">and</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">im</span><span class="p">)[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">pass</span> <span class="c1">#good cropping box</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Please check the boundary of cropping!&#39;</span><span class="p">)</span>
+
+    <span class="n">pbar</span><span class="o">=</span><span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">nframes</span><span class="p">)</span>
+    <span class="n">counter</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">step</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nframes</span><span class="o">/</span><span class="mi">100</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">batchsize</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">counter</span><span class="p">,</span><span class="n">framename</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">framelist</span><span class="p">):</span>
+                <span class="c1">#frame=io.imread(os.path.join(directory,framename),mode=&#39;RGB&#39;)</span>
+                <span class="k">if</span> <span class="n">rgb</span><span class="p">:</span>
+                    <span class="n">im</span><span class="o">=</span><span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span><span class="n">framename</span><span class="p">),</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">im</span><span class="o">=</span><span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span><span class="n">framename</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">counter</span><span class="o">%</span><span class="n">step</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]:</span>
+                    <span class="n">frame</span><span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">im</span><span class="p">[</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]:</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]:</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">],:])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">frame</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+
+                <span class="n">pose</span> <span class="o">=</span> <span class="n">predict</span><span class="o">.</span><span class="n">getpose</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+                <span class="n">PredicteData</span><span class="p">[</span><span class="n">counter</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pose</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">batchsize</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;ubyte&#39;</span><span class="p">)</span> <span class="c1"># this keeps all the frames of a batch</span>
+        <span class="k">for</span> <span class="n">counter</span><span class="p">,</span><span class="n">framename</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">framelist</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">rgb</span><span class="p">:</span>
+                    <span class="n">im</span><span class="o">=</span><span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span><span class="n">framename</span><span class="p">),</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">im</span><span class="o">=</span><span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span><span class="n">framename</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">counter</span><span class="o">%</span><span class="n">step</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]:</span>
+                    <span class="n">frames</span><span class="p">[</span><span class="n">batch_ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">im</span><span class="p">[</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]:</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]:</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">],:])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">frames</span><span class="p">[</span><span class="n">batch_ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">batch_ind</span><span class="o">==</span><span class="n">batchsize</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">pose</span> <span class="o">=</span> <span class="n">predict</span><span class="o">.</span><span class="n">getposeNP</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span><span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+                    <span class="n">PredicteData</span><span class="p">[</span><span class="n">batch_num</span><span class="o">*</span><span class="n">batchsize</span><span class="p">:(</span><span class="n">batch_num</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">batchsize</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pose</span>
+                    <span class="n">batch_ind</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">batch_num</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                   <span class="n">batch_ind</span><span class="o">+=</span><span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">batch_ind</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span> <span class="c1">#take care of the last frames (the batch that might have been processed)</span>
+            <span class="n">pose</span> <span class="o">=</span> <span class="n">predict</span><span class="o">.</span><span class="n">getposeNP</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span> <span class="c1">#process the whole batch (some frames might be from previous batch!)</span>
+            <span class="n">PredicteData</span><span class="p">[</span><span class="n">batch_num</span><span class="o">*</span><span class="n">batchsize</span><span class="p">:</span><span class="n">batch_num</span><span class="o">*</span><span class="n">batchsize</span><span class="o">+</span><span class="n">batch_ind</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[:</span><span class="n">batch_ind</span><span class="p">,:]</span>
+
+    <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">PredicteData</span><span class="p">,</span><span class="n">nframes</span><span class="p">,</span><span class="n">nx</span><span class="p">,</span><span class="n">ny</span></div>
+
+
+<div class="viewcode-block" id="analyze_time_lapse_frames"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.predict_videos.analyze_time_lapse_frames">[docs]</a><span class="k">def</span> <span class="nf">analyze_time_lapse_frames</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">directory</span><span class="p">,</span><span class="n">frametype</span><span class="o">=</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span><span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">trainingsetindex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">gputouse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">save_as_csv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">rgb</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Analyzed all images (of type = frametype) in a folder and stores the output in one file.</span>
+
+<span class="sd">    You can crop the frames (before analysis), by changing &#39;cropping&#39;=True and setting &#39;x1&#39;,&#39;x2&#39;,&#39;y1&#39;,&#39;y2&#39; in the config file.</span>
+
+<span class="sd">    Output: The labels are stored as MultiIndex Pandas Array, which contains the name of the network, body part name, (x, y) label position \n</span>
+<span class="sd">            in pixels, and the likelihood for each frame per body part. These arrays are stored in an efficient Hierarchical Data Format (HDF) \n</span>
+<span class="sd">            in the same directory, where the video is stored. However, if the flag save_as_csv is set to True, the data can also be exported in \n</span>
+<span class="sd">            comma-separated values format (.csv), which in turn can be imported in many programs, such as MATLAB, R, Prism, etc.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    directory: string</span>
+<span class="sd">        Full path to directory containing the frames that shall be analyzed</span>
+
+<span class="sd">    frametype: string, optional</span>
+<span class="sd">        Checks for the file extension of the frames. Only images with this extension are analyzed. The default is ``.png``</span>
+
+<span class="sd">    shuffle: int, optional</span>
+<span class="sd">        An integer specifying the shuffle index of the training dataset used for training the network. The default is 1.</span>
+
+<span class="sd">    trainingsetindex: int, optional</span>
+<span class="sd">        Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</span>
+
+<span class="sd">    gputouse: int, optional. Natural number indicating the number of your GPU (see number in nvidia-smi). If you do not have a GPU put None.</span>
+<span class="sd">    See: https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries</span>
+
+<span class="sd">    save_as_csv: bool, optional</span>
+<span class="sd">        Saves the predictions in a .csv file. The default is ``False``; if provided it must be either ``True`` or ``False``</span>
+
+<span class="sd">    rbg: bool, optional.</span>
+<span class="sd">        Whether to load image as rgb; Note e.g. some tiffs do not alow that option in io.imread, then just set this to false.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    If you want to analyze all frames in /analysis/project/timelapseexperiment1</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.analyze_videos(&#39;/analysis/project/reaching-task/config.yaml&#39;,&#39;/analysis/project/timelapseexperiment1&#39;)</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    If you want to analyze all frames in /analysis/project/timelapseexperiment1</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.analyze_videos(&#39;/analysis/project/reaching-task/config.yaml&#39;,&#39;/analysis/project/timelapseexperiment1&#39;, frametype=&#39;.bmp&#39;)</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    Note: for test purposes one can extract all frames from a video with ffmeg, e.g. ffmpeg -i testvideo.avi thumb%04d.png</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;TF_CUDNN_USE_AUTOTUNE&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TF_CUDNN_USE_AUTOTUNE&#39;</span><span class="p">]</span> <span class="c1">#was potentially set during training</span>
+
+    <span class="k">if</span> <span class="n">gputouse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># gpu selection</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CUDA_VISIBLE_DEVICES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gputouse</span><span class="p">)</span>
+
+    <span class="n">vers</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
+        <span class="n">TF</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">TF</span> <span class="o">=</span> <span class="n">tf</span>
+
+    <span class="n">TF</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+    <span class="n">start_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="c1">#record cwd to return to this directory in the end</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">trainFraction</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="n">trainingsetindex</span><span class="p">]</span>
+    <span class="n">modelfolder</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;project_path&quot;</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetModelFolder</span><span class="p">(</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">cfg</span><span class="p">)))</span>
+    <span class="n">path_test_config</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">modelfolder</span><span class="p">)</span> <span class="o">/</span> <span class="s1">&#39;test&#39;</span> <span class="o">/</span> <span class="s1">&#39;pose_cfg.yaml&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dlc_cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path_test_config</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;It seems the model for shuffle </span><span class="si">%s</span><span class="s2"> and trainFraction </span><span class="si">%s</span><span class="s2"> does not exist.&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">))</span>
+    <span class="c1"># Check which snapshots are available and sort them by # iterations</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">Snapshots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">modelfolder</span> <span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">))</span><span class="k">if</span> <span class="s2">&quot;index&quot;</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Snapshots not found! It seems the dataset for shuffle </span><span class="si">%s</span><span class="s2"> has not been trained/does not exist.</span><span class="se">\n</span><span class="s2"> Please train it before using it to analyze videos.</span><span class="se">\n</span><span class="s2"> Use the function &#39;train_network&#39; to train the network for shuffle </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">shuffle</span><span class="p">,</span><span class="n">shuffle</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;snapshotindex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Snapshotindex is set to &#39;all&#39; in the config.yaml file. Running video analysis with all snapshots is very costly! Use the function &#39;evaluate_network&#39; to choose the best the snapshot. For now, changing snapshot index to -1!&quot;</span><span class="p">)</span>
+        <span class="n">snapshotindex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">snapshotindex</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;snapshotindex&#39;</span><span class="p">]</span>
+
+    <span class="n">increasing_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">Snapshots</span><span class="p">])</span>
+    <span class="n">Snapshots</span> <span class="o">=</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">increasing_indices</span><span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">snapshotindex</span><span class="p">],</span> <span class="s2">&quot;for model&quot;</span><span class="p">,</span> <span class="n">modelfolder</span><span class="p">)</span>
+
+    <span class="c1">##################################################</span>
+    <span class="c1"># Load and setup CNN part detector</span>
+    <span class="c1">##################################################</span>
+
+    <span class="c1"># Check if data already was generated:</span>
+    <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;init_weights&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">modelfolder</span> <span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">snapshotindex</span><span class="p">])</span>
+    <span class="n">trainingsiterations</span> <span class="o">=</span> <span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;init_weights&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1">#update batchsize (based on parameters in config.yaml)</span>
+    <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Name for scorer:</span>
+    <span class="n">DLCscorer</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetScorerName</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">trainingsiterations</span><span class="o">=</span><span class="n">trainingsiterations</span><span class="p">)</span>
+    <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">predict</span><span class="o">.</span><span class="n">setup_pose_prediction</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">)</span>
+
+    <span class="c1"># update number of outputs and adjust pandas indices</span>
+    <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">xyz_labs_orig</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;likelihood&#39;</span><span class="p">]</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">])]</span>
+    <span class="n">suffix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="c1"># first one has empty suffix for backwards compatibility</span>
+    <span class="n">xyz_labs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">+</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">suffix</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xyz_labs_orig</span><span class="p">]</span>
+
+    <span class="n">pdindex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([[</span><span class="n">DLCscorer</span><span class="p">],</span>
+                                          <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;all_joints_names&#39;</span><span class="p">],</span>
+                                          <span class="n">xyz_labs</span><span class="p">],</span>
+                                         <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;scorer&#39;</span><span class="p">,</span> <span class="s1">&#39;bodyparts&#39;</span><span class="p">,</span> <span class="s1">&#39;coords&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">gputouse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#gpu selectinon</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CUDA_VISIBLE_DEVICES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gputouse</span><span class="p">)</span>
+
+    <span class="c1">##################################################</span>
+    <span class="c1"># Loading the images</span>
+    <span class="c1">##################################################</span>
+    <span class="c1">#checks if input is a directory</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes all the frames in the directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Analyzing all frames in the directory: &quot;</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">framelist</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">frametype</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">)])</span>
+
+        <span class="n">vname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+        <span class="n">dataname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span><span class="n">vname</span> <span class="o">+</span> <span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Attempt to load data...</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">dataname</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Frames already analyzed!&quot;</span><span class="p">,</span> <span class="n">dataname</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">nframes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">framelist</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nframes</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+                <span class="n">PredicteData</span><span class="p">,</span><span class="n">nframes</span><span class="p">,</span><span class="n">nx</span><span class="p">,</span><span class="n">ny</span><span class="o">=</span><span class="n">GetPosesofFrames</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">dlc_cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span><span class="n">directory</span><span class="p">,</span><span class="n">framelist</span><span class="p">,</span><span class="n">nframes</span><span class="p">,</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">],</span><span class="n">rgb</span><span class="p">)</span>
+                <span class="n">stop</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+                    <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ny</span><span class="p">]</span>
+
+                <span class="n">dictionary</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="n">start</span><span class="p">,</span>
+                    <span class="s2">&quot;stop&quot;</span><span class="p">:</span> <span class="n">stop</span><span class="p">,</span>
+                    <span class="s2">&quot;run_duration&quot;</span><span class="p">:</span> <span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">,</span>
+                    <span class="s2">&quot;Scorer&quot;</span><span class="p">:</span> <span class="n">DLCscorer</span><span class="p">,</span>
+                    <span class="s2">&quot;config file&quot;</span><span class="p">:</span> <span class="n">dlc_cfg</span><span class="p">,</span>
+                    <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">dlc_cfg</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;num_outputs&quot;</span><span class="p">:</span> <span class="n">dlc_cfg</span><span class="p">[</span><span class="s2">&quot;num_outputs&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;frame_dimensions&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span>
+                    <span class="s2">&quot;nframes&quot;</span><span class="p">:</span> <span class="n">nframes</span><span class="p">,</span>
+                    <span class="s2">&quot;cropping&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">],</span>
+                    <span class="s2">&quot;cropping_parameters&quot;</span><span class="p">:</span> <span class="n">coords</span>
+                <span class="p">}</span>
+                <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">dictionary</span><span class="p">}</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving results in </span><span class="si">%s</span><span class="s2">...&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">directory</span><span class="p">))</span>
+
+                <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">SaveData</span><span class="p">(</span><span class="n">PredicteData</span><span class="p">[:</span><span class="n">nframes</span><span class="p">,:],</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">dataname</span><span class="p">,</span> <span class="n">pdindex</span><span class="p">,</span> <span class="n">framelist</span><span class="p">,</span><span class="n">save_as_csv</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The folder was analyzed. Now your research can truly start!&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;If the tracking is not satisfactory for some frome, consider expanding the training set.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No frames were found. Consider changing the path or the frametype.&quot;</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">start_path</span><span class="p">))</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;video&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
+    <span class="n">cli_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

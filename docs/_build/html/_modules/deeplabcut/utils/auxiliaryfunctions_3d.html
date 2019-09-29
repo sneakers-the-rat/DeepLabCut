@@ -1,0 +1,408 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.utils.auxiliaryfunctions_3d &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.utils.auxiliaryfunctions_3d</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.utils.auxiliaryfunctions_3d</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+<span class="sd">Please see AUTHORS for contributors.</span>
+
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<div class="viewcode-block" id="Foldernames3Dproject"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.auxiliaryfunctions_3d.Foldernames3Dproject">[docs]</a><span class="k">def</span> <span class="nf">Foldernames3Dproject</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Definitions of subfolders in 3D projects &#39;&#39;&#39;</span>
+    
+    <span class="n">img_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="s1">&#39;calibration_images&#39;</span><span class="p">)</span>
+    <span class="n">path_corners</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="s1">&#39;corners&#39;</span><span class="p">)</span>
+    <span class="n">path_camera_matrix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="s1">&#39;camera_matrix&#39;</span><span class="p">)</span>
+    <span class="n">path_undistort</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="s1">&#39;undistortion&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">img_path</span><span class="p">,</span><span class="n">path_corners</span><span class="p">,</span><span class="n">path_camera_matrix</span><span class="p">,</span><span class="n">path_undistort</span></div>
+
+<div class="viewcode-block" id="create_empty_df"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.auxiliaryfunctions_3d.create_empty_df">[docs]</a><span class="k">def</span> <span class="nf">create_empty_df</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span><span class="n">scorer</span><span class="p">,</span><span class="n">flag</span><span class="p">):</span>
+    <span class="c1"># Creates an empty dataFrame of same shape as df_side_view</span>
+    <span class="c1"># flag = 2d or 3d</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dataframe</span>
+    <span class="n">bodyparts</span> <span class="o">=</span>  <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">bodyparts</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">bodyparts</span> <span class="o">=</span>  <span class="nb">list</span><span class="p">(</span><span class="n">bodyparts</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">idx</span><span class="p">)])</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">a</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">dataFrame</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">bodypart</span> <span class="ow">in</span> <span class="n">bodyparts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;2d&#39;</span><span class="p">:</span>
+            <span class="n">pdindex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([[</span><span class="n">scorer</span><span class="p">],</span> <span class="p">[</span><span class="n">bodypart</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]],</span>
+                                             <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;scorer&#39;</span><span class="p">,</span> <span class="s1">&#39;bodyparts&#39;</span><span class="p">,</span> <span class="s1">&#39;coords&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;3d&#39;</span><span class="p">:</span>
+            <span class="n">pdindex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([[</span><span class="n">scorer</span><span class="p">],</span> <span class="p">[</span><span class="n">bodypart</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="s1">&#39;z&#39;</span><span class="p">]],</span>
+                                             <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;scorer&#39;</span><span class="p">,</span> <span class="s1">&#39;bodyparts&#39;</span><span class="p">,</span> <span class="s1">&#39;coords&#39;</span><span class="p">])</span> 
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">pdindex</span><span class="p">,</span><span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">dataFrame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">frame</span><span class="p">,</span><span class="n">dataFrame</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">dataFrame</span><span class="p">,</span><span class="n">scorer</span><span class="p">,</span><span class="n">bodyparts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="compute_triangulation_calibration_images"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.auxiliaryfunctions_3d.compute_triangulation_calibration_images">[docs]</a><span class="k">def</span> <span class="nf">compute_triangulation_calibration_images</span><span class="p">(</span><span class="n">stereo_matrix</span><span class="p">,</span> <span class="n">projectedPoints1</span><span class="p">,</span> <span class="n">projectedPoints2</span><span class="p">,</span><span class="n">path_undistort</span><span class="p">,</span><span class="n">cfg_3d</span><span class="p">,</span><span class="n">plot</span><span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs triangulation of the calibration images.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">triangulate</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">P1</span> <span class="o">=</span> <span class="n">stereo_matrix</span><span class="p">[</span><span class="s1">&#39;P1&#39;</span><span class="p">]</span>
+    <span class="n">P2</span> <span class="o">=</span> <span class="n">stereo_matrix</span><span class="p">[</span><span class="s1">&#39;P2&#39;</span><span class="p">]</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">]</span>
+    <span class="n">colormap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">markerSize</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;dotsize&#39;</span><span class="p">]</span>
+    <span class="n">markerType</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;markerType&#39;</span><span class="p">]</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">projectedPoints1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">X_l</span> <span class="o">=</span> <span class="n">triangulatePoints</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">,</span> <span class="n">projectedPoints1</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">projectedPoints2</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">triangulate</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X_l</span><span class="p">)</span>
+    <span class="n">triangulate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">triangulate</span><span class="p">)</span>
+
+<span class="c1"># Plotting</span>
+    <span class="k">if</span> <span class="n">plot</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">colormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">triangulate</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">triangulate</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">xs</span> <span class="o">=</span> <span class="n">triangulate</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">,:]</span>
+            <span class="n">ys</span> <span class="o">=</span> <span class="n">triangulate</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">,:]</span>
+            <span class="n">zs</span> <span class="o">=</span> <span class="n">triangulate</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">2</span><span class="p">,:]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="n">col</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">marker</span><span class="o">=</span><span class="n">markerType</span><span class="p">,</span><span class="n">s</span><span class="o">=</span><span class="n">markerSize</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path_undistort</span><span class="p">),</span><span class="s2">&quot;checkerboard_3d.png&quot;</span><span class="p">))</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">triangulate</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="triangulatePoints"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.auxiliaryfunctions_3d.triangulatePoints">[docs]</a><span class="k">def</span> <span class="nf">triangulatePoints</span><span class="p">(</span> <span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">triangulatePoints</span><span class="p">(</span> <span class="n">P1</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">P2</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">X</span><span class="o">/</span><span class="n">X</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span></div>
+
+    
+<div class="viewcode-block" id="get_camerawise_videos"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.auxiliaryfunctions_3d.get_camerawise_videos">[docs]</a><span class="k">def</span> <span class="nf">get_camerawise_videos</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">cam_names</span><span class="p">,</span><span class="n">videotype</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns the list of videos corresponding to the camera names specified in the cam_names.</span>
+<span class="sd">    e.g. if cam_names = [&#39;camera-1&#39;,&#39;camera-2&#39;]</span>
+<span class="sd">    </span>
+<span class="sd">    then it will return [[&#39;somename-camera-1-othername.avi&#39;, &#39;somename-camera-2-othername.avi&#39;]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">glob</span>
+    <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+    <span class="n">vid</span><span class="o">=</span><span class="p">[]</span>
+    
+    <span class="c1"># Find videos only specific to the cam names</span>
+    <span class="n">videos</span> <span class="o">=</span> <span class="p">[</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="n">cam_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="n">videotype</span><span class="p">)))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cam_names</span><span class="p">))</span> <span class="p">]</span>
+    <span class="n">videos</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">videos</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+
+    <span class="c1"># Exclude the labeled video files</span>
+    <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">videotype</span><span class="p">:</span>
+        <span class="n">file_to_exclude</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;labeled&#39;</span><span class="o">+</span><span class="n">videotype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">file_to_exclude</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;labeled.&#39;</span><span class="o">+</span><span class="n">videotype</span><span class="p">)</span>
+    <span class="n">videos</span><span class="o">=</span><span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">videos</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">file_to_exclude</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)]</span>
+    <span class="n">video_list</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">cam</span><span class="o">=</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#camera1</span>
+    <span class="n">vid</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="n">cam</span><span class="o">+</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="n">videotype</span><span class="p">)))])</span> <span class="c1">#all videos with cam </span>
+    <span class="c1">#print(&quot;here is what I found&quot;,vid)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vid</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+        <span class="k">if</span> <span class="n">cam</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">vid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">k</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">):</span>
+            <span class="n">ending</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">vid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">k</span><span class="p">])</span><span class="o">.</span><span class="n">suffix</span>
+            <span class="n">pref</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">vid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">k</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">cam</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">suf</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">vid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">k</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">cam</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">pref</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">suf</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Strange naming convention on your part. Respect.&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">putativecam2name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">suf</span><span class="o">+</span><span class="n">ending</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">suf</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="n">putativecam2name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">pref</span><span class="o">+</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">ending</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">putativecam2name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">pref</span><span class="o">+</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">suf</span><span class="o">+</span><span class="n">ending</span><span class="p">)</span>
+            <span class="c1">#print([os.path.join(path,pref+cam+suf+ending),putativecam2name])</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">putativecam2name</span><span class="p">):</span> 
+                <span class="c1">#found a pair!!!</span>
+                <span class="n">video_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">pref</span><span class="o">+</span><span class="n">cam</span><span class="o">+</span><span class="n">suf</span><span class="o">+</span><span class="n">ending</span><span class="p">),</span><span class="n">putativecam2name</span><span class="p">])</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">video_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Get_list_of_triangulated_and_videoFiles"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.auxiliaryfunctions_3d.Get_list_of_triangulated_and_videoFiles">[docs]</a><span class="k">def</span> <span class="nf">Get_list_of_triangulated_and_videoFiles</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span><span class="n">videotype</span><span class="p">,</span><span class="n">scorer_3d</span><span class="p">,</span><span class="n">cam_names</span><span class="p">,</span><span class="n">videofolder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the list of triangulated h5 and the corresponding video files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">prefix</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">suffix</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">string_to_search</span> <span class="o">=</span> <span class="n">scorer_3d</span><span class="o">+</span><span class="s1">&#39;.h5&#39;</span>
+
+    <span class="c1"># Checks if filepath is a directory</span>
+    <span class="k">if</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">filepath</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="kc">True</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes all the videos in the directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Analyzing all the videos in the directory&quot;</span><span class="p">)</span>
+        <span class="n">videofolder</span><span class="o">=</span> <span class="n">filepath</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">videofolder</span><span class="p">)</span>
+        <span class="n">triangulated_file_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">string_to_search</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">)]</span>
+        <span class="n">video_list</span> <span class="o">=</span> <span class="n">get_camerawise_videos</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="n">cam_names</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span>
+        <span class="n">triangulated_folder</span> <span class="o">=</span> <span class="n">videofolder</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">triangulated_file_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">filepath</span> <span class="k">if</span> <span class="p">(</span><span class="n">string_to_search</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">)]</span>
+        <span class="n">triangulated_folder</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">filepath</span> <span class="k">if</span> <span class="p">(</span><span class="n">string_to_search</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">)]</span>
+        <span class="n">triangulated_folder</span> <span class="o">=</span> <span class="n">triangulated_folder</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">videofolder</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">videofolder</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">filepath</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">video_list</span> <span class="o">=</span> <span class="n">get_camerawise_videos</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="n">cam_names</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+
+    <span class="c1"># Get the filename of the triangulated file excluing the scorer name and remove any &#39;-&#39; or _ from it</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">string_to_search</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">triangulated_file_list</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filename</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;_&#39;</span> <span class="ow">or</span> <span class="n">filename</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="n">filename</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;_&#39;</span> <span class="ow">or</span> <span class="n">filename</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="n">filename</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="c1"># Get the suffix and prefix of the video filenames so that they can be used for matching the triangulated file names.</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">video_list</span><span class="p">)):</span>
+        <span class="n">pre</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">suf</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cam_names</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">pre</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">pre</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;_&#39;</span> <span class="ow">or</span> <span class="n">pre</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                <span class="n">pre</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pre</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">suf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">suf</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;_&#39;</span> <span class="ow">or</span> <span class="n">suf</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                <span class="n">suf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">suf</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">suffix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">suf</span><span class="p">)</span>
+        <span class="n">prefix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pre</span><span class="p">)</span>
+
+    <span class="c1"># Match the suffix and prefix with the triangulated file name and return the list with triangulated file and corresponding video files.</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filename</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">prefix</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">and</span> <span class="n">prefix</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">suffix</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">and</span> <span class="n">suffix</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
+                <span class="n">triangulated_file</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">triangulated_folder</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="n">filename</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="n">string_to_search</span><span class="p">)))</span>
+                <span class="n">vfiles</span> <span class="o">=</span> <span class="n">get_camerawise_videos</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="n">cam_names</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+                <span class="n">vfiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">z</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">vfiles</span> <span class="k">if</span> <span class="n">prefix</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">suffix</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">triangulated_file</span><span class="o">+</span><span class="n">vfiles</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">file_list</span></div>
+
+
+<div class="viewcode-block" id="SaveMetadata3d"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.auxiliaryfunctions_3d.SaveMetadata3d">[docs]</a><span class="k">def</span> <span class="nf">SaveMetadata3d</span><span class="p">(</span><span class="n">metadatafilename</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metadatafilename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="LoadMetadata3d"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.auxiliaryfunctions_3d.LoadMetadata3d">[docs]</a><span class="k">def</span> <span class="nf">LoadMetadata3d</span><span class="p">(</span><span class="n">metadatafilename</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metadatafilename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">metadata</span><span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metadata</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

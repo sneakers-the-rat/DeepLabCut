@@ -1,0 +1,244 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Adapted from DeeperCut by Eldar Insafutdinov</span>
+<span class="sd">https://github.com/eldar/pose-tensorflow</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="Batch"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset.Batch">[docs]</a><span class="k">class</span> <span class="nc">Batch</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">part_score_targets</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">part_score_weights</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">locref_targets</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">locref_mask</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">pairwise_targets</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">pairwise_mask</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">data_item</span> <span class="o">=</span> <span class="mi">7</span></div>
+
+<div class="viewcode-block" id="DataItem"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset.DataItem">[docs]</a><span class="k">class</span> <span class="nc">DataItem</span><span class="p">:</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="data_to_input"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset.data_to_input">[docs]</a><span class="k">def</span> <span class="nf">data_to_input</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span></div>
+
+<span class="c1"># Augmentation functions</span>
+<div class="viewcode-block" id="mirror_joints_map"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset.mirror_joints_map">[docs]</a><span class="k">def</span> <span class="nf">mirror_joints_map</span><span class="p">(</span><span class="n">all_joints</span><span class="p">,</span> <span class="n">num_joints</span><span class="p">):</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_joints</span><span class="p">)</span>
+    <span class="n">symmetric_joints</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">all_joints</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">symmetric_joints</span><span class="p">:</span>
+        <span class="n">res</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">res</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="CropImage"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.dataset.html#deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset.CropImage">[docs]</a><span class="k">def</span> <span class="nf">CropImage</span><span class="p">(</span><span class="n">joints</span><span class="p">,</span><span class="n">im</span><span class="p">,</span><span class="n">Xlabel</span><span class="p">,</span><span class="n">Ylabel</span><span class="p">,</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Randomly cropping image around xlabel,ylabel taking into account size of image. Introduced in DLC 2 &#39;&#39;&#39;</span>
+    <span class="n">widthforward</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;minsize&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;rightwidth&quot;</span><span class="p">]))</span>
+    <span class="n">widthback</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;minsize&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;leftwidth&quot;</span><span class="p">]))</span>
+    <span class="n">hup</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;minsize&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;topheight&quot;</span><span class="p">]))</span>
+    <span class="n">hdown</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;minsize&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;bottomheight&quot;</span><span class="p">]))</span>
+    <span class="n">Xstart</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">Xlabel</span><span class="o">-</span><span class="n">widthback</span><span class="p">))</span>
+    <span class="n">Xstop</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">im</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">Xlabel</span><span class="o">+</span><span class="n">widthforward</span><span class="p">))</span>
+    <span class="n">Ystart</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">Ylabel</span><span class="o">-</span><span class="n">hdown</span><span class="p">))</span>
+    <span class="n">Ystop</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">im</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">Ylabel</span><span class="o">+</span><span class="n">hup</span><span class="p">))</span>
+    <span class="n">joints</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">-=</span><span class="n">Xstart</span>
+    <span class="n">joints</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">2</span><span class="p">]</span><span class="o">-=</span><span class="n">Ystart</span>
+    
+    <span class="n">inbounds</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">joints</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">joints</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">im</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">joints</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">2</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">joints</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">2</span><span class="p">]</span><span class="o">&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">im</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">joints</span><span class="p">[:,</span><span class="n">inbounds</span><span class="p">,:],</span><span class="n">im</span><span class="p">[</span><span class="n">Ystart</span><span class="p">:</span><span class="n">Ystop</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">Xstart</span><span class="p">:</span><span class="n">Xstop</span><span class="o">+</span><span class="mi">1</span><span class="p">,:]</span></div>
+
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

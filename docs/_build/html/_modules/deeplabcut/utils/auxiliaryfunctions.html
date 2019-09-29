@@ -1,0 +1,550 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.utils.auxiliaryfunctions &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.utils.auxiliaryfunctions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.utils.auxiliaryfunctions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+<span class="sd">Please see AUTHORS for contributors.</span>
+
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">pickle</span><span class="o">,</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">ruamel.yaml</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<div class="viewcode-block" id="create_config_template"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.create_config_template">[docs]</a><span class="k">def</span> <span class="nf">create_config_template</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a template for config.yaml file. This specific order is preserved while saving as yaml file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">ruamel.yaml</span>
+    <span class="n">yaml_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2"># Project definitions (do not edit)</span>
+<span class="s2">    Task:</span>
+<span class="s2">    scorer:</span>
+<span class="s2">    date:</span>
+<span class="s2">    </span><span class="se">\n</span><span class="s2"></span>
+<span class="s2"># Project path (change when moving around)</span>
+<span class="s2">    project_path:</span>
+<span class="s2">    </span><span class="se">\n</span><span class="s2"></span>
+<span class="s2"># Annotation data set configuration (and individual video cropping parameters)</span>
+<span class="s2">    video_sets:</span>
+<span class="s2">    bodyparts:</span>
+<span class="s2">    start:</span>
+<span class="s2">    stop:</span>
+<span class="s2">    numframes2pick:</span>
+<span class="s2">    </span><span class="se">\n</span><span class="s2"></span>
+<span class="s2"># Plotting configuration</span>
+<span class="s2">    skeleton:</span>
+<span class="s2">    skeleton_color:</span>
+<span class="s2">    pcutoff:</span>
+<span class="s2">    dotsize:</span>
+<span class="s2">    alphavalue:</span>
+<span class="s2">    colormap:</span>
+<span class="s2">    </span><span class="se">\n</span><span class="s2"></span>
+<span class="s2"># Training,Evaluation and Analysis configuration</span>
+<span class="s2">    TrainingFraction:</span>
+<span class="s2">    iteration:</span>
+<span class="s2">    resnet:</span>
+<span class="s2">    snapshotindex:</span>
+<span class="s2">    batch_size:</span>
+<span class="s2">    </span><span class="se">\n</span><span class="s2"></span>
+<span class="s2"># Cropping Parameters (for analysis and outlier frame detection)</span>
+<span class="s2">    cropping:</span>
+<span class="s2">#if cropping is true for analysis, then set the values here:</span>
+<span class="s2">    x1:</span>
+<span class="s2">    x2:</span>
+<span class="s2">    y1:</span>
+<span class="s2">    y2:</span>
+<span class="s2">    </span><span class="se">\n</span><span class="s2"></span>
+<span class="s2"># Refinement configuration (parameters from annotation dataset configuration also relevant in this stage)</span>
+<span class="s2">    corner2move2:</span>
+<span class="s2">    move2corner:</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">ruamelFile</span> <span class="o">=</span> <span class="n">ruamel</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">YAML</span><span class="p">()</span>
+    <span class="n">cfg_file</span> <span class="o">=</span> <span class="n">ruamelFile</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">yaml_str</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">cfg_file</span><span class="p">,</span><span class="n">ruamelFile</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="create_config_template_3d"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.create_config_template_3d">[docs]</a><span class="k">def</span> <span class="nf">create_config_template_3d</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a template for config.yaml file for 3d project. This specific order is preserved while saving as yaml file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">ruamel.yaml</span>
+    <span class="n">yaml_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2"># Project definitions (do not edit)</span>
+<span class="s2">    Task:</span>
+<span class="s2">    scorer:</span>
+<span class="s2">    date:</span>
+<span class="s2">    </span><span class="se">\n</span><span class="s2"></span>
+<span class="s2"># Project path (change when moving around)</span>
+<span class="s2">    project_path:</span>
+<span class="s2">    </span><span class="se">\n</span><span class="s2"></span>
+<span class="s2"># Plotting configuration</span>
+<span class="s2">    skeleton: # Note that the pairs must be defined, as you want them linked!</span>
+<span class="s2">    skeleton_color:</span>
+<span class="s2">    pcutoff:</span>
+<span class="s2">    colormap:</span>
+<span class="s2">    dotsize:</span>
+<span class="s2">    alphaValue:</span>
+<span class="s2">    markerType:</span>
+<span class="s2">    markerColor:</span>
+<span class="s2">    </span><span class="se">\n</span><span class="s2"></span>
+<span class="s2"># Number of cameras, camera names, path of the config files, shuffle index and trainingsetindex used to analyze videos:</span>
+<span class="s2">    num_cameras:</span>
+<span class="s2">    camera_names:</span>
+<span class="s2">    scorername_3d: # Enter the scorer name for the 3D output</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">ruamelFile_3d</span> <span class="o">=</span> <span class="n">ruamel</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">YAML</span><span class="p">()</span>
+    <span class="n">cfg_file_3d</span> <span class="o">=</span> <span class="n">ruamelFile_3d</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">yaml_str</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">cfg_file_3d</span><span class="p">,</span><span class="n">ruamelFile_3d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_config"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.read_config">[docs]</a><span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span><span class="n">configname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads structured config file</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ruamelFile</span> <span class="o">=</span> <span class="n">ruamel</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">YAML</span><span class="p">()</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">configname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">cfg</span> <span class="o">=</span> <span class="n">ruamelFile</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;could not determine a constructor for the tag &#39;!!python/tuple&#39;&quot;</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ymlfile</span><span class="p">:</span>
+                  <span class="n">cfg</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ymlfile</span><span class="p">,</span><span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
+                  <span class="n">write_config</span><span class="p">(</span><span class="n">configname</span><span class="p">,</span><span class="n">cfg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span> <span class="p">(</span><span class="s2">&quot;Config file is not found. Please make sure that the file exists and/or there are no unnecessary spaces in the path of the config file!&quot;</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="write_config"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.write_config">[docs]</a><span class="k">def</span> <span class="nf">write_config</span><span class="p">(</span><span class="n">configname</span><span class="p">,</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write structured config file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">configname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
+        <span class="n">ruamelFile</span> <span class="o">=</span> <span class="n">ruamel</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">YAML</span><span class="p">()</span>
+        <span class="n">cfg_file</span><span class="p">,</span><span class="n">ruamelFile</span> <span class="o">=</span> <span class="n">create_config_template</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">cfg_file</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        
+        <span class="c1"># Adding default value for variable skeleton and skeleton_color for backward compatibility.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;skeleton&#39;</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;skeleton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;skeleton_color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span>
+        <span class="n">ruamelFile</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">cfg_file</span><span class="p">,</span> <span class="n">cf</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="write_config_3d"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.write_config_3d">[docs]</a><span class="k">def</span> <span class="nf">write_config_3d</span><span class="p">(</span><span class="n">configname</span><span class="p">,</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write structured 3D config file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<span class="c1">#    with open(projconfigfile, &#39;w&#39;) as cf:</span>
+<span class="c1">#        ruamelFile_3d.dump(cfg_file_3d, cf)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">configname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
+        <span class="n">ruamelFile</span> <span class="o">=</span> <span class="n">ruamel</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">YAML</span><span class="p">()</span>
+        <span class="n">cfg_file</span><span class="p">,</span><span class="n">ruamelFile</span> <span class="o">=</span> <span class="n">create_config_template_3d</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">cfg_file</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">ruamelFile</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">cfg_file</span><span class="p">,</span> <span class="n">cf</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="write_config_3d_template"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.write_config_3d_template">[docs]</a><span class="k">def</span> <span class="nf">write_config_3d_template</span><span class="p">(</span><span class="n">projconfigfile</span><span class="p">,</span><span class="n">cfg_file_3d</span><span class="p">,</span><span class="n">ruamelFile_3d</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">projconfigfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
+        <span class="n">ruamelFile_3d</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">cfg_file_3d</span><span class="p">,</span> <span class="n">cf</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="read_plainconfig"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.read_plainconfig">[docs]</a><span class="k">def</span> <span class="nf">read_plainconfig</span><span class="p">(</span><span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;pose_cfg.yaml&quot;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; read unstructured yaml&#39;&#39;&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">yaml_cfg</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">yaml_cfg</span></div>
+
+<div class="viewcode-block" id="write_plainconfig"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.write_plainconfig">[docs]</a><span class="k">def</span> <span class="nf">write_plainconfig</span><span class="p">(</span><span class="n">configname</span><span class="p">,</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">configname</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ymlfile</span><span class="p">:</span>
+                <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">ymlfile</span><span class="p">,</span><span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="attempttomakefolder"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.attempttomakefolder">[docs]</a><span class="k">def</span> <span class="nf">attempttomakefolder</span><span class="p">(</span><span class="n">foldername</span><span class="p">,</span><span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Attempts to create a folder with specified name. Does nothing if it already exists. &#39;&#39;&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">foldername</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span> <span class="c1">#https://www.python.org/dev/peps/pep-0519/</span>
+        <span class="n">foldername</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">foldername</span><span class="p">)</span> <span class="c1">#https://github.com/AlexEMG/DeepLabCut/issues/105 (windows)</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">foldername</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">foldername</span><span class="p">,</span> <span class="s2">&quot; already exists!&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">foldername</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">foldername</span><span class="p">)</span></div>
+
+<span class="c1"># Read the pickle file</span>
+<div class="viewcode-block" id="read_pickle"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.read_pickle">[docs]</a><span class="k">def</span> <span class="nf">read_pickle</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">))</span></div>
+
+<span class="c1"># Write the pickle file    </span>
+<div class="viewcode-block" id="write_pickle"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.write_pickle">[docs]</a><span class="k">def</span> <span class="nf">write_pickle</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="create_empty_df"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.create_empty_df">[docs]</a><span class="k">def</span> <span class="nf">create_empty_df</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span><span class="n">scorer</span><span class="p">,</span><span class="n">flag</span><span class="p">):</span>
+<span class="c1"># Creates an empty dataFrame of same shape as df_side_view.  </span>
+<span class="c1"># flag = number of coordinates. e.g. 4 for 3d,3 for 2d as we need to store the likelihood too.</span>
+<span class="c1">#    df = pd.read_hdf(dataframe)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dataframe</span>
+    <span class="n">scorer</span> <span class="o">=</span> <span class="n">scorer</span><span class="c1">#df.columns.get_level_values(0)[0]</span>
+    <span class="n">bodyparts</span> <span class="o">=</span>  <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">bodyparts</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">bodyparts</span> <span class="o">=</span>  <span class="nb">list</span><span class="p">(</span><span class="n">bodyparts</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">idx</span><span class="p">)])</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">a</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">dataFrame</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">bodypart</span> <span class="ow">in</span> <span class="n">bodyparts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;2d&#39;</span><span class="p">:</span>
+            <span class="n">pdindex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([[</span><span class="n">scorer</span><span class="p">],</span> <span class="p">[</span><span class="n">bodypart</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]],</span>
+                                             <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;scorer&#39;</span><span class="p">,</span> <span class="s1">&#39;bodyparts&#39;</span><span class="p">,</span> <span class="s1">&#39;coords&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;3d&#39;</span><span class="p">:</span>
+            <span class="n">pdindex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([[</span><span class="n">scorer</span><span class="p">],</span> <span class="p">[</span><span class="n">bodypart</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="s1">&#39;z&#39;</span><span class="p">]],</span>
+                                             <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;scorer&#39;</span><span class="p">,</span> <span class="s1">&#39;bodyparts&#39;</span><span class="p">,</span> <span class="s1">&#39;coords&#39;</span><span class="p">])</span> 
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">pdindex</span><span class="p">,</span><span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">dataFrame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">frame</span><span class="p">,</span><span class="n">dataFrame</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">dataFrame</span><span class="p">,</span><span class="n">scorer</span><span class="p">,</span><span class="n">bodyparts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Getlistofvideos"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.Getlistofvideos">[docs]</a><span class="k">def</span> <span class="nf">Getlistofvideos</span><span class="p">(</span><span class="n">videos</span><span class="p">,</span><span class="n">videotype</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">random</span> <span class="k">import</span> <span class="n">sample</span>
+    <span class="c1">#checks if input is a directory</span>
+    <span class="k">if</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="kc">True</span><span class="p">]:</span><span class="c1">#os.path.isdir(video)==True:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes all the videos in the directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Analyzing all the videos in the directory&quot;</span><span class="p">)</span>
+        <span class="n">videofolder</span><span class="o">=</span> <span class="n">videos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">videofolder</span><span class="p">)</span>
+        <span class="n">videolist</span><span class="o">=</span><span class="p">[</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">videotype</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;labeled.mp4&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">)]</span> <span class="c1">#exclude labeled-videos!</span>
+        <span class="n">Videos</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span><span class="n">videolist</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">videolist</span><span class="p">))</span> <span class="c1"># this is useful so multiple nets can be used to analzye simultanously</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">videos</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">videos</span><span class="p">):</span> <span class="c1"># #or just one direct path!</span>
+                <span class="n">Videos</span><span class="o">=</span><span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">videos</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;labeled.mp4&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">Videos</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Videos</span><span class="o">=</span><span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">videos</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;labeled.mp4&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">Videos</span></div>
+
+<div class="viewcode-block" id="SaveData"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.SaveData">[docs]</a><span class="k">def</span> <span class="nf">SaveData</span><span class="p">(</span><span class="n">PredicteData</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">dataname</span><span class="p">,</span> <span class="n">pdindex</span><span class="p">,</span> <span class="n">imagenames</span><span class="p">,</span><span class="n">save_as_csv</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Save predicted data as h5 file and metadata as pickle file; created by predict_videos.py &#39;&#39;&#39;</span>
+    <span class="n">DataMachine</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">PredicteData</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">pdindex</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">imagenames</span><span class="p">)</span>
+    <span class="n">DataMachine</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span><span class="n">dataname</span><span class="p">,</span> <span class="s1">&#39;df_with_missing&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">save_as_csv</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving csv poses!&quot;</span><span class="p">)</span>
+        <span class="n">DataMachine</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">dataname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;.csv&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dataname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;includingmetadata.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># Pickle the &#39;data&#39; dictionary using the highest protocol available.</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LoadVideoMetadata"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.LoadVideoMetadata">[docs]</a><span class="k">def</span> <span class="nf">LoadVideoMetadata</span><span class="p">(</span><span class="n">dataname</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Load meta data from analyzed video, created by predict_videos.py &#39;&#39;&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dataname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;includingmetadata.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span> <span class="c1">#same as in SaveData!</span>
+        <span class="n">metadata</span><span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metadata</span></div>
+
+<div class="viewcode-block" id="SaveMetadata"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.SaveMetadata">[docs]</a><span class="k">def</span> <span class="nf">SaveMetadata</span><span class="p">(</span><span class="n">metadatafilename</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">trainIndexes</span><span class="p">,</span> <span class="n">testIndexes</span><span class="p">,</span> <span class="n">trainFraction</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metadatafilename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># Pickle the &#39;labeled-data&#39; dictionary using the highest protocol available.</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">([</span><span class="n">data</span><span class="p">,</span> <span class="n">trainIndexes</span><span class="p">,</span> <span class="n">testIndexes</span><span class="p">,</span> <span class="n">trainFraction</span><span class="p">],</span> <span class="n">f</span><span class="p">,</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LoadMetadata"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.LoadMetadata">[docs]</a><span class="k">def</span> <span class="nf">LoadMetadata</span><span class="p">(</span><span class="n">metadatafile</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metadatafile</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="p">[</span><span class="n">trainingdata_details</span><span class="p">,</span> <span class="n">trainIndexes</span><span class="p">,</span> <span class="n">testIndexes</span><span class="p">,</span><span class="n">testFraction_data</span><span class="p">]</span><span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trainingdata_details</span><span class="p">,</span> <span class="n">trainIndexes</span><span class="p">,</span> <span class="n">testIndexes</span><span class="p">,</span> <span class="n">testFraction_data</span></div>
+
+
+<div class="viewcode-block" id="get_immediate_subdirectories"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.get_immediate_subdirectories">[docs]</a><span class="k">def</span> <span class="nf">get_immediate_subdirectories</span><span class="p">(</span><span class="n">a_dir</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Get list of immediate subdirectories &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">a_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a_dir</span><span class="p">,</span> <span class="n">name</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="listfilesofaparticulartypeinfolder"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.listfilesofaparticulartypeinfolder">[docs]</a><span class="k">def</span> <span class="nf">listfilesofaparticulartypeinfolder</span><span class="p">(</span><span class="n">a_dir</span><span class="p">,</span><span class="n">afiletype</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; List files of a particular type in a folder a_dir &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">a_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">afiletype</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GetVideoList"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.GetVideoList">[docs]</a><span class="k">def</span> <span class="nf">GetVideoList</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="n">videopath</span><span class="p">,</span><span class="n">videtype</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Get list of videos in a path (if filetype == all), otherwise just a specific file.&#39;&#39;&#39;</span>
+    <span class="n">videos</span><span class="o">=</span><span class="n">listfilesofaparticulartypeinfolder</span><span class="p">(</span><span class="n">videopath</span><span class="p">,</span><span class="n">videtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">filename</span><span class="o">==</span><span class="s1">&#39;all&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">videos</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
+            <span class="n">videos</span><span class="o">=</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">videos</span><span class="o">=</span><span class="p">[]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Video not found!&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">videos</span></div>
+
+<span class="c1">## Various functions to get filenames, foldernames etc. based on configuration parameters.</span>
+<div class="viewcode-block" id="GetTrainingSetFolder"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.GetTrainingSetFolder">[docs]</a><span class="k">def</span> <span class="nf">GetTrainingSetFolder</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Training Set folder for config file based on parameters &#39;&#39;&#39;</span>
+    <span class="n">Task</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;Task&#39;</span><span class="p">]</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+    <span class="n">iterate</span> <span class="o">=</span> <span class="s1">&#39;iteration-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;training-datasets&#39;</span><span class="p">,</span><span class="n">iterate</span><span class="p">,</span><span class="s1">&#39;UnaugmentedDataSet_&#39;</span> <span class="o">+</span> <span class="n">Task</span> <span class="o">+</span> <span class="n">date</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="GetModelFolder"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.GetModelFolder">[docs]</a><span class="k">def</span> <span class="nf">GetModelFolder</span><span class="p">(</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="n">Task</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;Task&#39;</span><span class="p">]</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+    <span class="n">iterate</span> <span class="o">=</span> <span class="s1">&#39;iteration-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;dlc-models/&#39;</span><span class="o">+</span> <span class="n">iterate</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="n">Task</span> <span class="o">+</span> <span class="n">date</span> <span class="o">+</span> <span class="s1">&#39;-trainset&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">trainFraction</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;shuffle&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">shuffle</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="GetEvaluationFolder"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.GetEvaluationFolder">[docs]</a><span class="k">def</span> <span class="nf">GetEvaluationFolder</span><span class="p">(</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="n">Task</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;Task&#39;</span><span class="p">]</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+    <span class="n">iterate</span> <span class="o">=</span> <span class="s1">&#39;iteration-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;evaluation-results/&#39;</span><span class="o">+</span> <span class="n">iterate</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="n">Task</span> <span class="o">+</span> <span class="n">date</span> <span class="o">+</span> <span class="s1">&#39;-trainset&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">trainFraction</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;shuffle&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">shuffle</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="GetDataandMetaDataFilenames"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.GetDataandMetaDataFilenames">[docs]</a><span class="k">def</span> <span class="nf">GetDataandMetaDataFilenames</span><span class="p">(</span><span class="n">trainingsetfolder</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="c1"># Filename for metadata and data relative to project path for corresponding parameters</span>
+    <span class="n">metadatafn</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">trainingsetfolder</span><span class="p">)</span> <span class="p">,</span> <span class="s1">&#39;Documentation_data-&#39;</span> <span class="o">+</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;Task&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">trainFraction</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;shuffle&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">shuffle</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.pickle&#39;</span><span class="p">)</span>
+    <span class="n">datafn</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">trainingsetfolder</span><span class="p">)</span> <span class="p">,</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;Task&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;scorer&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">trainFraction</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;shuffle&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">shuffle</span><span class="p">)</span><span class="o">+</span> <span class="s1">&#39;.mat&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">datafn</span><span class="p">,</span><span class="n">metadatafn</span></div>
+
+
+<div class="viewcode-block" id="IntersectionofBodyPartsandOnesGivenbyUser"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.IntersectionofBodyPartsandOnesGivenbyUser">[docs]</a><span class="k">def</span> <span class="nf">IntersectionofBodyPartsandOnesGivenbyUser</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">comparisonbodyparts</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Returns all body parts when comparisonbodyparts==&#39;all&#39;, otherwise all bpts that are in the intersection of comparisonbodyparts and the actual bodyparts &#39;&#39;&#39;</span>
+    <span class="n">allpbts</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;bodyparts&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">comparisonbodyparts</span><span class="o">==</span><span class="s2">&quot;all&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">allpbts</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1">#take only items in list that are actually bodyparts...</span>
+        <span class="n">cpbpts</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bp</span> <span class="ow">in</span> <span class="n">comparisonbodyparts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">bp</span> <span class="ow">in</span> <span class="n">allpbts</span><span class="p">:</span>
+                <span class="n">cpbpts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cpbpts</span></div>
+
+<div class="viewcode-block" id="GetScorerName"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.GetScorerName">[docs]</a><span class="k">def</span> <span class="nf">GetScorerName</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">trainingsiterations</span><span class="o">=</span><span class="s1">&#39;unknown&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Extract the scorer/network name for a particular shuffle, training fraction, etc. &#39;&#39;&#39;</span>
+    <span class="n">Task</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;Task&#39;</span><span class="p">]</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">trainingsiterations</span><span class="o">==</span><span class="s1">&#39;unknown&#39;</span><span class="p">:</span>
+        <span class="n">snapshotindex</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;snapshotindex&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;snapshotindex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Changing snapshotindext to the last one -- plotting, videomaking, etc. should not be performed for all indices. For more selectivity enter the ordinal number of the snapshot you want (ie. 4 for the fifth) in the config file.&quot;</span><span class="p">)</span>
+            <span class="n">snapshotindex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">snapshotindex</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;snapshotindex&#39;</span><span class="p">]</span>
+
+        <span class="n">modelfolder</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;project_path&quot;</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">GetModelFolder</span><span class="p">(</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">cfg</span><span class="p">)),</span><span class="s1">&#39;train&#39;</span><span class="p">)</span>
+        <span class="n">Snapshots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">modelfolder</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;index&quot;</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">])</span>
+        <span class="n">increasing_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">Snapshots</span><span class="p">])</span>
+        <span class="n">Snapshots</span> <span class="o">=</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">increasing_indices</span><span class="p">]</span>
+        <span class="c1">#dlc_cfg = read_config(os.path.join(modelfolder,&#39;pose_cfg.yaml&#39;))</span>
+        <span class="c1">#dlc_cfg[&#39;init_weights&#39;] = os.path.join(modelfolder , &#39;train&#39;, Snapshots[snapshotindex])</span>
+        <span class="n">SNP</span><span class="o">=</span><span class="n">Snapshots</span><span class="p">[</span><span class="n">snapshotindex</span><span class="p">]</span>
+        <span class="n">trainingsiterations</span> <span class="o">=</span> <span class="p">(</span><span class="n">SNP</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">scorer</span> <span class="o">=</span> <span class="s1">&#39;DeepCut&#39;</span> <span class="o">+</span> <span class="s2">&quot;_resnet&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;resnet&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">Task</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;shuffle&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">shuffle</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">trainingsiterations</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">scorer</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,604 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.utils.make_labeled_video &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.utils.make_labeled_video</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.utils.make_labeled_video</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+<span class="sd">Please see AUTHORS for contributors.</span>
+
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+
+<span class="sd">Hao Wu, hwu01@g.harvard.edu contributed the original OpenCV class!</span>
+<span class="sd">You can find the directory for ffmpeg bindings by: &quot;find / | grep ffmpeg&quot; and then setting it.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">####################################################</span>
+<span class="c1"># Dependencies</span>
+<span class="c1">####################################################</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="c1">#import sys</span>
+<span class="kn">import</span> <span class="nn">argparse</span><span class="o">,</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DLClight&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+    <span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;AGG&#39;</span><span class="p">)</span> <span class="c1">#anti-grain geometry engine #https://matplotlib.org/faq/usage_faq.html</span>
+<span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Darwin&#39;</span><span class="p">:</span>
+    <span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;WxAgg&#39;</span><span class="p">)</span> <span class="c1">#TkAgg</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;TkAgg&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.config</span> <span class="k">import</span> <span class="n">load_config</span>
+<span class="kn">from</span> <span class="nn">skimage.util</span> <span class="k">import</span> <span class="n">img_as_ubyte</span>
+<span class="kn">from</span> <span class="nn">skimage.draw</span> <span class="k">import</span> <span class="n">circle_perimeter</span><span class="p">,</span> <span class="n">circle</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span><span class="n">line_aa</span>
+
+<span class="kn">from</span> <span class="nn">deeplabcut.utils.video_processor</span> <span class="k">import</span> <span class="n">VideoProcessorCV</span> <span class="k">as</span> <span class="n">vp</span> <span class="c1"># used to CreateVideo</span>
+
+<div class="viewcode-block" id="get_cmap"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.get_cmap">[docs]</a><span class="k">def</span> <span class="nf">get_cmap</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;hsv&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Returns a function that maps each index in 0, 1, ..., n-1 to a distinct</span>
+<span class="sd">    RGB color; the keyword argument name must be a standard mpl colormap name.&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CreateVideo"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.CreateVideo">[docs]</a><span class="k">def</span> <span class="nf">CreateVideo</span><span class="p">(</span><span class="n">clip</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">pcutoff</span><span class="p">,</span><span class="n">dotsize</span><span class="p">,</span><span class="n">colormap</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">bodyparts2plot</span><span class="p">,</span><span class="n">trailpoints</span><span class="p">,</span><span class="n">cropping</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">bodyparts2connect</span><span class="p">,</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">draw_skeleton</span><span class="p">,</span><span class="n">displaycropped</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Creating individual frames with labeled body parts and making a video&#39;&#39;&#39;</span>
+        <span class="n">colorclass</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">colormap</span><span class="p">)</span>
+        <span class="n">C</span><span class="o">=</span><span class="n">colorclass</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)))</span>
+        <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="n">C</span><span class="p">[:,:</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">draw_skeleton</span><span class="p">:</span>
+            <span class="n">color_for_skeleton</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">skeleton_color</span><span class="p">))[:</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+            <span class="c1">#recode the bodyparts2connect into indices for df_x and df_y for speed</span>
+            <span class="n">bpts2connect</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">bodyparts2connect</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bodyparts2plot</span> <span class="ow">and</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bodyparts2plot</span><span class="p">:</span>
+                    <span class="n">bpts2connect</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">index</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)][</span><span class="mi">0</span><span class="p">],</span><span class="n">index</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)][</span><span class="mi">0</span><span class="p">]])</span>
+        
+        <span class="k">if</span> <span class="n">displaycropped</span><span class="p">:</span>
+            <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span> <span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">,</span><span class="n">x2</span><span class="o">-</span><span class="n">x1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span> <span class="n">clip</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span> <span class="n">clip</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+        
+        <span class="n">fps</span><span class="o">=</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">()</span>
+        <span class="n">nframes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Dataframe</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">nframes</span><span class="o">/</span><span class="n">fps</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Duration of video [s]: &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;, recorded with &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">fps</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s2">&quot;fps!&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall # of frames: &quot;</span><span class="p">,</span> <span class="n">nframes</span><span class="p">,</span> <span class="s2">&quot;with cropped frame dimensions: &quot;</span><span class="p">,</span><span class="n">nx</span><span class="p">,</span><span class="n">ny</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating frames and creating video.&quot;</span><span class="p">)</span>
+        <span class="n">df_likelihood</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">nframes</span><span class="p">))</span>
+        <span class="n">df_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">nframes</span><span class="p">))</span>
+        <span class="n">df_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">nframes</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">):</span>
+            <span class="n">df_likelihood</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">DLCscorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">if</span> <span class="n">cropping</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">displaycropped</span><span class="p">:</span>
+                <span class="n">df_x</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">DLCscorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">+</span><span class="n">x1</span>
+                <span class="n">df_y</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">DLCscorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">+</span><span class="n">y1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df_x</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">DLCscorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+                <span class="n">df_y</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">DLCscorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        
+    
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nframes</span><span class="p">)):</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">clip</span><span class="o">.</span><span class="n">load_frame</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">displaycropped</span><span class="p">:</span>
+                    <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">[</span><span class="n">y1</span><span class="p">:</span><span class="n">y2</span><span class="p">,</span><span class="n">x1</span><span class="p">:</span><span class="n">x2</span><span class="p">]</span>
+            
+            <span class="k">for</span> <span class="n">bpindex</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)):</span>
+                <span class="c1"># Draw the skeleton for specific bodyparts to be connected as specified in the config file</span>
+                <span class="k">if</span> <span class="n">draw_skeleton</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">bpts2connect</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">df_likelihood</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">index</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">pcutoff</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">df_likelihood</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">index</span><span class="p">]</span> <span class="o">&gt;</span><span class="n">pcutoff</span><span class="p">):</span>
+<span class="c1">#                           rr, cc,val = line_aa(int(df_y[pair[0],index]),int(df_x[pair[0],index]),int(df_y[pair[1],index]), int(df_x[pair[1],index]))</span>
+                            <span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span><span class="n">val</span> <span class="o">=</span> <span class="n">line_aa</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">df_y</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">index</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="n">ny</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">df_x</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">index</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="n">nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">df_y</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">index</span><span class="p">],</span><span class="mi">1</span><span class="p">,</span><span class="n">ny</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">df_x</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">index</span><span class="p">],</span><span class="mi">1</span><span class="p">,</span><span class="n">nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+                            <span class="n">image</span><span class="p">[</span><span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">color_for_skeleton</span>
+
+                <span class="k">if</span> <span class="n">df_likelihood</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,</span><span class="n">index</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">pcutoff</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">trailpoints</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span> <span class="c1">#plot history</span>
+                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">trailpoints</span><span class="p">,</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+                            <span class="n">rr</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="n">circle</span><span class="p">(</span><span class="n">df_y</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,</span><span class="n">index</span><span class="o">-</span><span class="n">k</span><span class="p">],</span><span class="n">df_x</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,</span><span class="n">index</span><span class="o">-</span><span class="n">k</span><span class="p">],</span><span class="n">dotsize</span><span class="p">,</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="p">))</span>
+                            <span class="n">image</span><span class="p">[</span><span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">bpindex</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">xc</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df_x</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,</span><span class="n">index</span><span class="p">])</span>
+                        <span class="n">yc</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df_y</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,</span><span class="n">index</span><span class="p">])</span>
+                        <span class="n">rr</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="n">circle</span><span class="p">(</span><span class="n">yc</span><span class="p">,</span><span class="n">xc</span><span class="p">,</span><span class="n">dotsize</span><span class="p">,</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="p">))</span>
+                        <span class="n">image</span><span class="p">[</span><span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">bpindex</span><span class="p">]</span>
+
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">image</span>
+            <span class="n">clip</span><span class="o">.</span><span class="n">save_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="n">clip</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CreateVideoSlow"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.CreateVideoSlow">[docs]</a><span class="k">def</span> <span class="nf">CreateVideoSlow</span><span class="p">(</span><span class="n">videooutname</span><span class="p">,</span><span class="n">clip</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">tmpfolder</span><span class="p">,</span><span class="n">dotsize</span><span class="p">,</span><span class="n">colormap</span><span class="p">,</span><span class="n">alphavalue</span><span class="p">,</span><span class="n">pcutoff</span><span class="p">,</span><span class="n">trailpoints</span><span class="p">,</span><span class="n">cropping</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">delete</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">bodyparts2plot</span><span class="p">,</span><span class="n">outputframerate</span><span class="p">,</span><span class="n">Frames2plot</span><span class="p">,</span><span class="n">bodyparts2connect</span><span class="p">,</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">draw_skeleton</span><span class="p">,</span><span class="n">displaycropped</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Creating individual frames with labeled body parts and making a video&#39;&#39;&#39;</span>
+    <span class="c1">#scorer=np.unique(Dataframe.columns.get_level_values(0))[0]</span>
+    <span class="c1">#bodyparts2plot = list(np.unique(Dataframe.columns.get_level_values(1)))</span>
+            
+    <span class="k">if</span> <span class="n">displaycropped</span><span class="p">:</span>
+        <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span> <span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">,</span><span class="n">x2</span><span class="o">-</span><span class="n">x1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span> <span class="n">clip</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span> <span class="n">clip</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+    
+    <span class="n">fps</span><span class="o">=</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">()</span>
+    <span class="k">if</span>  <span class="n">outputframerate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#by def. same as input rate.</span>
+        <span class="n">outputframerate</span><span class="o">=</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">()</span>
+    
+    <span class="n">nframes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Dataframe</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="n">nframes</span><span class="o">/</span><span class="n">fps</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Duration of video [s]: &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;, recorded with &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">fps</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s2">&quot;fps!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall # of frames: &quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">nframes</span><span class="p">),</span> <span class="s2">&quot;with cropped frame dimensions: &quot;</span><span class="p">,</span><span class="n">nx</span><span class="p">,</span><span class="n">ny</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating frames and creating video.&quot;</span><span class="p">)</span>
+    <span class="n">df_likelihood</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">nframes</span><span class="p">))</span>
+    <span class="n">df_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">nframes</span><span class="p">))</span>
+    <span class="n">df_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">nframes</span><span class="p">))</span>
+    
+    <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">):</span>
+        <span class="n">df_likelihood</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">DLCscorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">if</span> <span class="n">cropping</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">displaycropped</span><span class="p">:</span>
+            <span class="n">df_x</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">DLCscorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">+</span><span class="n">x1</span>
+            <span class="n">df_y</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">DLCscorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">+</span><span class="n">y1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df_x</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">DLCscorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">df_y</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">DLCscorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">get_cmap</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">name</span><span class="o">=</span><span class="n">colormap</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">draw_skeleton</span><span class="p">:</span>
+            <span class="c1">#recode the bodyparts2connect into indices for df_x and df_y for speed</span>
+            <span class="n">bpts2connect</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">bodyparts2connect</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bodyparts2plot</span> <span class="ow">and</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bodyparts2plot</span><span class="p">:</span>
+                    <span class="n">bpts2connect</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">index</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)][</span><span class="mi">0</span><span class="p">],</span><span class="n">index</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">)][</span><span class="mi">0</span><span class="p">]])</span>
+            
+    <span class="n">nframes_digits</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">nframes</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">nframes_digits</span><span class="o">&gt;</span><span class="mi">9</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Your video has more than 10**9 frames, we recommend chopping it up.&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">Frames2plot</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+        <span class="n">Index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">nframes</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Index</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Frames2plot</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">k</span><span class="o">&lt;</span><span class="n">nframes</span><span class="p">:</span>
+                <span class="n">Index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+            
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nframes</span><span class="p">)):</span>
+        <span class="n">imagename</span> <span class="o">=</span> <span class="n">tmpfolder</span> <span class="o">+</span> <span class="s2">&quot;/file&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">nframes_digits</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.png&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">imagename</span><span class="p">):</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">load_frame</span><span class="p">())</span> <span class="c1">#still need to read (so counter advances!)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">img_as_ubyte</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">load_frame</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">Index</span><span class="p">:</span> <span class="c1">#then extract the frame!</span>
+                <span class="k">if</span> <span class="n">cropping</span> <span class="ow">and</span> <span class="n">displaycropped</span><span class="p">:</span>
+                        <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">[</span><span class="n">y1</span><span class="p">:</span><span class="n">y2</span><span class="p">,</span><span class="n">x1</span><span class="p">:</span><span class="n">x2</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                
+                <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">nx</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="n">ny</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="mi">100</span><span class="p">))</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                
+                <span class="c1"># Adds skeleton to the video</span>
+                <span class="c1">####################</span>
+                <span class="k">if</span> <span class="n">draw_skeleton</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">bpts2connect</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">df_likelihood</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">index</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">pcutoff</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">df_likelihood</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">index</span><span class="p">]</span> <span class="o">&gt;</span><span class="n">pcutoff</span><span class="p">):</span>
+                                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">df_x</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">index</span><span class="p">],</span><span class="n">df_x</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">index</span><span class="p">]],[</span><span class="n">df_y</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">index</span><span class="p">],</span><span class="n">df_y</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">index</span><span class="p">]],</span><span class="n">color</span><span class="o">=</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="n">alphavalue</span><span class="p">)</span>
+                                
+                <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">df_likelihood</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,</span><span class="n">index</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">pcutoff</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">trailpoints</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                                <span class="n">df_x</span><span class="p">[</span><span class="n">bpindex</span><span class="p">][</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">index</span><span class="o">-</span><span class="n">trailpoints</span><span class="p">):</span><span class="n">index</span><span class="p">],</span>
+                                <span class="n">df_y</span><span class="p">[</span><span class="n">bpindex</span><span class="p">][</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">index</span><span class="o">-</span><span class="n">trailpoints</span><span class="p">):</span><span class="n">index</span><span class="p">],</span>
+                                <span class="n">s</span><span class="o">=</span><span class="n">dotsize</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+                                <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">(</span><span class="n">bpindex</span><span class="p">),</span>
+                                <span class="n">alpha</span><span class="o">=</span><span class="n">alphavalue</span><span class="o">*.</span><span class="mi">75</span><span class="p">)</span>
+                            <span class="c1">#less transparent present.</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                                <span class="n">df_x</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,</span><span class="n">index</span><span class="p">],</span>
+                                <span class="n">df_y</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,</span><span class="n">index</span><span class="p">],</span>
+                                <span class="n">s</span><span class="o">=</span><span class="n">dotsize</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+                                <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">(</span><span class="n">bpindex</span><span class="p">),</span>
+                                <span class="n">alpha</span><span class="o">=</span><span class="n">alphavalue</span><span class="p">)</span>
+    
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                                <span class="n">df_x</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,</span><span class="n">index</span><span class="p">],</span>
+                                <span class="n">df_y</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,</span><span class="n">index</span><span class="p">],</span>
+                                <span class="n">s</span><span class="o">=</span><span class="n">dotsize</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+                                <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">(</span><span class="n">bpindex</span><span class="p">),</span>
+                                <span class="n">alpha</span><span class="o">=</span><span class="n">alphavalue</span><span class="p">)</span>
+                
+                <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ny</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                
+                <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span>
+                    <span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">imagename</span><span class="p">)</span>
+    
+                <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+    
+    <span class="n">start</span><span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">tmpfolder</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All labeled frames were created, now generating video...&quot;</span><span class="p">)</span>
+    <span class="c1">## One can change the parameters of the video creation script below:</span>
+    <span class="c1"># See ffmpeg user guide: http://ffmpeg.org/ffmpeg.html#Video-and-Audio-file-format-conversion</span>
+    <span class="c1"># </span>
+    <span class="k">try</span><span class="p">:</span> 
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span>
+            <span class="s1">&#39;ffmpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;-framerate&#39;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">()),</span> <span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="s1">&#39;file%0&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nframes_digits</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;d.png&#39;</span><span class="p">,</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">outputframerate</span><span class="p">),</span><span class="s1">&#39;../&#39;</span><span class="o">+</span><span class="n">videooutname</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ffmpeg not correctly installed, see https://github.com/AlexEMG/DeepLabCut/issues/45&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">delete</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.png&quot;</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">start</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="create_labeled_video"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.create_labeled_video">[docs]</a><span class="k">def</span> <span class="nf">create_labeled_video</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">videos</span><span class="p">,</span><span class="n">videotype</span><span class="o">=</span><span class="s1">&#39;avi&#39;</span><span class="p">,</span><span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">trainingsetindex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">filtered</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">save_frames</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">Frames2plot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">displayedbodyparts</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span><span class="n">codec</span><span class="o">=</span><span class="s1">&#39;mp4v&#39;</span><span class="p">,</span><span class="n">outputframerate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">destfolder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">draw_skeleton</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">trailpoints</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="n">displaycropped</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Labels the bodyparts in a video. Make sure the video is already analyzed by the function &#39;analyze_video&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    videos : list</span>
+<span class="sd">        A list of strings containing the full paths to videos for analysis or a path to the directory, where all the videos with same extension are stored.</span>
+<span class="sd">    </span>
+<span class="sd">    videotype: string, optional</span>
+<span class="sd">        Checks for the extension of the video in case the input to the video is a directory.\n Only videos with this extension are analyzed. The default is ``.avi``</span>
+
+<span class="sd">    shuffle : int, optional</span>
+<span class="sd">        Number of shuffles of training dataset. Default is set to 1.</span>
+<span class="sd">    </span>
+<span class="sd">    trainingsetindex: int, optional</span>
+<span class="sd">        Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</span>
+<span class="sd">     </span>
+<span class="sd">    filtered: bool, default false</span>
+<span class="sd">        Boolean variable indicating if filtered output should be plotted rather than frame-by-frame predictions. Filtered version can be calculated with deeplabcut.filterpredictions</span>
+<span class="sd">    </span>
+<span class="sd">    videotype: string, optional</span>
+<span class="sd">        Checks for the extension of the video in case the input is a directory.\nOnly videos with this extension are analyzed. The default is ``.avi``</span>
+
+<span class="sd">    save_frames: bool</span>
+<span class="sd">        If true creates each frame individual and then combines into a video. This variant is relatively slow as</span>
+<span class="sd">        it stores all individual frames. However, it uses matplotlib to create the frames and is therefore much more flexible (one can set transparency of markers, crop, and easily customize).</span>
+
+<span class="sd">    Frames2plot: List of indices</span>
+<span class="sd">        If not None &amp; save_frames=True then the frames corresponding to the index will be plotted. For example, Frames2plot=[0,11] will plot the first and the 12th frame.</span>
+<span class="sd">        </span>
+<span class="sd">    delete: bool</span>
+<span class="sd">        If true then the individual frames created during the video generation will be deleted.</span>
+
+<span class="sd">    displayedbodyparts: list of strings, optional</span>
+<span class="sd">        This select the body parts that are plotted in the video. Either ``all``, then all body parts</span>
+<span class="sd">        from config.yaml are used orr a list of strings that are a subset of the full list.</span>
+<span class="sd">        E.g. [&#39;hand&#39;,&#39;Joystick&#39;] for the demo Reaching-Mackenzie-2018-08-30/config.yaml to select only these two body parts.</span>
+
+<span class="sd">    codec: codec for labeled video. Options see http://www.fourcc.org/codecs.php [depends on your ffmpeg installation.]</span>
+<span class="sd">    </span>
+<span class="sd">    outputframerate: positive number, output frame rate for labeled video (only available for the mode with saving frames.) By default: None, which results in the original video rate.</span>
+<span class="sd">    </span>
+<span class="sd">    destfolder: string, optional</span>
+<span class="sd">        Specifies the destination folder that was used for storing analysis data (default is the path of the video).</span>
+<span class="sd">        </span>
+<span class="sd">    draw_skeleton: bool</span>
+<span class="sd">        If ``True`` adds a line connecting the body parts making a skeleton on on each frame. The body parts to be connected and the color of these connecting lines are specified in the config file. By default: ``False``</span>
+<span class="sd">    </span>
+<span class="sd">    trailpoints: int</span>
+<span class="sd">        Number of revious frames whose body parts are plotted in a frame (for displaying history). Default is set to 0.</span>
+<span class="sd">    </span>
+<span class="sd">    displaycropped: bool, optional</span>
+<span class="sd">        Specifies whether only cropped frame is displayed (with labels analyzed therein), or the original frame with the labels analyzed in the cropped subset.</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    If you want to create the labeled video for only 1 video</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_labeled_video(&#39;/analysis/project/reaching-task/config.yaml&#39;,[&#39;/analysis/project/videos/reachingvideo1.avi&#39;])</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    If you want to create the labeled video for only 1 video and store the individual frames</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_labeled_video(&#39;/analysis/project/reaching-task/config.yaml&#39;,[&#39;/analysis/project/videos/reachingvideo1.avi&#39;],save_frames=True)</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    If you want to create the labeled video for multiple videos</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_labeled_video(&#39;/analysis/project/reaching-task/config.yaml&#39;,[&#39;/analysis/project/videos/reachingvideo1.avi&#39;,&#39;/analysis/project/videos/reachingvideo2.avi&#39;])</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    If you want to create the labeled video for all the videos (as .avi extension) in a directory.</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_labeled_video(&#39;/analysis/project/reaching-task/config.yaml&#39;,[&#39;/analysis/project/videos/&#39;])</span>
+
+<span class="sd">    --------</span>
+<span class="sd">    If you want to create the labeled video for all the videos (as .mp4 extension) in a directory.</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_labeled_video(&#39;/analysis/project/reaching-task/config.yaml&#39;,[&#39;/analysis/project/videos/&#39;],videotype=&#39;mp4&#39;)</span>
+
+<span class="sd">    --------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">trainFraction</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="n">trainingsetindex</span><span class="p">]</span>
+    <span class="n">DLCscorer</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetScorerName</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">)</span> <span class="c1">#automatically loads corresponding model (even training iteration based on snapshot index)</span>
+
+    <span class="n">bodyparts</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">IntersectionofBodyPartsandOnesGivenbyUser</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">displayedbodyparts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">draw_skeleton</span><span class="p">:</span>
+        <span class="n">bodyparts2connect</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;skeleton&#39;</span><span class="p">]</span>
+        <span class="n">skeleton_color</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;skeleton_color&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bodyparts2connect</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">skeleton_color</span> <span class="o">=</span> <span class="kc">None</span>
+        
+    <span class="n">Videos</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">Getlistofvideos</span><span class="p">(</span><span class="n">videos</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">Videos</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">destfolder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#videofolder = str(Path(video).parents[0])</span>
+            <span class="n">videofolder</span><span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#where your folder with videos is.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">videofolder</span><span class="o">=</span><span class="n">destfolder</span>
+            
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">videofolder</span><span class="p">))</span>
+        <span class="n">videotype</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting % &quot;</span><span class="p">,</span> <span class="n">videofolder</span><span class="p">,</span> <span class="n">videos</span><span class="p">)</span>
+        <span class="n">vname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filtered</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="n">videooutname</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vname</span> <span class="o">+</span> <span class="n">DLCscorer</span><span class="o">+</span><span class="s1">&#39;filtered_labeled.mp4&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">videooutname</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vname</span> <span class="o">+</span> <span class="n">DLCscorer</span><span class="o">+</span><span class="s1">&#39;_labeled.mp4&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">videofolder</span><span class="p">),</span><span class="n">vname</span> <span class="o">+</span> <span class="n">DLCscorer</span><span class="o">+</span><span class="s1">&#39;_labeled.mp4&#39;</span><span class="p">)):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labeled video already created.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Loading &quot;</span><span class="p">,</span> <span class="n">video</span><span class="p">,</span> <span class="s2">&quot;and data.&quot;</span><span class="p">)</span>
+            <span class="n">dataname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">videofolder</span><span class="p">),</span><span class="n">vname</span><span class="o">+</span><span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">Dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">dataname</span><span class="p">)</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">LoadVideoMetadata</span><span class="p">(</span><span class="n">dataname</span><span class="p">)</span>
+                <span class="c1">#print(metadata)</span>
+                <span class="n">datanames</span><span class="o">=</span><span class="p">[</span><span class="n">dataname</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="n">datanames</span><span class="o">=</span><span class="p">[</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">vname</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;.h5&quot;</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;resnet&quot;</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">datanames</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The video was not analyzed with this scorer:&quot;</span><span class="p">,</span> <span class="n">DLCscorer</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No other scorers were found, please use the function &#39;analyze_videos&#39; first.&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">datanames</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The video was not analyzed with this scorer:&quot;</span><span class="p">,</span> <span class="n">DLCscorer</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Other scorers were found, however:&quot;</span><span class="p">,</span> <span class="n">datanames</span><span class="p">)</span>
+                    <span class="n">DLCscorer</span><span class="o">=</span><span class="s1">&#39;DeepCut&#39;</span><span class="o">+</span><span class="p">(</span><span class="n">datanames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;DeepCut&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating labeled video for:&quot;</span><span class="p">,</span> <span class="n">DLCscorer</span><span class="p">,</span><span class="s2">&quot; instead.&quot;</span><span class="p">)</span>
+                    <span class="n">Dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">datanames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">metadata</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">LoadVideoMetadata</span><span class="p">(</span><span class="n">datanames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">datanames</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="c1">#Loading cropping data used during analysis</span>
+                <span class="n">cropping</span><span class="o">=</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s2">&quot;cropping&quot;</span><span class="p">]</span>
+                <span class="p">[</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">]</span><span class="o">=</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s2">&quot;cropping_parameters&quot;</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">cropping</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">save_frames</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+                    <span class="n">tmpfolder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">videofolder</span><span class="p">),</span><span class="s1">&#39;temp-&#39;</span> <span class="o">+</span> <span class="n">vname</span><span class="p">)</span>
+                    <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">attempttomakefolder</span><span class="p">(</span><span class="n">tmpfolder</span><span class="p">)</span>
+                    <span class="n">clip</span> <span class="o">=</span> <span class="n">vp</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
+                    
+                    <span class="n">CreateVideoSlow</span><span class="p">(</span><span class="n">videooutname</span><span class="p">,</span><span class="n">clip</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">tmpfolder</span><span class="p">,</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;dotsize&quot;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;alphavalue&quot;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;pcutoff&quot;</span><span class="p">],</span><span class="n">trailpoints</span><span class="p">,</span><span class="n">cropping</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">delete</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">bodyparts</span><span class="p">,</span><span class="n">outputframerate</span><span class="p">,</span><span class="n">Frames2plot</span><span class="p">,</span><span class="n">bodyparts2connect</span><span class="p">,</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">draw_skeleton</span><span class="p">,</span><span class="n">displaycropped</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">displaycropped</span><span class="p">:</span> <span class="c1">#then the cropped video + the labels is depicted</span>
+                        <span class="n">clip</span> <span class="o">=</span> <span class="n">vp</span><span class="p">(</span><span class="n">fname</span> <span class="o">=</span> <span class="n">video</span><span class="p">,</span><span class="n">sname</span> <span class="o">=</span> <span class="n">videooutname</span><span class="p">,</span><span class="n">codec</span><span class="o">=</span><span class="n">codec</span><span class="p">,</span><span class="n">sw</span><span class="o">=</span><span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">,</span><span class="n">sh</span><span class="o">=</span><span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span>
+                        <span class="n">CreateVideo</span><span class="p">(</span><span class="n">clip</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;pcutoff&quot;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;dotsize&quot;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">],</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">bodyparts</span><span class="p">,</span><span class="n">trailpoints</span><span class="p">,</span><span class="n">cropping</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">bodyparts2connect</span><span class="p">,</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">draw_skeleton</span><span class="p">,</span><span class="n">displaycropped</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span> <span class="c1">#then the full video + the (perhaps in cropped mode analyzed labels) are depicted</span>
+                        <span class="n">clip</span> <span class="o">=</span> <span class="n">vp</span><span class="p">(</span><span class="n">fname</span> <span class="o">=</span> <span class="n">video</span><span class="p">,</span><span class="n">sname</span> <span class="o">=</span> <span class="n">videooutname</span><span class="p">,</span><span class="n">codec</span><span class="o">=</span><span class="n">codec</span><span class="p">)</span>
+                        <span class="n">CreateVideo</span><span class="p">(</span><span class="n">clip</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">,</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;pcutoff&quot;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;dotsize&quot;</span><span class="p">],</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">],</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">bodyparts</span><span class="p">,</span><span class="n">trailpoints</span><span class="p">,</span><span class="n">cropping</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">bodyparts2connect</span><span class="p">,</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">draw_skeleton</span><span class="p">,</span><span class="n">displaycropped</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;videos&#39;</span><span class="p">)</span>
+    <span class="n">cli_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

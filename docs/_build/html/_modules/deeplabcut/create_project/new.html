@@ -1,0 +1,396 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.create_project.new &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.create_project.new</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.create_project.new</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">from</span> <span class="nn">deeplabcut</span> <span class="k">import</span> <span class="n">DEBUG</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<div class="viewcode-block" id="create_new_project"><a class="viewcode-back" href="../../../source/deeplabcut.create_project.html#deeplabcut.create_project.new.create_new_project">[docs]</a><span class="k">def</span> <span class="nf">create_new_project</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">experimenter</span><span class="p">,</span> <span class="n">videos</span><span class="p">,</span> <span class="n">working_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy_videos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">videotype</span><span class="o">=</span><span class="s1">&#39;.avi&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a new project directory, sub-directories and a basic configuration file. The configuration file is loaded with the default values. Change its parameters to your projects need.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    project : string</span>
+<span class="sd">        String containing the name of the project.</span>
+
+<span class="sd">    experimenter : string</span>
+<span class="sd">        String containing the name of the experimenter.</span>
+
+<span class="sd">    videos : list</span>
+<span class="sd">        A list of string containing the full paths of the videos to include in the project.</span>
+<span class="sd">        Attention: Can also be a directory, then all videos of videotype will be imported.</span>
+
+<span class="sd">    working_directory : string, optional</span>
+<span class="sd">        The directory where the project will be created. The default is the ``current working directory``; if provided, it must be a string.</span>
+
+<span class="sd">    copy_videos : bool, optional</span>
+<span class="sd">        If this is set to True, the videos are copied to the ``videos`` directory. If it is False,symlink of the videos are copied to the project/videos directory. The default is ``False``; if provided it must be either</span>
+<span class="sd">        ``True`` or ``False``.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    Linux/MacOs</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_new_project(&#39;reaching-task&#39;,&#39;Linus&#39;,[&#39;/data/videos/mouse1.avi&#39;,&#39;/data/videos/mouse2.avi&#39;,&#39;/data/videos/mouse3.avi&#39;],&#39;/analysis/project/&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_new_project(&#39;reaching-task&#39;,&#39;Linus&#39;,[&#39;/data/videos&#39;],videotype=&#39;.mp4&#39;)</span>
+
+<span class="sd">    Windows:</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_new_project(&#39;reaching-task&#39;,&#39;Bill&#39;,[r&#39;C:\yourusername\rig-95\Videos\reachingvideo1.avi&#39;], copy_videos=True)</span>
+<span class="sd">    Users must format paths with either:  r&#39;C:\ OR &#39;C:\\ &lt;- i.e. a double backslash \ \ )</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">dt</span>
+    <span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+    <span class="n">month</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%B&quot;</span><span class="p">)</span>
+    <span class="n">day</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">day</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">month</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">day</span><span class="p">))</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">working_directory</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">working_directory</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+    <span class="n">wd</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">working_directory</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="n">project_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{pn}</span><span class="s1">-</span><span class="si">{exp}</span><span class="s1">-</span><span class="si">{date}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pn</span><span class="o">=</span><span class="n">project</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="n">experimenter</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">)</span>
+    <span class="n">project_path</span> <span class="o">=</span> <span class="n">wd</span> <span class="o">/</span> <span class="n">project_name</span>
+
+    <span class="c1"># Create project and sub-directories</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">DEBUG</span> <span class="ow">and</span> <span class="n">project_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Project &quot;</span><span class="si">{}</span><span class="s1">&quot; already exists!&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_path</span><span class="p">))</span>
+        <span class="k">return</span>
+    <span class="n">video_path</span> <span class="o">=</span> <span class="n">project_path</span> <span class="o">/</span> <span class="s1">&#39;videos&#39;</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="n">project_path</span> <span class="o">/</span> <span class="s1">&#39;labeled-data&#39;</span>
+    <span class="n">shuffles_path</span> <span class="o">=</span> <span class="n">project_path</span> <span class="o">/</span> <span class="s1">&#39;training-datasets&#39;</span>
+    <span class="n">results_path</span> <span class="o">=</span> <span class="n">project_path</span> <span class="o">/</span> <span class="s1">&#39;dlc-models&#39;</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">video_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">,</span> <span class="n">shuffles_path</span><span class="p">,</span> <span class="n">results_path</span><span class="p">]:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Created &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+    
+    <span class="c1"># Add all videos in the folder. Multiple folders can be passed in a list, similar to the video files. Folders and video files can also be passed!</span>
+    <span class="n">vids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
+        <span class="c1">#Check if it is a folder</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="n">vids_in_dir</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">vp</span><span class="p">)</span> <span class="k">for</span> <span class="n">vp</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">if</span> <span class="n">videotype</span> <span class="ow">in</span> <span class="n">vp</span><span class="p">]</span>
+            <span class="n">vids</span> <span class="o">=</span> <span class="n">vids</span> <span class="o">+</span> <span class="n">vids_in_dir</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vids_in_dir</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No videos found in&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Perhaps change the videotype, which is currently set to:&quot;</span><span class="p">,</span> <span class="n">videotype</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">videos</span> <span class="o">=</span> <span class="n">vids</span>
+                <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vids_in_dir</span><span class="p">),</span><span class="s2">&quot; videos from the directory&quot;</span> <span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;were added to the project.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                <span class="n">vids</span> <span class="o">=</span> <span class="n">vids</span> <span class="o">+</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">videos</span> <span class="o">=</span> <span class="n">vids</span>
+
+    <span class="c1"># Import all videos in a folder or if just one video withouth [] passed, then make it a list.</span>
+<span class="c1">#    if isinstance(videos,str):</span>
+<span class="c1">#        #there are two cases:</span>
+<span class="c1">#        if os.path.isdir(videos): # it is a path!</span>
+<span class="c1">#            path=videos</span>
+<span class="c1">#            videos=[os.path.join(path,vp) for vp in os.listdir(path) if videotype in vp]</span>
+<span class="c1">#            if len(videos)==0:</span>
+<span class="c1">#                print(&quot;No videos found in&quot;,path,os.listdir(path))</span>
+<span class="c1">#                print(&quot;Perhaps change the videotype, which is currently set to:&quot;, videotype)</span>
+<span class="c1">#            else:</span>
+<span class="c1">#                print(&quot;Directory entered, &quot; , len(videos),&quot; videos were found.&quot;)</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            if os.path.isfile(videos):</span>
+<span class="c1">#                videos=[videos]</span>
+
+    <span class="n">videos</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">vp</span><span class="p">)</span> <span class="k">for</span> <span class="n">vp</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">]</span>
+    <span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_path</span><span class="o">/</span><span class="n">Path</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates directory under data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">destinations</span> <span class="o">=</span> <span class="p">[</span><span class="n">video_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">vp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">vp</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">copy_videos</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Copying the videos&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">videos</span><span class="p">,</span> <span class="n">destinations</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">src</span><span class="p">),</span><span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span> <span class="c1">#https://www.python.org/dev/peps/pep-0519/</span>
+            <span class="c1">#https://github.com/AlexEMG/DeepLabCut/issues/105 (for windows)</span>
+            <span class="c1">#try:</span>
+            <span class="c1">#    #shutil.copy(src,dst)</span>
+            <span class="c1">#except OSError or TypeError: #https://github.com/AlexEMG/DeepLabCut/issues/105 (for windows)</span>
+            <span class="c1">#    shutil.copy(os.fspath(src),os.fspath(dst))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="c1"># creates the symlinks of the video and puts it in the videos directory.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating the symbolic link of the video&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">videos</span><span class="p">,</span> <span class="n">destinations</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">dst</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">DEBUG</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="s1">&#39;Video </span><span class="si">{}</span><span class="s1"> exists already!&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">src</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+                <span class="n">dst</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">subprocess</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="s1">&#39;mklink </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span><span class="n">src</span><span class="p">),</span><span class="n">shell</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Created the symlink of </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">))</span>
+            <span class="n">videos</span> <span class="o">=</span> <span class="n">destinations</span>
+
+    <span class="k">if</span> <span class="n">copy_videos</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="n">videos</span><span class="o">=</span><span class="n">destinations</span> <span class="c1"># in this case the *new* location should be added to the config file</span>
+        
+    <span class="c1"># adds the video list to the config.yaml file</span>
+    <span class="n">video_sets</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+           <span class="c1"># For windows os.path.realpath does not work and does not link to the real video. [old: rel_video_path = os.path.realpath(video)]</span>
+           <span class="n">rel_video_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)))</span>
+        <span class="k">except</span><span class="p">:</span>
+           <span class="n">rel_video_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">readlink</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">video</span><span class="p">))</span>
+
+        <span class="n">vcap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">rel_video_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vcap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">():</span>
+           <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vcap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_WIDTH</span><span class="p">))</span>
+           <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vcap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_HEIGHT</span><span class="p">))</span>
+           <span class="n">video_sets</span><span class="p">[</span><span class="n">rel_video_path</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;crop&#39;</span><span class="p">:</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">]))}</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cannot open the video file!&quot;</span><span class="p">)</span>
+           <span class="n">video_sets</span><span class="o">=</span><span class="kc">None</span>
+
+    <span class="c1">#        Set values to config file:</span>
+    <span class="n">cfg_file</span><span class="p">,</span><span class="n">ruamelFile</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">create_config_template</span><span class="p">()</span>
+    <span class="n">cfg_file</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;Task&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">project</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;scorer&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">experimenter</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;video_sets&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">video_sets</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">]</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">project_path</span><span class="p">)</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">d</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;bodyparts&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bodypart1&#39;</span><span class="p">,</span><span class="s1">&#39;bodypart2&#39;</span><span class="p">,</span><span class="s1">&#39;bodypart3&#39;</span><span class="p">,</span><span class="s1">&#39;objectA&#39;</span><span class="p">]</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;cropping&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;numframes2pick&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">20</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">0.95</span><span class="p">]</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;resnet&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">50</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;snapshotindex&#39;</span><span class="p">]</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">640</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">277</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">624</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">8</span> <span class="c1">#batch size during inference (video - analysis); see https://www.biorxiv.org/content/early/2018/10/30/457242</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;corner2move2&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;move2corner&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;skeleton&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;bodypart1&#39;</span><span class="p">,</span><span class="s1">&#39;bodypart2&#39;</span><span class="p">],[</span><span class="s1">&#39;objectA&#39;</span><span class="p">,</span><span class="s1">&#39;bodypart3&#39;</span><span class="p">]]</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;skeleton_color&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;black&#39;</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;pcutoff&#39;</span><span class="p">]</span><span class="o">=</span><span class="mf">0.1</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;dotsize&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">12</span> <span class="c1">#for plots size of dots</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;alphavalue&#39;</span><span class="p">]</span><span class="o">=</span><span class="mf">0.7</span> <span class="c1">#for plots transparency of markers</span>
+    <span class="n">cfg_file</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span> <span class="c1">#for plots type of colormap</span>
+
+    <span class="n">projconfigfile</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">project_path</span><span class="p">),</span><span class="s1">&#39;config.yaml&#39;</span><span class="p">)</span>
+    <span class="c1"># Write dictionary to yaml  config file</span>
+    <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">write_config</span><span class="p">(</span><span class="n">projconfigfile</span><span class="p">,</span><span class="n">cfg_file</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Generated &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_path</span> <span class="o">/</span> <span class="s1">&#39;config.yaml&#39;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">A new project with name </span><span class="si">%s</span><span class="s2"> is created at </span><span class="si">%s</span><span class="s2"> and a configurable file (config.yaml) is stored there. Change the parameters in this file to adapt to your project&#39;s needs.</span><span class="se">\n</span><span class="s2"> Once you have changed the configuration file, use the function &#39;extract_frames&#39; to select frames for labeling.</span><span class="se">\n</span><span class="s2">. [OPTIONAL] Use the function &#39;add_new_videos&#39; to add new videos to your project (at any stage).&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">wd</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">projconfigfile</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

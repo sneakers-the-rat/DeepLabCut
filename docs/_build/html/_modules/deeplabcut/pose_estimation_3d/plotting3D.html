@@ -1,0 +1,505 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_3d.plotting3D &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_3d.plotting3D</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_3d.plotting3D</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions_3d</span>
+<span class="kn">from</span> <span class="nn">matplotlib.axes._axes</span> <span class="k">import</span> <span class="n">_log</span> <span class="k">as</span> <span class="n">matplotlib_axes_logger</span>
+<span class="n">matplotlib_axes_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">gridspec</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+
+<div class="viewcode-block" id="create_labeled_video_3d"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_3d.html#deeplabcut.pose_estimation_3d.plotting3D.create_labeled_video_3d">[docs]</a><span class="k">def</span> <span class="nf">create_labeled_video_3d</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">path</span><span class="p">,</span><span class="n">videofolder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">trailpoints</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">videotype</span><span class="o">=</span><span class="s1">&#39;avi&#39;</span><span class="p">,</span><span class="n">view</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">113</span><span class="p">,</span> <span class="o">-</span><span class="mi">270</span><span class="p">],</span><span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">],</span><span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">],</span><span class="n">zlim</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">],</span><span class="n">draw_skeleton</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a video with views from the two cameras and the 3d reconstruction for a selected number of frames.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    path : list</span>
+<span class="sd">        A list of strings containing the full paths to triangulated files for analysis or a path to the directory, where all the triangulated files are stored.</span>
+<span class="sd">    </span>
+<span class="sd">    videofolder: string</span>
+<span class="sd">        Full path of the folder where the videos are stored. Use this if the vidoes are stored in a different location other than where the triangulation files are stored. By default is ``None`` and therefore looks for video files in the directory where the triangulation file is stored.</span>
+
+<span class="sd">    start: int</span>
+<span class="sd">        Integer specifying the start of frame index to select. Default is set to 0.</span>
+<span class="sd">    </span>
+<span class="sd">    end: int</span>
+<span class="sd">        Integer specifying the end of frame index to select. Default is set to None, where all the frames of the video are used for creating the labeled video.</span>
+<span class="sd">        </span>
+<span class="sd">    trailpoints: int</span>
+<span class="sd">        Number of revious frames whose body parts are plotted in a frame (for displaying history). Default is set to 0.</span>
+
+<span class="sd">    videotype: string, optional</span>
+<span class="sd">        Checks for the extension of the video in case the input is a directory.\nOnly videos with this extension are analyzed. The default is ``.avi``</span>
+
+<span class="sd">    view: list</span>
+<span class="sd">        A list that sets the elevation angle in z plane and azimuthal angle in x,y plane of 3d view. Useful for rotating the axis for 3d view</span>
+<span class="sd">    </span>
+<span class="sd">    xlim: list</span>
+<span class="sd">        A list of integers specifying the limits for xaxis of 3d view. By default it is set to [None,None], where the x limit is set by taking the minimum and maximum value of the x coordinates for all the bodyparts.</span>
+<span class="sd">    </span>
+<span class="sd">    ylim: list</span>
+<span class="sd">        A list of integers specifying the limits for yaxis of 3d view. By default it is set to [None,None], where the y limit is set by taking the minimum and maximum value of the y coordinates for all the bodyparts.</span>
+<span class="sd">    </span>
+<span class="sd">    zlim: list</span>
+<span class="sd">        A list of integers specifying the limits for zaxis of 3d view. By default it is set to [None,None], where the z limit is set by taking the minimum and maximum value of the z coordinates for all the bodyparts.</span>
+
+<span class="sd">    draw_skeleton: bool</span>
+<span class="sd">        If ``True`` adds a line connecting the body parts making a skeleton on on each frame. The body parts to be connected and the color of these connecting lines are specified in the config file. By default: ``True``</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Linux/MacOs</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_labeled_video_3d(config,[&#39;/data/project1/videos/3d.h5&#39;],start=100, end=500)</span>
+<span class="sd">    </span>
+<span class="sd">    To create labeled videos for all the triangulated files in the folder</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_labeled_video_3d(config,[&#39;/data/project1/videos&#39;],start=100, end=500)</span>
+<span class="sd">    </span>
+<span class="sd">    To set the xlim, ylim, zlim and rotate the view of the 3d axis</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_labeled_video_3d(config,[&#39;/data/project1/videos&#39;],start=100, end=500,view=[30,90],xlim=[-12,12],ylim=[15,25],zlim=[20,30])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Read the config file and related variables</span>
+    <span class="n">cfg_3d</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">cam_names</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;camera_names&#39;</span><span class="p">]</span>
+    <span class="n">pcutoff</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;pcutoff&#39;</span><span class="p">]</span>
+    <span class="n">markerSize</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;dotsize&#39;</span><span class="p">]</span>
+    <span class="n">alphaValue</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;alphaValue&#39;</span><span class="p">]</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">]</span>
+    <span class="n">bodyparts2connect</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;skeleton&#39;</span><span class="p">]</span>
+    <span class="n">skeleton_color</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;skeleton_color&#39;</span><span class="p">]</span>
+    <span class="n">scorer_3d</span> <span class="o">=</span> <span class="n">cfg_3d</span><span class="p">[</span><span class="s1">&#39;scorername_3d&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># Flatten the list of bodyparts to connect</span>
+    <span class="n">bodyparts2plot</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">val</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">bodyparts2connect</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]))</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">))</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">Get_list_of_triangulated_and_videoFiles</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">videotype</span><span class="p">,</span><span class="n">scorer_3d</span><span class="p">,</span><span class="n">cam_names</span><span class="p">,</span><span class="n">videofolder</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">file_list</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file_list</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No corresponding video file(s) found for the specified triangulated file or folder. Did you specify the video file type? If videos are stored in a different location, please use the ``videofolder`` argument to specify their path.&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">file_list</span><span class="p">:</span>
+        <span class="n">path_h5_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">triangulate_file</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># triangulated file is a list which is always sorted as [triangulated.h5,camera-1.videotype,camera-2.videotype]</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">triangulate_file</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
+        <span class="n">string_to_remove</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">triangulate_file</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span>
+        <span class="n">pickle_file</span> <span class="o">=</span> <span class="n">triangulate_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">string_to_remove</span><span class="p">,</span><span class="s1">&#39;_includingmetadata.pickle&#39;</span><span class="p">)</span>
+        <span class="n">metadata_</span> <span class="o">=</span> <span class="n">auxiliaryfunctions_3d</span><span class="o">.</span><span class="n">LoadMetadata3d</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">)</span>
+        
+        <span class="n">base_filename_cam1</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">videotype</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># required for searching the filtered file</span>
+        <span class="n">base_filename_cam2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">videotype</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># required for searching the filtered file</span>
+        <span class="n">cam1_view_video</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">cam2_view_video</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">cam1_scorer</span> <span class="o">=</span> <span class="n">metadata_</span><span class="p">[</span><span class="s1">&#39;scorer_name&#39;</span><span class="p">][</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">cam2_scorer</span> <span class="o">=</span> <span class="n">metadata_</span><span class="p">[</span><span class="s1">&#39;scorer_name&#39;</span><span class="p">][</span><span class="n">cam_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating 3D video from </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2"> using </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">cam1_view_video</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">Path</span><span class="p">(</span><span class="n">cam2_view_video</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">Path</span><span class="p">(</span><span class="n">triangulate_file</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="c1"># Read the video files and corresponfing h5 files</span>
+        <span class="n">vid_cam1</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">cam1_view_video</span><span class="p">)</span>
+        <span class="n">vid_cam2</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">cam2_view_video</span><span class="p">)</span>
+
+        <span class="c1"># Look for the filtered predictions file</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Trying to find filtered predictions...&quot;</span><span class="p">)</span>
+            <span class="n">df_cam1</span><span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_h5_file</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="n">base_filename_cam1</span><span class="o">+</span><span class="n">cam1_scorer</span><span class="o">+</span><span class="s1">&#39;*filtered.h5&#39;</span><span class="p">)))[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">df_cam2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_h5_file</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="n">base_filename_cam2</span><span class="o">+</span><span class="n">cam2_scorer</span><span class="o">+</span><span class="s1">&#39;*filtered.h5&#39;</span><span class="p">)))[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found filtered predictions! I will use these for triangulation.&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This is I found: &quot;</span><span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_h5_file</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="n">base_filename_cam1</span><span class="o">+</span><span class="n">cam1_scorer</span><span class="o">+</span><span class="s1">&#39;*filtered.h5&#39;</span><span class="p">)),</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_h5_file</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="o">+</span><span class="n">base_filename_cam2</span><span class="o">+</span><span class="n">cam2_scorer</span><span class="o">+</span><span class="s1">&#39;*filtered.h5&#39;</span><span class="p">)))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No filtered predictions found. I will use the unfiltered predictions.&quot;</span><span class="p">)</span>
+            <span class="n">df_cam1</span><span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_h5_file</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">base_filename_cam1</span><span class="o">+</span><span class="n">cam1_scorer</span><span class="o">+</span><span class="s1">&#39;*.h5&#39;</span><span class="p">)))[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">df_cam2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_h5_file</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">base_filename_cam2</span><span class="o">+</span><span class="n">cam2_scorer</span><span class="o">+</span><span class="s1">&#39;*.h5&#39;</span><span class="p">)))[</span><span class="mi">0</span><span class="p">])</span>
+        
+        <span class="n">df_3d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">triangulate_file</span><span class="p">,</span><span class="s1">&#39;df_with_missing&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;figure.max_open_warning&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+        
+        <span class="k">if</span> <span class="n">end</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+            <span class="n">end</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df_3d</span><span class="p">)</span> <span class="c1"># All the frames</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># Start plotting for every frame</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">frames</span><span class="p">):</span>
+            <span class="n">output_folder</span><span class="p">,</span><span class="n">num_frames</span> <span class="o">=</span> <span class="n">plot2D</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">bodyparts2plot</span><span class="p">,</span><span class="n">vid_cam1</span><span class="p">,</span><span class="n">vid_cam2</span><span class="p">,</span><span class="n">bodyparts2connect</span><span class="p">,</span><span class="n">df_cam1</span><span class="p">,</span><span class="n">df_cam2</span><span class="p">,</span><span class="n">df_3d</span><span class="p">,</span><span class="n">pcutoff</span><span class="p">,</span><span class="n">markerSize</span><span class="p">,</span><span class="n">alphaValue</span><span class="p">,</span><span class="n">color</span><span class="p">,</span><span class="n">path_h5_file</span><span class="p">,</span><span class="n">file_name</span><span class="p">,</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">view</span><span class="p">,</span><span class="n">draw_skeleton</span><span class="p">,</span><span class="n">trailpoints</span><span class="p">,</span><span class="n">xlim</span><span class="p">,</span><span class="n">ylim</span><span class="p">,</span><span class="n">zlim</span><span class="p">)</span>
+
+        <span class="c1"># Once all the frames are saved, then make a movie using ffmpeg.</span>
+        <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">output_folder</span><span class="p">))</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;ffmpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;-start_number&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="p">,</span><span class="s1">&#39;-framerate&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;img%0&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">num_frames</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;d.png&#39;</span><span class="p">),</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span><span class="s1">&#39;-vb&#39;</span><span class="p">,</span> <span class="s1">&#39;20M&#39;</span> <span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="o">+</span><span class="n">file_name</span><span class="o">+</span><span class="s1">&#39;.mpg&#39;</span><span class="p">))])</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="plot2D"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_3d.html#deeplabcut.pose_estimation_3d.plotting3D.plot2D">[docs]</a><span class="k">def</span> <span class="nf">plot2D</span><span class="p">(</span><span class="n">cfg_3d</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">bodyparts2plot</span><span class="p">,</span><span class="n">vid_cam1</span><span class="p">,</span><span class="n">vid_cam2</span><span class="p">,</span><span class="n">bodyparts2connect</span><span class="p">,</span><span class="n">df_cam1_view</span><span class="p">,</span><span class="n">df_cam2_view</span><span class="p">,</span><span class="n">xyz_pts</span><span class="p">,</span><span class="n">pcutoff</span><span class="p">,</span><span class="n">markerSize</span><span class="p">,</span><span class="n">alphaValue</span><span class="p">,</span><span class="n">color</span><span class="p">,</span><span class="n">path_h5_file</span><span class="p">,</span><span class="n">file_name</span><span class="p">,</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">view</span><span class="p">,</span><span class="n">draw_skeleton</span><span class="p">,</span><span class="n">trailpoints</span><span class="p">,</span><span class="n">xlim</span><span class="p">,</span><span class="n">ylim</span><span class="p">,</span><span class="n">zlim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates 2D gif for a selected number of frames</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create the fig and define the axes</span>
+    <span class="n">gs</span> <span class="o">=</span> <span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span><span class="n">width_ratios</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+    <span class="n">axes1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="c1"># row 0, col 0</span>
+    <span class="n">axes2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1"># row 0, col 1</span>
+    <span class="n">axes3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span> <span class="c1"># row 1, span all columns</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="c1"># Clear plot and initialize the variables</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+    <span class="n">axes1</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+    <span class="n">axes2</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+    <span class="n">axes3</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+
+    <span class="c1"># Initialize arrays for appending the 3d data for actual plotting the points</span>
+    <span class="n">xdata_3d</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ydata_3d</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">zdata_3d</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Initialize arrays for appending the 3d data for drawing the lines</span>
+    <span class="n">xlines_3d</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ylines_3d</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">zlines_3d</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Initialize arrays for appending the 2d data from cam1 for actual plotting the points</span>
+    <span class="n">xdata_cam1</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">ydata_cam1</span><span class="o">=</span><span class="p">[]</span> 
+
+    <span class="c1"># Initialize arrays for appending the 2d data from cam2 for actual plotting the points</span>
+    <span class="n">xdata_cam2</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">ydata_cam2</span><span class="o">=</span><span class="p">[]</span> 
+
+    <span class="c1"># Initialize arrays for appending the 2d data from cam1 for drawing the lines</span>
+    <span class="n">xcam1</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ycam1</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="c1"># Initialize arrays for appending the 2d data from cam2 for drawing the lines</span>
+    <span class="n">xcam2</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ycam2</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Get the scorer names from the dataframe</span>
+    <span class="n">scorer_cam1</span> <span class="o">=</span> <span class="n">df_cam1_view</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">scorer_cam2</span> <span class="o">=</span> <span class="n">df_cam2_view</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">scorer_3d</span> <span class="o">=</span> <span class="n">xyz_pts</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Set the x,y, and z limits for the 3d view</span>
+    <span class="n">numberFrames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid_cam1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_COUNT</span><span class="p">))</span>
+    <span class="n">df_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">numberFrames</span><span class="p">))</span>
+    <span class="n">df_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">numberFrames</span><span class="p">))</span>
+    <span class="n">df_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">),</span><span class="n">numberFrames</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">):</span>
+        <span class="n">df_x</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">xyz_pts</span><span class="p">[</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">df_y</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">xyz_pts</span><span class="p">[</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">df_z</span><span class="p">[</span><span class="n">bpindex</span><span class="p">,:]</span><span class="o">=</span><span class="n">xyz_pts</span><span class="p">[</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;z&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">if</span> <span class="n">xlim</span><span class="o">==</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">]:</span>
+        <span class="n">axes3</span><span class="o">.</span><span class="n">set_xlim3d</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df_x</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">df_x</span><span class="p">)])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axes3</span><span class="o">.</span><span class="n">set_xlim3d</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ylim</span><span class="o">==</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">]:</span>
+        <span class="n">axes3</span><span class="o">.</span><span class="n">set_ylim3d</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df_y</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">df_y</span><span class="p">)])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axes3</span><span class="o">.</span><span class="n">set_ylim3d</span><span class="p">(</span><span class="n">ylim</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">zlim</span><span class="o">==</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">]:</span>
+        <span class="n">axes3</span><span class="o">.</span><span class="n">set_zlim3d</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df_z</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">df_z</span><span class="p">)])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axes3</span><span class="o">.</span><span class="n">set_zlim3d</span><span class="p">(</span><span class="n">zlim</span><span class="p">)</span>
+
+    <span class="n">axes3</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([])</span>
+    <span class="n">axes3</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([])</span>
+    <span class="n">axes3</span><span class="o">.</span><span class="n">set_zticklabels</span><span class="p">([])</span>
+    <span class="n">axes3</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">axes3</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="n">view</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">view</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">axes3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">axes3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">axes3</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+
+    <span class="c1"># Set the frame number to read#max(0,index-trailpoints):index</span>
+    <span class="n">vid_cam1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">vid_cam2</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">ret_cam1</span><span class="p">,</span> <span class="n">frame_cam1</span> <span class="o">=</span> <span class="n">vid_cam1</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">ret_cam2</span><span class="p">,</span><span class="n">frame_cam2</span> <span class="o">=</span> <span class="n">vid_cam2</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="c1"># Plot the labels for each body part</span>
+    <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span><span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="p">):</span>
+        <span class="n">axes1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame_cam1</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+        <span class="n">axes2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame_cam2</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">df_cam1_view</span><span class="p">[</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">pcutoff</span> <span class="ow">and</span> <span class="p">(</span><span class="n">df_cam2_view</span><span class="p">[</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">pcutoff</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">trailpoints</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">xdata_cam1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam1_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="n">trailpoints</span><span class="p">):</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ydata_cam1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam1_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="n">trailpoints</span><span class="p">):</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+                <span class="n">xdata_cam2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam2_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="n">trailpoints</span><span class="p">):</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ydata_cam2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam2_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="n">trailpoints</span><span class="p">):</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+                <span class="n">xdata_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="n">trailpoints</span><span class="p">):</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ydata_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="n">trailpoints</span><span class="p">):</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+                <span class="n">zdata_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="n">trailpoints</span><span class="p">):</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;z&#39;</span><span class="p">])</span> 
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">xdata_cam1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam1_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ydata_cam1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam1_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+                <span class="n">xdata_cam2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam2_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ydata_cam2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam2_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+                <span class="n">xdata_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ydata_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+                <span class="n">zdata_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;z&#39;</span><span class="p">])</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xdata_cam1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">ydata_cam1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">xdata_cam2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">ydata_cam2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">xdata_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">ydata_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">zdata_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span><span class="n">axes1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xdata_cam1</span><span class="p">[</span><span class="n">bpindex</span><span class="p">],</span><span class="n">ydata_cam1</span><span class="p">[</span><span class="n">bpindex</span><span class="p">],</span><span class="n">s</span><span class="o">=</span><span class="n">markerSize</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bp</span><span class="p">)))</span>
+        <span class="n">p</span> <span class="o">=</span><span class="n">axes2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xdata_cam2</span><span class="p">[</span><span class="n">bpindex</span><span class="p">],</span><span class="n">ydata_cam2</span><span class="p">[</span><span class="n">bpindex</span><span class="p">],</span><span class="n">s</span><span class="o">=</span><span class="n">markerSize</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bp</span><span class="p">)))</span>
+        <span class="n">p</span> <span class="o">=</span><span class="n">axes3</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xdata_3d</span><span class="p">[</span><span class="n">bpindex</span><span class="p">],</span><span class="n">ydata_3d</span><span class="p">[</span><span class="n">bpindex</span><span class="p">],</span><span class="n">zdata_3d</span><span class="p">[</span><span class="n">bpindex</span><span class="p">],</span><span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">(</span><span class="n">bodyparts2plot</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bp</span><span class="p">)))</span>
+
+    <span class="c1"># Connecting the bodyparts specified in the config file.3d file is created based on the likelihoods of cam1 and cam2. Using 3d file and check if the body part is nan then dont plot skeleton</span>
+    <span class="k">if</span> <span class="n">draw_skeleton</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts2connect</span><span class="p">)):</span>
+            <span class="n">bool_above_pcutoff</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;x&#39;</span><span class="p">]))]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">bool_above_pcutoff</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">xcam1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam1_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ycam1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam1_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+                <span class="n">xcam1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam1_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ycam1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam1_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam1</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+
+                <span class="n">xcam2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam2_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ycam2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam2_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+                <span class="n">xcam2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam2_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ycam2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_cam2_view</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_cam2</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+
+                <span class="n">xlines_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ylines_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+                <span class="n">zlines_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;z&#39;</span><span class="p">])</span>
+                <span class="n">xlines_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+                <span class="n">ylines_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+                <span class="n">zlines_3d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz_pts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">scorer_3d</span><span class="p">][</span><span class="n">bodyparts2connect</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;z&#39;</span><span class="p">])</span>
+
+                <span class="n">axes1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xcam1</span><span class="p">,</span><span class="n">ycam1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="n">alphaValue</span><span class="p">)</span>
+                <span class="n">axes2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xcam2</span><span class="p">,</span><span class="n">ycam2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="n">alphaValue</span><span class="p">)</span>
+                <span class="n">axes3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xlines_3d</span><span class="p">,</span><span class="n">ylines_3d</span><span class="p">,</span><span class="n">zlines_3d</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">skeleton_color</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="n">alphaValue</span><span class="p">)</span>
+
+                <span class="n">xcam1</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">ycam1</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">xcam2</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">ycam2</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">xlines_3d</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">ylines_3d</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">zlines_3d</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Saving the frames</span>
+    <span class="n">output_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_h5_file</span><span class="p">,</span><span class="s1">&#39;temp_&#39;</span><span class="o">+</span><span class="n">file_name</span><span class="p">))</span>
+    <span class="n">output_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">num_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">numberFrames</span><span class="p">)))</span>
+    <span class="n">img_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_folder</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/img&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">num_frames</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">img_name</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span><span class="n">num_frames</span><span class="p">)</span></div>
+
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

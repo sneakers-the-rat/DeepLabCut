@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.create_project.new_3d &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.create_project.new_3d</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.create_project.new_3d</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="c1">#import yaml</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="c1">#import cv2</span>
+<span class="kn">from</span> <span class="nn">deeplabcut</span> <span class="k">import</span> <span class="n">DEBUG</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="c1">#import shutil</span>
+
+<div class="viewcode-block" id="create_new_project_3d"><a class="viewcode-back" href="../../../source/deeplabcut.create_project.html#deeplabcut.create_project.new_3d.create_new_project_3d">[docs]</a><span class="k">def</span> <span class="nf">create_new_project_3d</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">experimenter</span><span class="p">,</span> <span class="n">num_cameras</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">working_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a new project directory, sub-directories and a basic configuration file for 3d project. </span>
+<span class="sd">    The configuration file is loaded with the default values. Adjust the parameters to your project&#39;s needs.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    project : string</span>
+<span class="sd">        String containing the name of the project.</span>
+
+<span class="sd">    experimenter : string</span>
+<span class="sd">        String containing the name of the experimenter.</span>
+
+<span class="sd">    num_cameras : int</span>
+<span class="sd">        An integer value specifying the number of cameras.</span>
+<span class="sd">        </span>
+<span class="sd">    working_directory : string, optional</span>
+<span class="sd">        The directory where the project will be created. The default is the ``current working directory``; if provided, it must be a string.</span>
+
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    Linux/MacOs</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_new_project_3d(&#39;reaching-task&#39;,&#39;Linus&#39;,2)</span>
+
+<span class="sd">    Windows:</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_new_project(&#39;reaching-task&#39;,&#39;Bill&#39;,2)</span>
+<span class="sd">    Users must format paths with either:  r&#39;C:\ OR &#39;C:\\ &lt;- i.e. a double backslash \ \ )</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">dt</span>
+    <span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+    
+    <span class="n">date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+    <span class="n">month</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%B&quot;</span><span class="p">)</span>
+    <span class="n">day</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">day</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">month</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">day</span><span class="p">))</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">working_directory</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">working_directory</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+    
+    <span class="n">wd</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">working_directory</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="n">project_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{pn}</span><span class="s1">-</span><span class="si">{exp}</span><span class="s1">-</span><span class="si">{date}</span><span class="s1">-</span><span class="si">{triangulate}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pn</span><span class="o">=</span><span class="n">project</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="n">experimenter</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span><span class="n">triangulate</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+    <span class="n">project_path</span> <span class="o">=</span> <span class="n">wd</span> <span class="o">/</span> <span class="n">project_name</span>
+    <span class="c1"># Create project and sub-directories</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">DEBUG</span> <span class="ow">and</span> <span class="n">project_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Project &quot;</span><span class="si">{}</span><span class="s1">&quot; already exists!&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_path</span><span class="p">))</span>
+        <span class="k">return</span>
+    
+    <span class="n">camera_matrix_path</span> <span class="o">=</span> <span class="n">project_path</span> <span class="o">/</span> <span class="s1">&#39;camera_matrix&#39;</span>
+    <span class="n">calibration_images_path</span> <span class="o">=</span> <span class="n">project_path</span> <span class="o">/</span> <span class="s1">&#39;calibration_images&#39;</span>
+    <span class="n">undistortion_path</span> <span class="o">=</span> <span class="n">project_path</span> <span class="o">/</span> <span class="s1">&#39;undistortion&#39;</span>
+    <span class="n">path_corners</span> <span class="o">=</span> <span class="n">project_path</span><span class="o">/</span><span class="s1">&#39;corners&#39;</span>
+    
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">camera_matrix_path</span><span class="p">,</span> <span class="n">calibration_images_path</span><span class="p">,</span> <span class="n">undistortion_path</span><span class="p">,</span><span class="n">path_corners</span><span class="p">]:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Created &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+    
+    <span class="c1"># Create config file</span>
+    <span class="n">cfg_file_3d</span><span class="p">,</span><span class="n">ruamelFile_3d</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">create_config_template_3d</span><span class="p">()</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;Task&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">project</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;scorer&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">experimenter</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">d</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">]</span><span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">project_path</span><span class="p">)</span>
+<span class="c1">#    cfg_file_3d[&#39;config_files&#39;]= [str(&#39;Enter the path of the config file &#39;)+str(i)+ &#39; to include&#39; for i in range(1,3)]</span>
+<span class="c1">#    cfg_file_3d[&#39;config_files&#39;]= [&#39;Enter the path of the config file 1&#39;]</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;jet&#39;</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;dotsize&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mi">15</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;alphaValue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;markerType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;markerColor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;pcutoff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;num_cameras&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_cameras</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;camera_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;camera-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">num_cameras</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;scorername_3d&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DLC_3D&#39;</span>
+    
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;skeleton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;bodypart1&#39;</span><span class="p">,</span><span class="s1">&#39;bodypart2&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;bodypart2&#39;</span><span class="p">,</span><span class="s1">&#39;bodypart3&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;bodypart3&#39;</span><span class="p">,</span><span class="s1">&#39;bodypart4&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;bodypart4&#39;</span><span class="p">,</span><span class="s1">&#39;bodypart5&#39;</span><span class="p">]]</span>
+    <span class="n">cfg_file_3d</span><span class="p">[</span><span class="s1">&#39;skeleton_color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cameras</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;/home/mackenzie/DEEPLABCUT/DeepLabCut/2DprojectCam&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-Mackenzie-2019-06-05/config.yaml&#39;</span><span class="p">)</span>
+        <span class="n">cfg_file_3d</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cfg_file_3d</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;config_file_camera-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)),</span><span class="n">path</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cameras</span><span class="p">):</span>
+        <span class="n">cfg_file_3d</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cfg_file_3d</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;shuffle_camera-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">cfg_file_3d</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cfg_file_3d</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;trainingsetindex_camera-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)),</span><span class="mi">0</span><span class="p">)</span>
+        
+    <span class="n">projconfigfile</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">project_path</span><span class="p">),</span><span class="s1">&#39;config.yaml&#39;</span><span class="p">)</span>
+    <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">write_config_3d</span><span class="p">(</span><span class="n">projconfigfile</span><span class="p">,</span><span class="n">cfg_file_3d</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Generated &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_path</span> <span class="o">/</span> <span class="s1">&#39;config.yaml&#39;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">A new project with name </span><span class="si">%s</span><span class="s2"> is created at </span><span class="si">%s</span><span class="s2"> and a configurable file (config.yaml) is stored there. If you have not calibrated the cameras, then use the function &#39;calibrate_camera&#39; to start calibrating the camera otherwise use the function ``triangulate`` to triangulate the dataframe&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span><span class="n">wd</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">projconfigfile</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

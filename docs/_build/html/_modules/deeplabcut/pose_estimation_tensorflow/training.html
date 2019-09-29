@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_tensorflow.training &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_tensorflow.training</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_tensorflow.training</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+
+<div class="viewcode-block" id="train_network"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.training.train_network">[docs]</a><span class="k">def</span> <span class="nf">train_network</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">trainingsetindex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">gputouse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">max_snapshots_to_keep</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">autotune</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">displayiters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">saveiters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">maxiters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Trains the network with the labels in the training dataset.</span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    shuffle: int, optional</span>
+<span class="sd">        Integer value specifying the shuffle index to select for training. Default is set to 1</span>
+
+<span class="sd">    trainingsetindex: int, optional</span>
+<span class="sd">        Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</span>
+
+<span class="sd">    gputouse: int, optional. Natural number indicating the number of your GPU (see number in nvidia-smi). If you do not have a GPU put None.</span>
+<span class="sd">    See: https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries</span>
+
+<span class="sd">    Additional parameters:</span>
+
+<span class="sd">    max_snapshots_to_keep: int, or None. Sets how many snapshots are kept, i.e. states of the trained network. Every savinginteration many times</span>
+<span class="sd">    a snapshot is stored, however only the last max_snapshots_to_keep many are kept! If you change this to None, then all are kept.</span>
+<span class="sd">    See: https://github.com/AlexEMG/DeepLabCut/issues/8#issuecomment-387404835</span>
+
+<span class="sd">    autotune: property of TensorFlow, somehow faster if &#39;false&#39; (as Eldar found out, see https://github.com/tensorflow/tensorflow/issues/13317). Default: False</span>
+
+<span class="sd">    displayiters: this variable is actually set in pose_config.yaml. However, you can overwrite it with this hack. Don&#39;t use this regularly, just if you are too lazy to dig out</span>
+<span class="sd">    the pose_config.yaml file for the corresponding project. If None, the value from there is used, otherwise it is overwritten! Default: None</span>
+
+<span class="sd">    saveiters: this variable is actually set in pose_config.yaml. However, you can overwrite it with this hack. Don&#39;t use this regularly, just if you are too lazy to dig out</span>
+<span class="sd">    the pose_config.yaml file for the corresponding project. If None, the value from there is used, otherwise it is overwritten! Default: None</span>
+
+<span class="sd">    maxiters: this variable is actually set in pose_config.yaml. However, you can overwrite it with this hack. Don&#39;t use this regularly, just if you are too lazy to dig out</span>
+<span class="sd">    the pose_config.yaml file for the corresponding project. If None, the value from there is used, otherwise it is overwritten! Default: None</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    for training the network for first shuffle of the training dataset.</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.train_network(&#39;/analysis/project/reaching-task/config.yaml&#39;)</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    for training the network for second shuffle of the training dataset.</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.train_network(&#39;/analysis/project/reaching-task/config.yaml&#39;,shuffle=2)</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+    <span class="n">vers</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">12</span><span class="p">:</span>
+        <span class="n">TF</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">TF</span><span class="o">=</span><span class="n">tf</span>
+
+    <span class="c1">#reload logger.</span>
+    <span class="kn">import</span> <span class="nn">importlib</span>
+    <span class="kn">import</span> <span class="nn">logging</span>
+    <span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">logging</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+    <span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.train</span> <span class="k">import</span> <span class="n">train</span>
+    <span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+
+    <span class="n">TF</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+    <span class="n">start_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+    <span class="c1"># Read file path for pose_config file. &gt;&gt; pass it on</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">modelfoldername</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetModelFolder</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;TrainingFraction&quot;</span><span class="p">][</span><span class="n">trainingsetindex</span><span class="p">],</span><span class="n">shuffle</span><span class="p">,</span><span class="n">cfg</span><span class="p">)</span>
+    <span class="n">poseconfigfile</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">modelfoldername</span><span class="p">),</span><span class="s2">&quot;train&quot;</span><span class="p">,</span><span class="s2">&quot;pose_cfg.yaml&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">poseconfigfile</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The training datafile &quot;</span><span class="p">,</span> <span class="n">poseconfigfile</span><span class="p">,</span> <span class="s2">&quot; is not present.&quot;</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Probably, the training dataset for this secific shuffle index was not created.&quot;</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Try with a different shuffle/trainingsetfraction or use function &#39;create_training_dataset&#39; to create a new trainingdataset with this shuffle index.&quot;</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="c1"># Set environment variables</span>
+      <span class="k">if</span> <span class="n">autotune</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span> <span class="c1">#see: https://github.com/tensorflow/tensorflow/issues/13317</span>
+          <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TF_CUDNN_USE_AUTOTUNE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+      <span class="k">if</span> <span class="n">gputouse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CUDA_VISIBLE_DEVICES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gputouse</span><span class="p">)</span>
+
+
+      <span class="k">try</span><span class="p">:</span>
+          <span class="n">train</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">poseconfigfile</span><span class="p">),</span><span class="n">displayiters</span><span class="p">,</span><span class="n">saveiters</span><span class="p">,</span><span class="n">maxiters</span><span class="p">,</span><span class="n">max_to_keep</span><span class="o">=</span><span class="n">max_snapshots_to_keep</span><span class="p">)</span> <span class="c1">#pass on path and file name for pose_cfg.yaml!</span>
+      <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+          <span class="k">raise</span> <span class="n">e</span>
+      <span class="k">finally</span><span class="p">:</span>
+          <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">start_path</span><span class="p">))</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The network is now trained and ready to evaluate. Use the function &#39;evaluate_network&#39; to evaluate the network.&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

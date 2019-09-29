@@ -1,0 +1,352 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_tensorflow.nnet package &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deeplabcut.create_project.html">deeplabcut.create_project package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">deeplabcut</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_tensorflow.nnet package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/deeplabcut.pose_estimation_tensorflow.nnet.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="deeplabcut-pose-estimation-tensorflow-nnet-package">
+<h1>deeplabcut.pose_estimation_tensorflow.nnet package<a class="headerlink" href="#deeplabcut-pose-estimation-tensorflow-nnet-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.nnet.losses">
+<span id="deeplabcut-pose-estimation-tensorflow-nnet-losses-module"></span><h2>deeplabcut.pose_estimation_tensorflow.nnet.losses module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.nnet.losses" title="Permalink to this headline">¶</a></h2>
+<p>Source: DeeperCut by Eldar Insafutdinov
+<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a></p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.losses.huber_loss">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.losses.</code><code class="descname">huber_loss</code><span class="sig-paren">(</span><em>labels</em>, <em>predictions</em>, <em>weight=1.0</em>, <em>k=1.0</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/losses.html#huber_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.losses.huber_loss" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Define a huber loss  <a class="reference external" href="https://en.wikipedia.org/wiki/Huber_loss">https://en.wikipedia.org/wiki/Huber_loss</a></dt>
+<dd>tensor: tensor to regularize.
+k: value of k in the huber loss
+scope: Optional scope for op_scope.</dd>
+</dl>
+<p>Huber loss:
+f(x) = if <a href="#id1"><span class="problematic" id="id2">|x|</span></a> &lt;= k:</p>
+<blockquote>
+<div><blockquote>
+<div>0.5 * x^2</div></blockquote>
+<dl class="docutils">
+<dt>else:</dt>
+<dd>k * <a href="#id3"><span class="problematic" id="id4">|x|</span></a> - 0.5 * k^2</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>the L1 loss op.</dd>
+</dl>
+<p><a class="reference external" href="http://concise-bio.readthedocs.io/en/latest/_modules/concise/tf_helper.html">http://concise-bio.readthedocs.io/en/latest/_modules/concise/tf_helper.html</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.nnet.net_factory">
+<span id="deeplabcut-pose-estimation-tensorflow-nnet-net-factory-module"></span><h2>deeplabcut.pose_estimation_tensorflow.nnet.net_factory module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.nnet.net_factory" title="Permalink to this headline">¶</a></h2>
+<p>Adopted: DeeperCut by Eldar Insafutdinov
+<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a></p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.net_factory.pose_net">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.net_factory.</code><code class="descname">pose_net</code><span class="sig-paren">(</span><em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/net_factory.html#pose_net"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.net_factory.pose_net" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.nnet.pose_net">
+<span id="deeplabcut-pose-estimation-tensorflow-nnet-pose-net-module"></span><h2>deeplabcut.pose_estimation_tensorflow.nnet.pose_net module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.nnet.pose_net" title="Permalink to this headline">¶</a></h2>
+<p>Source: DeeperCut by Eldar Insafutdinov
+<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a></p>
+<dl class="class">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet">
+<em class="property">class </em><code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.pose_net.</code><code class="descname">PoseNet</code><span class="sig-paren">(</span><em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/pose_net.html#PoseNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.extract_features">
+<code class="descname">extract_features</code><span class="sig-paren">(</span><em>inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/pose_net.html#PoseNet.extract_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.extract_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.get_net">
+<code class="descname">get_net</code><span class="sig-paren">(</span><em>inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/pose_net.html#PoseNet.get_net"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.get_net" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.prediction_layers">
+<code class="descname">prediction_layers</code><span class="sig-paren">(</span><em>features</em>, <em>end_points</em>, <em>reuse=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/pose_net.html#PoseNet.prediction_layers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.prediction_layers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.test">
+<code class="descname">test</code><span class="sig-paren">(</span><em>inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/pose_net.html#PoseNet.test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>batch</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/pose_net.html#PoseNet.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.train" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.pose_net.get_batch_spec">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.pose_net.</code><code class="descname">get_batch_spec</code><span class="sig-paren">(</span><em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/pose_net.html#get_batch_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.get_batch_spec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.pose_net.prediction_layer">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.pose_net.</code><code class="descname">prediction_layer</code><span class="sig-paren">(</span><em>cfg</em>, <em>input</em>, <em>name</em>, <em>num_outputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/pose_net.html#prediction_layer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.prediction_layer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.nnet.predict">
+<span id="deeplabcut-pose-estimation-tensorflow-nnet-predict-module"></span><h2>deeplabcut.pose_estimation_tensorflow.nnet.predict module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.nnet.predict" title="Permalink to this headline">¶</a></h2>
+<p>Adapted from original predict.py by Eldar Insafutdinov’s implementation of [DeeperCut](<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a>)</p>
+<p>Source: DeeperCut by Eldar Insafutdinov
+<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a></p>
+<p>To do faster inference on videos:</p>
+<p>“On the inference speed and video-compression robustness of DeepLabCut”
+Alexander Mathis &amp; Richard Warren
+doi: <a class="reference external" href="https://doi.org/10.1101/457242">https://doi.org/10.1101/457242</a>
+See <a class="reference external" href="https://www.biorxiv.org/content/early/2018/10/30/457242">https://www.biorxiv.org/content/early/2018/10/30/457242</a></p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.predict.argmax_pose_predict">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.predict.</code><code class="descname">argmax_pose_predict</code><span class="sig-paren">(</span><em>scmap</em>, <em>offmat</em>, <em>stride</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/predict.html#argmax_pose_predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.predict.argmax_pose_predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine scoremat and offsets to the final pose.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.predict.extract_cnn_output">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.predict.</code><code class="descname">extract_cnn_output</code><span class="sig-paren">(</span><em>outputs_np</em>, <em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/predict.html#extract_cnn_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.predict.extract_cnn_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>extract locref + scmap from network</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.predict.extract_cnn_outputmulti">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.predict.</code><code class="descname">extract_cnn_outputmulti</code><span class="sig-paren">(</span><em>outputs_np</em>, <em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/predict.html#extract_cnn_outputmulti"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.predict.extract_cnn_outputmulti" title="Permalink to this definition">¶</a></dt>
+<dd><p>extract locref + scmap from network
+Dimensions: image batch x imagedim1 x imagedim2 x bodypart</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.predict.get_top_values">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.predict.</code><code class="descname">get_top_values</code><span class="sig-paren">(</span><em>scmap</em>, <em>n_top=5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/predict.html#get_top_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.predict.get_top_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.predict.getpose">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.predict.</code><code class="descname">getpose</code><span class="sig-paren">(</span><em>image</em>, <em>cfg</em>, <em>sess</em>, <em>inputs</em>, <em>outputs</em>, <em>outall=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/predict.html#getpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.predict.getpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract pose</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.predict.getposeNP">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.predict.</code><code class="descname">getposeNP</code><span class="sig-paren">(</span><em>image</em>, <em>cfg</em>, <em>sess</em>, <em>inputs</em>, <em>outputs</em>, <em>outall=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/predict.html#getposeNP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.predict.getposeNP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adapted from DeeperCut, performs numpy-based faster inference on batches.
+Introduced in <a class="reference external" href="https://www.biorxiv.org/content/10.1101/457242v1">https://www.biorxiv.org/content/10.1101/457242v1</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.predict.multi_pose_predict">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.predict.</code><code class="descname">multi_pose_predict</code><span class="sig-paren">(</span><em>scmap</em>, <em>locref</em>, <em>stride</em>, <em>num_outputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/predict.html#multi_pose_predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.predict.multi_pose_predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.nnet.predict.setup_pose_prediction">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.nnet.predict.</code><code class="descname">setup_pose_prediction</code><span class="sig-paren">(</span><em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/pose_estimation_tensorflow/nnet/predict.html#setup_pose_prediction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.nnet.predict.setup_pose_prediction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.nnet">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.nnet" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<p>pose_estimation_tensorflow is based of Eldar’s repository:
+<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

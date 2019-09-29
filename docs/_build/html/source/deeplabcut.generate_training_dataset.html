@@ -1,0 +1,1139 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.generate_training_dataset package &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deeplabcut.create_project.html">deeplabcut.create_project package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">deeplabcut</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>deeplabcut.generate_training_dataset package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/deeplabcut.generate_training_dataset.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="deeplabcut-generate-training-dataset-package">
+<h1>deeplabcut.generate_training_dataset package<a class="headerlink" href="#deeplabcut-generate-training-dataset-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deeplabcut.generate_training_dataset.auxfun_drag_label">
+<span id="deeplabcut-generate-training-dataset-auxfun-drag-label-module"></span><h2>deeplabcut.generate_training_dataset.auxfun_drag_label module<a class="headerlink" href="#module-deeplabcut.generate_training_dataset.auxfun_drag_label" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.auxfun_drag_label.</code><code class="descname">DraggablePoint</code><span class="sig-paren">(</span><em>point</em>, <em>bodyParts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label.html#DraggablePoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label.html#DraggablePoint.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>connect to all the events we need</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.disconnect">
+<code class="descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label.html#DraggablePoint.disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>disconnect all the stored connection ids</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.lock">
+<code class="descname">lock</code><em class="property"> = None</em><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.lock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.on_hover">
+<code class="descname">on_hover</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label.html#DraggablePoint.on_hover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.on_hover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotate the lables and likelihood when the user hovers over the data points.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.on_motion">
+<code class="descname">on_motion</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label.html#DraggablePoint.on_motion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.on_motion" title="Permalink to this definition">¶</a></dt>
+<dd><p>During the drag!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.on_press">
+<code class="descname">on_press</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label.html#DraggablePoint.on_press"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.on_press" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the event for the button press!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.on_release">
+<code class="descname">on_release</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label.html#DraggablePoint.on_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label.DraggablePoint.on_release" title="Permalink to this definition">¶</a></dt>
+<dd><p>on release we reset the press data</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals">
+<span id="deeplabcut-generate-training-dataset-auxfun-drag-label-multiple-individuals-module"></span><h2>deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals module<a class="headerlink" href="#module-deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.</code><code class="descname">DraggablePoint</code><span class="sig-paren">(</span><em>point</em>, <em>individual_names</em>, <em>bodyParts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label_multiple_individuals.html#DraggablePoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label_multiple_individuals.html#DraggablePoint.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>connect to all the events we need</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.disconnect">
+<code class="descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label_multiple_individuals.html#DraggablePoint.disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>disconnect all the stored connection ids</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.lock">
+<code class="descname">lock</code><em class="property"> = None</em><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.lock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.on_hover">
+<code class="descname">on_hover</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label_multiple_individuals.html#DraggablePoint.on_hover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.on_hover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotate the lables and likelihood when the user hovers over the data points.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.on_motion">
+<code class="descname">on_motion</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label_multiple_individuals.html#DraggablePoint.on_motion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.on_motion" title="Permalink to this definition">¶</a></dt>
+<dd><p>During the drag!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.on_press">
+<code class="descname">on_press</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label_multiple_individuals.html#DraggablePoint.on_press"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.on_press" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the event for the button press!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.on_release">
+<code class="descname">on_release</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/auxfun_drag_label_multiple_individuals.html#DraggablePoint.on_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.auxfun_drag_label_multiple_individuals.DraggablePoint.on_release" title="Permalink to this definition">¶</a></dt>
+<dd><p>on release we reset the press data</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.generate_training_dataset.frame_extraction">
+<span id="deeplabcut-generate-training-dataset-frame-extraction-module"></span><h2>deeplabcut.generate_training_dataset.frame_extraction module<a class="headerlink" href="#module-deeplabcut.generate_training_dataset.frame_extraction" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction.extract_frames">
+<code class="descclassname">deeplabcut.generate_training_dataset.frame_extraction.</code><code class="descname">extract_frames</code><span class="sig-paren">(</span><em>config</em>, <em>mode='automatic'</em>, <em>algo='kmeans'</em>, <em>crop=False</em>, <em>userfeedback=True</em>, <em>cluster_step=1</em>, <em>cluster_resizewidth=30</em>, <em>cluster_color=False</em>, <em>opencv=True</em>, <em>slider_width=25</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction.html#extract_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction.extract_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts frames from the videos in the config.yaml file. Only the videos in the config.yaml will be used to select the frames.</p>
+<p>Use the function <code class="docutils literal notranslate"><span class="pre">add_new_video</span></code> at any stage of the project to add new videos to the config file and extract their frames.</p>
+<p>The provided function either selects frames from the videos in a randomly and temporally uniformly distributed way (uniform),</p>
+<p>by clustering based on visual appearance (k-means), or by manual selection.</p>
+<p>Three important parameters for automatic extraction: numframes2pick, start and stop are set in the config file.</p>
+<p>Please refer to the user guide for more details on methods and parameters <a class="reference external" href="https://www.biorxiv.org/content/biorxiv/early/2018/11/24/476531.full.pdf">https://www.biorxiv.org/content/biorxiv/early/2018/11/24/476531.full.pdf</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>config</strong> (<em>string</em>) – Full path of the config.yaml file as a string.</li>
+<li><strong>mode</strong> (<em>string</em>) – String containing the mode of extraction. It must be either <code class="docutils literal notranslate"><span class="pre">automatic</span></code> or <code class="docutils literal notranslate"><span class="pre">manual</span></code>.</li>
+<li><strong>algo</strong> (<em>string</em>) – String specifying the algorithm to use for selecting the frames. Currently, deeplabcut supports either <code class="docutils literal notranslate"><span class="pre">kmeans</span></code> or <code class="docutils literal notranslate"><span class="pre">uniform</span></code> based selection. This flag is
+only required for <code class="docutils literal notranslate"><span class="pre">automatic</span></code> mode and the default is <code class="docutils literal notranslate"><span class="pre">uniform</span></code>. For uniform, frames are picked in temporally uniform way, kmeans performs clustering on downsampled frames (see user guide for details).
+Note: color information is discarded for kmeans, thus e.g. for camouflaged octopus clustering one might want to change this.</li>
+<li><strong>crop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If this is set to True, a user interface pops up with a frame to select the cropping parameters. Use the left click to draw a cropping area and hit the button set cropping parameters to save the cropping parameters for a video.
+The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>; if provided it must be either <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
+<li><strong>userfeedback</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If this is set to false during automatic mode then frames for all videos are extracted. The user can set this to true, which will result in a dialog,
+where the user is asked for each video if (additional/any) frames from this video should be extracted. Use this, e.g. if you have already labeled
+some folders and want to extract data for new videos.</li>
+<li><strong>cluster_resizewidth</strong> (<em>number</em><em>, </em><em>default: 30</em>) – For k-means one can change the width to which the images are downsampled (aspect ratio is fixed).</li>
+<li><strong>cluster_step</strong> (<em>number</em><em>, </em><em>default: 1</em>) – By default each frame is used for clustering, but for long videos one could only use every nth frame (set by: cluster_step). This saves memory before clustering can start, however,
+reading the individual frames takes longer due to the skipping.</li>
+<li><strong>cluster_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>default: False</em>) – If false then each downsampled image is treated as a grayscale vector (discarding color information). If true, then the color channels are considered. This increases
+the computational complexity.</li>
+<li><strong>opencv</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>default: True</em>) – Uses openCV for loading &amp; extractiong (otherwise moviepy (legacy))</li>
+<li><strong>slider_width</strong> (<em>number</em><em>, </em><em>default: 25</em>) – Width of the video frames slider, in percent of window</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>for selecting frames automatically with ‘kmeans’ and want to crop the frames.
+&gt;&gt;&gt; deeplabcut.extract_frames(‘/analysis/project/reaching-task/config.yaml’,’automatic’,’kmeans’,True)
+——–
+for selecting frames automatically with ‘kmeans’ and considering the color information.
+&gt;&gt;&gt; deeplabcut.extract_frames(‘/analysis/project/reaching-task/config.yaml’,’automatic’,’kmeans’,cluster_color=True)
+——–
+for selecting frames automatically with ‘uniform’ and want to crop the frames.
+&gt;&gt;&gt; deeplabcut.extract_frames(‘/analysis/project/reaching-task/config.yaml’,’automatic’,crop=True)
+——–
+for selecting frames manually,
+&gt;&gt;&gt; deeplabcut.extract_frames(‘/analysis/project/reaching-task/config.yaml’,’manual’)
+——–
+for selecting frames manually, with a 60% wide frames slider
+&gt;&gt;&gt; deeplabcut.extract_frames(‘/analysis/project/reaching-task/config.yaml’,’manual’, slider_width=60)</p>
+<p>While selecting the frames manually, you do not need to specify the <code class="docutils literal notranslate"><span class="pre">crop</span></code> parameter in the command. Rather, you will get a prompt in the graphic user interface to choose
+if you need to crop or not.
+——–</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction.line_select_callback">
+<code class="descclassname">deeplabcut.generate_training_dataset.frame_extraction.</code><code class="descname">line_select_callback</code><span class="sig-paren">(</span><em>eclick</em>, <em>erelease</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction.html#line_select_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction.line_select_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>eclick and erelease are the press and release events</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.generate_training_dataset.frame_extraction_toolbox">
+<span id="deeplabcut-generate-training-dataset-frame-extraction-toolbox-module"></span><h2>deeplabcut.generate_training_dataset.frame_extraction_toolbox module<a class="headerlink" href="#module-deeplabcut.generate_training_dataset.frame_extraction_toolbox" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.ImagePanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.frame_extraction_toolbox.</code><code class="descname">ImagePanel</code><span class="sig-paren">(</span><em>parent</em>, <em>config</em>, <em>gui_size</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#ImagePanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.ImagePanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Panel</span></code></p>
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.ImagePanel.getColorIndices">
+<code class="descname">getColorIndices</code><span class="sig-paren">(</span><em>img</em>, <em>bodyparts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#ImagePanel.getColorIndices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.ImagePanel.getColorIndices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the colormaps ticks and . The order of ticks labels is reversed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.ImagePanel.getfigure">
+<code class="descname">getfigure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#ImagePanel.getfigure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.ImagePanel.getfigure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the figure, axes and canvas</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.frame_extraction_toolbox.</code><code class="descname">MainFrame</code><span class="sig-paren">(</span><em>parent</em>, <em>config</em>, <em>slider_width=25</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Frame</span></code></p>
+<p>Contains the main GUI and button boxes</p>
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.CheckCropping">
+<code class="descname">CheckCropping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.CheckCropping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.CheckCropping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display frame at time “time” for video to check if cropping is fine.
+Select ROI of interest by adjusting values in myconfig.py</p>
+<p>USAGE for cropping:
+clip.crop(x1=None, y1=None, x2=None, y2=None, width=None, height=None, x_center=None, y_center=None)</p>
+<p>Returns a new clip in which just a rectangular subregion of the
+original clip is conserved. x1,y1 indicates the top left corner and
+x2,y2 is the lower right corner of the cropped region.</p>
+<p>All coordinates are in pixels. Float numbers are accepted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.OnSliderScroll">
+<code class="descname">OnSliderScroll</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.OnSliderScroll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.OnSliderScroll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slider to scroll through the video</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.activate_frame_range">
+<code class="descname">activate_frame_range</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.activate_frame_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.activate_frame_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Activates the frame range boxes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.browseDir">
+<code class="descname">browseDir</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.browseDir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.browseDir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the File Dialog and ask the user to select the video file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.chooseFrame">
+<code class="descname">chooseFrame</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.chooseFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.chooseFrame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.grabFrame">
+<code class="descname">grabFrame</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.grabFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.grabFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the frame and saves in the current directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.helpButton">
+<code class="descname">helpButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.helpButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.helpButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens Instructions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.is_crop_ok">
+<code class="descname">is_crop_ok</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.is_crop_ok"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.is_crop_ok" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the cropping is ok</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.line_select_callback">
+<code class="descname">line_select_callback</code><span class="sig-paren">(</span><em>eclick</em>, <em>erelease</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.line_select_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.line_select_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>eclick and erelease are the press and release events</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.plot_labels">
+<code class="descname">plot_labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.plot_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.plot_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the labels of the analyzed video</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.quitButton">
+<code class="descname">quitButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.quitButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.quitButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quits the GUI</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.update">
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the image with the current slider index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.updateSlider">
+<code class="descname">updateSlider</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MainFrame.updateSlider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MainFrame.updateSlider" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.MatplotPanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.frame_extraction_toolbox.</code><code class="descname">MatplotPanel</code><span class="sig-paren">(</span><em>parent</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#MatplotPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.MatplotPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Panel</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.WidgetPanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.frame_extraction_toolbox.</code><code class="descname">WidgetPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#WidgetPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.WidgetPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Panel</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.frame_extraction_toolbox.show">
+<code class="descclassname">deeplabcut.generate_training_dataset.frame_extraction_toolbox.</code><code class="descname">show</code><span class="sig-paren">(</span><em>config</em>, <em>slider_width=25</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/frame_extraction_toolbox.html#show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.frame_extraction_toolbox.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.generate_training_dataset.labeling_toolbox">
+<span id="deeplabcut-generate-training-dataset-labeling-toolbox-module"></span><h2>deeplabcut.generate_training_dataset.labeling_toolbox module<a class="headerlink" href="#module-deeplabcut.generate_training_dataset.labeling_toolbox" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.ImagePanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.labeling_toolbox.</code><code class="descname">ImagePanel</code><span class="sig-paren">(</span><em>parent</em>, <em>config</em>, <em>gui_size</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#ImagePanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.ImagePanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Panel</span></code></p>
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.ImagePanel.drawplot">
+<code class="descname">drawplot</code><span class="sig-paren">(</span><em>img</em>, <em>img_name</em>, <em>itr</em>, <em>index</em>, <em>bodyparts</em>, <em>cmap</em>, <em>keep_view=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#ImagePanel.drawplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.ImagePanel.drawplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.ImagePanel.getColorIndices">
+<code class="descname">getColorIndices</code><span class="sig-paren">(</span><em>img</em>, <em>bodyparts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#ImagePanel.getColorIndices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.ImagePanel.getColorIndices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the colormaps ticks and . The order of ticks labels is reversed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.ImagePanel.getfigure">
+<code class="descname">getfigure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#ImagePanel.getfigure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.ImagePanel.getfigure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.ImagePanel.resetView">
+<code class="descname">resetView</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#ImagePanel.resetView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.ImagePanel.resetView" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.labeling_toolbox.</code><code class="descname">MainFrame</code><span class="sig-paren">(</span><em>parent</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Frame</span></code></p>
+<p>Contains the main GUI and button boxes</p>
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.OnKeyPressed">
+<code class="descname">OnKeyPressed</code><span class="sig-paren">(</span><em>event=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.OnKeyPressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.OnKeyPressed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.OnSliderScroll">
+<code class="descname">OnSliderScroll</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.OnSliderScroll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.OnSliderScroll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjust marker size for plotting the annotations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.activateSlider">
+<code class="descname">activateSlider</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.activateSlider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.activateSlider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Activates the slider to increase the markersize</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.browseDir">
+<code class="descname">browseDir</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.browseDir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.browseDir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the DirDialog and ask the user to change the directory where machine labels are stored</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.getLabels">
+<code class="descname">getLabels</code><span class="sig-paren">(</span><em>img_index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.getLabels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.getLabels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of x and y labels of the corresponding image index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.helpButton">
+<code class="descname">helpButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.helpButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.helpButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens Instructions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.homeButton">
+<code class="descname">homeButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.homeButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.homeButton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.lockChecked">
+<code class="descname">lockChecked</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.lockChecked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.lockChecked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.nextImage">
+<code class="descname">nextImage</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.nextImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.nextImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves to next image</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.nextLabel">
+<code class="descname">nextLabel</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.nextLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.nextLabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is to create a hotkey to skip down on the radio button panel.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.onButtonRelease">
+<code class="descname">onButtonRelease</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.onButtonRelease"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.onButtonRelease" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.onChecked">
+<code class="descname">onChecked</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.onChecked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.onChecked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.onClick">
+<code class="descname">onClick</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.onClick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.onClick" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function adds labels and auto advances to the next label.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.onZoom">
+<code class="descname">onZoom</code><span class="sig-paren">(</span><em>ax</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.onZoom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.onZoom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.panButton">
+<code class="descname">panButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.panButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.panButton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>img</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots and call auxfun_drag class for moving and removing points.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.prevImage">
+<code class="descname">prevImage</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.prevImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.prevImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the previous Image and enables user to move the annotations.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.previousLabel">
+<code class="descname">previousLabel</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.previousLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.previousLabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is to create a hotkey to skip up on the radio button panel.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.quitButton">
+<code class="descname">quitButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.quitButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.quitButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asks user for its inputs and then quits the GUI</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.saveDataSet">
+<code class="descname">saveDataSet</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.saveDataSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.saveDataSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the final dataframe</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.saveEachImage">
+<code class="descname">saveEachImage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.saveEachImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.saveEachImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves data for each image</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.updateZoomPan">
+<code class="descname">updateZoomPan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.updateZoomPan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.updateZoomPan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.zoomButton">
+<code class="descname">zoomButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#MainFrame.zoomButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.MainFrame.zoomButton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.ScrollPanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.labeling_toolbox.</code><code class="descname">ScrollPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#ScrollPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.ScrollPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx.lib.scrolledpanel.ScrolledPanel</span></code></p>
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.ScrollPanel.addRadioButtons">
+<code class="descname">addRadioButtons</code><span class="sig-paren">(</span><em>bodyparts</em>, <em>fileIndex</em>, <em>markersize</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#ScrollPanel.addRadioButtons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.ScrollPanel.addRadioButtons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds radio buttons for each bodypart on the right panel</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.ScrollPanel.clearBoxer">
+<code class="descname">clearBoxer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#ScrollPanel.clearBoxer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.ScrollPanel.clearBoxer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.ScrollPanel.on_focus">
+<code class="descname">on_focus</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#ScrollPanel.on_focus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.ScrollPanel.on_focus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.WidgetPanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.labeling_toolbox.</code><code class="descname">WidgetPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#WidgetPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.WidgetPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Panel</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.labeling_toolbox.show">
+<code class="descclassname">deeplabcut.generate_training_dataset.labeling_toolbox.</code><code class="descname">show</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/labeling_toolbox.html#show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.labeling_toolbox.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox">
+<span id="deeplabcut-generate-training-dataset-multiple-individual-labeling-toolbox-module"></span><h2>deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox module<a class="headerlink" href="#module-deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.</code><code class="descname">ImagePanel</code><span class="sig-paren">(</span><em>parent</em>, <em>config</em>, <em>gui_size</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#ImagePanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Panel</span></code></p>
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel.addcolorbar">
+<code class="descname">addcolorbar</code><span class="sig-paren">(</span><em>img</em>, <em>ax</em>, <em>itr</em>, <em>bodyparts</em>, <em>cmap</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#ImagePanel.addcolorbar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel.addcolorbar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel.drawplot">
+<code class="descname">drawplot</code><span class="sig-paren">(</span><em>img</em>, <em>img_name</em>, <em>itr</em>, <em>index</em>, <em>bodyparts</em>, <em>cmap</em>, <em>keep_view=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#ImagePanel.drawplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel.drawplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel.getColorIndices">
+<code class="descname">getColorIndices</code><span class="sig-paren">(</span><em>img</em>, <em>bodyparts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#ImagePanel.getColorIndices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel.getColorIndices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the colormaps ticks and . The order of ticks labels is reversed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel.getfigure">
+<code class="descname">getfigure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#ImagePanel.getfigure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel.getfigure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel.resetView">
+<code class="descname">resetView</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#ImagePanel.resetView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ImagePanel.resetView" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.</code><code class="descname">MainFrame</code><span class="sig-paren">(</span><em>parent</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Frame</span></code></p>
+<p>Contains the main GUI and button boxes</p>
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.OnKeyPressed">
+<code class="descname">OnKeyPressed</code><span class="sig-paren">(</span><em>event=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.OnKeyPressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.OnKeyPressed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.OnSliderScroll">
+<code class="descname">OnSliderScroll</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.OnSliderScroll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.OnSliderScroll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjust marker size for plotting the annotations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.activateSlider">
+<code class="descname">activateSlider</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.activateSlider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.activateSlider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Activates the slider to increase the markersize</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.browseDir">
+<code class="descname">browseDir</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.browseDir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.browseDir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the DirDialog and ask the user to change the directory where machine labels are stored</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.create_dataframe">
+<code class="descname">create_dataframe</code><span class="sig-paren">(</span><em>dataFrame</em>, <em>relativeimagenames</em>, <em>individual_names</em>, <em>uniquebodyparts</em>, <em>multibodyparts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.create_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.create_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.helpButton">
+<code class="descname">helpButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.helpButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.helpButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens Instructions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.homeButton">
+<code class="descname">homeButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.homeButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.homeButton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.lockChecked">
+<code class="descname">lockChecked</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.lockChecked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.lockChecked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.nextImage">
+<code class="descname">nextImage</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.nextImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.nextImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves to next image</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.onButtonRelease">
+<code class="descname">onButtonRelease</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.onButtonRelease"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.onButtonRelease" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.onChecked">
+<code class="descname">onChecked</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.onChecked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.onChecked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.onClick">
+<code class="descname">onClick</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.onClick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.onClick" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function adds labels and auto advances to the next label.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.onZoom">
+<code class="descname">onZoom</code><span class="sig-paren">(</span><em>ax</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.onZoom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.onZoom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.panButton">
+<code class="descname">panButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.panButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.panButton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>img</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots and call auxfun_drag class for moving and removing points.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.prevImage">
+<code class="descname">prevImage</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.prevImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.prevImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the previous Image and enables user to move the annotations.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.quitButton">
+<code class="descname">quitButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.quitButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.quitButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asks user for its inputs and then quits the GUI</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.saveDataSet">
+<code class="descname">saveDataSet</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.saveDataSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.saveDataSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the final dataframe</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.saveEachImage">
+<code class="descname">saveEachImage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.saveEachImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.saveEachImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves data for each image</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.select_individual">
+<code class="descname">select_individual</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.select_individual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.select_individual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.updateZoomPan">
+<code class="descname">updateZoomPan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.updateZoomPan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.updateZoomPan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.zoomButton">
+<code class="descname">zoomButton</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#MainFrame.zoomButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.MainFrame.zoomButton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ScrollPanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.</code><code class="descname">ScrollPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#ScrollPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ScrollPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx.lib.scrolledpanel.ScrolledPanel</span></code></p>
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ScrollPanel.addRadioButtons">
+<code class="descname">addRadioButtons</code><span class="sig-paren">(</span><em>bodyparts</em>, <em>individual_names</em>, <em>fileIndex</em>, <em>markersize</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#ScrollPanel.addRadioButtons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ScrollPanel.addRadioButtons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds radio buttons for each bodypart on the right panel</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ScrollPanel.clearBoxer">
+<code class="descname">clearBoxer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#ScrollPanel.clearBoxer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ScrollPanel.clearBoxer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ScrollPanel.on_focus">
+<code class="descname">on_focus</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#ScrollPanel.on_focus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.ScrollPanel.on_focus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.WidgetPanel">
+<em class="property">class </em><code class="descclassname">deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.</code><code class="descname">WidgetPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#WidgetPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.WidgetPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wx._core.Panel</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.show">
+<code class="descclassname">deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.</code><code class="descname">show</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/multiple_individual_labeling_toolbox.html#show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.multiple_individual_labeling_toolbox.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.generate_training_dataset.trainingsetmanipulation">
+<span id="deeplabcut-generate-training-dataset-trainingsetmanipulation-module"></span><h2>deeplabcut.generate_training_dataset.trainingsetmanipulation module<a class="headerlink" href="#module-deeplabcut.generate_training_dataset.trainingsetmanipulation" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.MakeLabeledPlots">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">MakeLabeledPlots</code><span class="sig-paren">(</span><em>folder</em>, <em>DataCombined</em>, <em>cfg</em>, <em>Labels</em>, <em>Colorscheme</em>, <em>cc</em>, <em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#MakeLabeledPlots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.MakeLabeledPlots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.MakeTest_pose_yaml">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">MakeTest_pose_yaml</code><span class="sig-paren">(</span><em>dictionary</em>, <em>keys2save</em>, <em>saveasfile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#MakeTest_pose_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.MakeTest_pose_yaml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.MakeTrain_pose_yaml">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">MakeTrain_pose_yaml</code><span class="sig-paren">(</span><em>itemstochange</em>, <em>saveasconfigfile</em>, <em>defaultconfigfile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#MakeTrain_pose_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.MakeTrain_pose_yaml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.SplitTrials">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">SplitTrials</code><span class="sig-paren">(</span><em>trialindex</em>, <em>trainFraction=0.8</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#SplitTrials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.SplitTrials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split a trial index into train and test sets. Also checks that the trainFraction is a two digit number between 0 an 1. The reason
+is that the folders contain the trainfraction as int(100*trainFraction).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.adddatasetstovideolistandviceversa">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">adddatasetstovideolistandviceversa</code><span class="sig-paren">(</span><em>config</em>, <em>prefix</em>, <em>width</em>, <em>height</em>, <em>suffix='.mp4'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#adddatasetstovideolistandviceversa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.adddatasetstovideolistandviceversa" title="Permalink to this definition">¶</a></dt>
+<dd><p>First run comparevideolistsanddatafolders(config) to compare the folders in labeled-data and the ones listed under video_sets (in the config file).
+If you detect differences this function can be used to maker sure each folder has a video entry &amp; vice versa.</p>
+<p>It corrects this problem in the following way:</p>
+<p>If a folder in labeled-data does not contain a video entry in the config file then the prefix path will be added in front of the name of the labeled-data folder and combined
+with the suffix variable as an ending. Width and height will be added as cropping variables as passed on. TODO: This should be written from the actual images!</p>
+<p>If a video entry in the config file does not contain a folder in labeled-data, then the entry is removed.</p>
+<p>Handle with care!</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>String containing the full path of the config file in the project.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.boxitintoacell">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">boxitintoacell</code><span class="sig-paren">(</span><em>joints</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#boxitintoacell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.boxitintoacell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auxiliary function for creating matfile.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.check_labels">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">check_labels</code><span class="sig-paren">(</span><em>config, Labels=['+', '.', 'x'], scale=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#check_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.check_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Double check if the labels were at correct locations and stored in a proper file format.</p>
+<p>This creates a new subdirectory for each video under the ‘labeled-data’ and all the frames are plotted with the labels.</p>
+<p>Make sure that these labels are fine.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+</dl>
+<p>Labels: List of at least 3 matplotlib markers. The first one will be used to indicate the human ground truth location (Default: +)</p>
+<dl class="docutils">
+<dt>scale <span class="classifier-delimiter">:</span> <span class="classifier">float, default =1</span></dt>
+<dd>Change the relative size of the output images.</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>for labeling the frames
+&gt;&gt;&gt; deeplabcut.check_labels(‘/analysis/project/reaching-task/config.yaml’)
+——–</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.comparevideolistsanddatafolders">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">comparevideolistsanddatafolders</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#comparevideolistsanddatafolders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.comparevideolistsanddatafolders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auxiliary function that compares the folders in labeled-data and the ones listed under video_sets (in the config file).</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>String containing the full path of the config file in the project.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.create_training_dataset">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">create_training_dataset</code><span class="sig-paren">(</span><em>config</em>, <em>num_shuffles=1</em>, <em>Shuffles=None</em>, <em>windows2linux=False</em>, <em>trainIndexes=None</em>, <em>testIndexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#create_training_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.create_training_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a training dataset. Labels from all the extracted frames are merged into a single .h5 file.</p>
+<p>Only the videos included in the config file are used to create this dataset.</p>
+<p>[OPTIONAL] Use the function ‘add_new_video’ at any stage of the project to add more videos to the project.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+<dt>num_shuffles <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd>Number of shuffles of training dataset to create, i.e. [1,2,3] for num_shuffles=3. Default is set to 1.</dd>
+<dt>Shuffles: list of shuffles.</dt>
+<dd>Alternatively the user can also give a list of shuffles (integers!).</dd>
+<dt>windows2linux: bool.</dt>
+<dd>The annotation files contain path formated according to your operating system. If you label on windows
+but train &amp; evaluate on a unix system (e.g. ubunt, colab, Mac) set this variable to True to convert the paths.</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">deeplabcut</span><span class="o">.</span><span class="n">create_training_dataset</span><span class="p">(</span><span class="s1">&#39;/analysis/project/reaching-task/config.yaml&#39;</span><span class="p">,</span><span class="n">num_shuffles</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">Windows:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">deeplabcut</span><span class="o">.</span><span class="n">create_training_dataset</span><span class="p">(</span><span class="s1">&#39;C:\Users\Ulf\looming-task\config.yaml&#39;</span><span class="p">,</span><span class="n">Shuffles</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+<span class="go">--------</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.dropannotationfileentriesduetodeletedimages">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">dropannotationfileentriesduetodeletedimages</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#dropannotationfileentriesduetodeletedimages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.dropannotationfileentriesduetodeletedimages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop entries for all deleted images in annotation files, i.e. for folders of the type: /labeled-data/<em>folder</em>/CollectedData_*scorer*.h5
+Will be carried out iteratively for all <em>folders</em> in labeled-data.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>String containing the full path of the config file in the project.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.dropduplicatesinannotatinfiles">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">dropduplicatesinannotatinfiles</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#dropduplicatesinannotatinfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.dropduplicatesinannotatinfiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop duplicate entries (of images) in annotation files (this should no longer happen, but might be useful).</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>String containing the full path of the config file in the project.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.dropimagesduetolackofannotation">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">dropimagesduetolackofannotation</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#dropimagesduetolackofannotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.dropimagesduetolackofannotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop images from corresponding folder for not annotated images: /labeled-data/<em>folder</em>/CollectedData_*scorer*.h5
+Will be carried out iteratively for all <em>folders</em> in labeled-data.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>String containing the full path of the config file in the project.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.get_cmap">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">get_cmap</code><span class="sig-paren">(</span><em>n</em>, <em>name='jet'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#get_cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.get_cmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a function that maps each index in 0, 1, …, n-1 to a distinct
+RGB color; the keyword argument name must be a standard mpl colormap name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.label_frames">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">label_frames</code><span class="sig-paren">(</span><em>config</em>, <em>multiple=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#label_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.label_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manually label/annotate the extracted frames. Update the list of body parts you want to localize in the config.yaml file first.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>String containing the full path of the config file in the project.</dd>
+<dt>multiple: bool, optional</dt>
+<dd>If this is set to True, a user can label multiple individuals.
+The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>; if provided it must be either <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>.</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>To label multiple individuals
+&gt;&gt;&gt; deeplabcut.label_frames(‘/analysis/project/reaching-task/config.yaml’,multiple=True)
+——–</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.merge_annotateddatasets">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">merge_annotateddatasets</code><span class="sig-paren">(</span><em>cfg</em>, <em>project_path</em>, <em>trainingsetfolder_full</em>, <em>windows2linux</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#merge_annotateddatasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.merge_annotateddatasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges all the h5 files for all labeled-datasets (from individual videos).
+This is a bit of a mess because of cross platform compatablity.</p>
+<p>Within platform comp. is straightforward. But if someone labels on windows and wants to train on a unix cluster or colab…</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.generate_training_dataset.trainingsetmanipulation.mergeandsplit">
+<code class="descclassname">deeplabcut.generate_training_dataset.trainingsetmanipulation.</code><code class="descname">mergeandsplit</code><span class="sig-paren">(</span><em>config</em>, <em>trainindex=0</em>, <em>uniform=True</em>, <em>windows2linux=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/deeplabcut/generate_training_dataset/trainingsetmanipulation.html#mergeandsplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.generate_training_dataset.trainingsetmanipulation.mergeandsplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function allows additional control over “create_training_dataset”.</p>
+<p>Merge annotated data sets (from different folders) and split data in a specific way, returns the split variables (train/test indices).
+Importantly, this allows one to freeze a split.</p>
+<p>One can also either create a uniform split (uniform = True; thereby indexing TrainingFraction in config file) or leave-one-folder out split
+by passing the index of the corrensponding video from the config.yaml file as variable trainindex.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+<dt>trainindex: int, optional</dt>
+<dd>Either (in case uniform = True) indexes which element of TrainingFraction in the config file should be used (note it is a list!).
+Alternatively (uniform = False) indexes which folder is dropped, i.e. the first if trainindex=0, the second if trainindex =1, etc.</dd>
+<dt>uniform: bool, optional</dt>
+<dd>Perform uniform split (disregarding folder structure in labeled data), or (if False) leave one folder out.</dd>
+<dt>windows2linux: bool.</dt>
+<dd>The annotation files contain path formated according to your operating system. If you label on windows
+but train &amp; evaluate on a unix system (e.g. ubunt, colab, Mac) set this variable to True to convert the paths.</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>To create a leave-one-folder-out model:
+&gt;&gt;&gt; trainIndexes, testIndexes=deeplabcut.mergeandsplit(config,trainindex=0,uniform=False)
+returns the indices for the first video folder (as defined in config file) as testIndexes and all others as trainIndexes.
+You can then create the training set by calling (e.g. defining it as Shuffle 3):
+&gt;&gt;&gt; deeplabcut.create_training_dataset(config,Shuffles=[3],trainIndexes=trainIndexes,testIndexes=testIndexes)</p>
+<p>To freeze a (uniform) split:
+&gt;&gt;&gt; trainIndexes, testIndexes=deeplabcut.mergeandsplit(config,trainindex=0,uniform=True)
+You can then create two model instances that have the identical trainingset. Thereby you can assess the role of various parameters on the performance of DLC.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">deeplabcut</span><span class="o">.</span><span class="n">create_training_dataset</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">Shuffles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">trainIndexes</span><span class="o">=</span><span class="n">trainIndexes</span><span class="p">,</span><span class="n">testIndexes</span><span class="o">=</span><span class="n">testIndexes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">deeplabcut</span><span class="o">.</span><span class="n">create_training_dataset</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">Shuffles</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">trainIndexes</span><span class="o">=</span><span class="n">trainIndexes</span><span class="p">,</span><span class="n">testIndexes</span><span class="o">=</span><span class="n">testIndexes</span><span class="p">)</span>
+<span class="go">--------</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.generate_training_dataset">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deeplabcut.generate_training_dataset" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

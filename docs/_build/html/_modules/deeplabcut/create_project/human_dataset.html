@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.create_project.human_dataset &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.create_project.human_dataset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.create_project.human_dataset</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">deeplabcut</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span><span class="p">,</span> <span class="n">auxfun_models</span>
+
+
+<div class="viewcode-block" id="MakeTrain_pose_yaml"><a class="viewcode-back" href="../../../source/deeplabcut.create_project.html#deeplabcut.create_project.human_dataset.MakeTrain_pose_yaml">[docs]</a><span class="k">def</span> <span class="nf">MakeTrain_pose_yaml</span><span class="p">(</span><span class="n">itemstochange</span><span class="p">,</span><span class="n">saveasconfigfile</span><span class="p">,</span><span class="n">defaultconfigfile</span><span class="p">):</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">defaultconfigfile</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">raw_doc</span> <span class="ow">in</span> <span class="n">raw</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">---&#39;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">docs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">raw_doc</span><span class="p">,</span><span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+            <span class="n">docs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">raw_doc</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">itemstochange</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">itemstochange</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="c1">#docs[0][&#39;init_weights&#39;] = &#39;../../pretrained/resnet_v1_101.ckpt&#39;</span>
+    <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;max_input_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1500</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">saveasconfigfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MakeTest_pose_yaml"><a class="viewcode-back" href="../../../source/deeplabcut.create_project.html#deeplabcut.create_project.human_dataset.MakeTest_pose_yaml">[docs]</a><span class="k">def</span> <span class="nf">MakeTest_pose_yaml</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">keys2save</span><span class="p">,</span> <span class="n">saveasfile</span><span class="p">):</span>
+    <span class="n">dict_test</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys2save</span><span class="p">:</span>
+        <span class="n">dict_test</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">dict_test</span><span class="p">[</span><span class="s1">&#39;scoremap_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
+    <span class="n">dict_test</span><span class="p">[</span><span class="s1">&#39;global_scale&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="c1">#dict_test[&#39;init_weights&#39;] = &#39;models/mpii/snapshot-1030000&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">saveasfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dict_test</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="create_pretrained_human_project"><a class="viewcode-back" href="../../../source/deeplabcut.create_project.html#deeplabcut.create_project.human_dataset.create_pretrained_human_project">[docs]</a><span class="k">def</span> <span class="nf">create_pretrained_human_project</span><span class="p">(</span><span class="n">project</span><span class="p">,</span><span class="n">experimenter</span><span class="p">,</span><span class="n">videos</span><span class="p">,</span><span class="n">working_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">copy_videos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">videotype</span><span class="o">=</span><span class="s1">&#39;.avi&#39;</span><span class="p">,</span><span class="n">createlabeledvideo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">analyzevideo</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a demo human project and analyzes a video with ResNet 101 weights pretrained on MPII Human Pose. This is from the DeeperCut paper by Insafutdinov et al. https://arxiv.org/abs/1605.03170 Please make sure to cite it too if you use this code!</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    project : string</span>
+<span class="sd">        String containing the name of the project.</span>
+
+<span class="sd">    experimenter : string</span>
+<span class="sd">        String containing the name of the experimenter.</span>
+
+<span class="sd">    videos : list</span>
+<span class="sd">        A list of string containing the full paths of the videos to include in the project.</span>
+
+<span class="sd">    working_directory : string, optional</span>
+<span class="sd">        The directory where the project will be created. The default is the ``current working directory``; if provided, it must be a string.</span>
+
+<span class="sd">    copy_videos : bool, optional</span>
+<span class="sd">        If this is set to True, the videos are copied to the ``videos`` directory. If it is False,symlink of the videos are copied to the project/videos directory. The default is ``False``; if provided it must be either</span>
+<span class="sd">        ``True`` or ``False``.</span>
+<span class="sd">    analyzevideo &quot; bool, optional </span>
+<span class="sd">        If true, then the video is analzyed and a labeled video is created. If false, then only the project will be created and the weights downloaded. You can then access them </span>
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    Linux/MacOs</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_pretrained_human_project(&#39;human&#39;,&#39;Linus&#39;,[&#39;/data/videos/mouse1.avi&#39;],&#39;/analysis/project/&#39;,copy_videos=False)</span>
+<span class="sd">    </span>
+<span class="sd">    Windows:</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.create_pretrained_human_project(&#39;human&#39;,&#39;Bill&#39;,[r&#39;C:\yourusername\rig-95\Videos\reachingvideo1.avi&#39;],r&#39;C:\yourusername\analysis\project&#39; copy_videos=False)</span>
+<span class="sd">    Users must format paths with either:  r&#39;C:\ OR &#39;C:\\ &lt;- i.e. a double backslash \ \ )</span>
+<span class="sd">    --------</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">cfg</span><span class="o">=</span><span class="n">deeplabcut</span><span class="o">.</span><span class="n">create_new_project</span><span class="p">(</span><span class="n">project</span><span class="p">,</span><span class="n">experimenter</span><span class="p">,</span><span class="n">videos</span><span class="p">,</span><span class="n">working_directory</span><span class="p">,</span><span class="n">copy_videos</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;bodyparts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ankle1&#39;</span><span class="p">,</span><span class="s1">&#39;knee1&#39;</span><span class="p">,</span><span class="s1">&#39;hip1&#39;</span><span class="p">,</span><span class="s1">&#39;hip2&#39;</span><span class="p">,</span><span class="s1">&#39;knee2&#39;</span><span class="p">,</span><span class="s1">&#39;ankle2&#39;</span><span class="p">,</span><span class="s1">&#39;wrist1&#39;</span><span class="p">,</span><span class="s1">&#39;elbow1&#39;</span><span class="p">,</span><span class="s1">&#39;shoulder1&#39;</span><span class="p">,</span><span class="s1">&#39;shoulder2&#39;</span><span class="p">,</span><span class="s1">&#39;elbow2&#39;</span><span class="p">,</span><span class="s1">&#39;wrist2&#39;</span><span class="p">,</span><span class="s1">&#39;chin&#39;</span><span class="p">,</span><span class="s1">&#39;forehead&#39;</span><span class="p">]</span>
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;skeleton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;ankle1&#39;</span><span class="p">,</span> <span class="s1">&#39;knee1&#39;</span><span class="p">],[</span><span class="s1">&#39;ankle2&#39;</span><span class="p">,</span> <span class="s1">&#39;knee2&#39;</span><span class="p">],[</span><span class="s1">&#39;knee1&#39;</span><span class="p">,</span> <span class="s1">&#39;hip1&#39;</span><span class="p">],[</span><span class="s1">&#39;knee2&#39;</span><span class="p">,</span> <span class="s1">&#39;hip2&#39;</span><span class="p">],[</span><span class="s1">&#39;hip1&#39;</span><span class="p">,</span> <span class="s1">&#39;hip2&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;shoulder1&#39;</span><span class="p">,</span> <span class="s1">&#39;shoulder2&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;shoulder1&#39;</span><span class="p">,</span> <span class="s1">&#39;hip1&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;shoulder2&#39;</span><span class="p">,</span> <span class="s1">&#39;hip2&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;shoulder1&#39;</span><span class="p">,</span> <span class="s1">&#39;elbow1&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;shoulder2&#39;</span><span class="p">,</span> <span class="s1">&#39;elbow2&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;chin&#39;</span><span class="p">,</span> <span class="s1">&#39;forehead&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;elbow1&#39;</span><span class="p">,</span> <span class="s1">&#39;wrist1&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;elbow2&#39;</span><span class="p">,</span> <span class="s1">&#39;wrist2&#39;</span><span class="p">]]</span>
+    <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">write_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+    
+    <span class="n">train_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetModelFolder</span><span class="p">(</span><span class="n">trainFraction</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">cfg</span><span class="o">=</span><span class="n">config</span><span class="p">)),</span><span class="s1">&#39;train&#39;</span><span class="p">))</span>
+    <span class="n">test_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetModelFolder</span><span class="p">(</span><span class="n">trainFraction</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">cfg</span><span class="o">=</span><span class="n">config</span><span class="p">)),</span><span class="s1">&#39;test&#39;</span><span class="p">))</span>
+    
+    <span class="c1"># Create the model directory </span>
+    <span class="n">train_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">test_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="n">modelfoldername</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetModelFolder</span><span class="p">(</span><span class="n">trainFraction</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">cfg</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+    
+    <span class="n">path_train_config</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="n">Path</span><span class="p">(</span><span class="n">modelfoldername</span><span class="p">),</span><span class="s1">&#39;train&#39;</span><span class="p">,</span><span class="s1">&#39;pose_cfg.yaml&#39;</span><span class="p">))</span>
+    <span class="n">path_test_config</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="n">Path</span><span class="p">(</span><span class="n">modelfoldername</span><span class="p">),</span><span class="s1">&#39;test&#39;</span><span class="p">,</span><span class="s1">&#39;pose_cfg.yaml&#39;</span><span class="p">))</span>
+    
+    
+    <span class="c1"># Download the weights and put then in appropriate directory</span>
+    <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">train_dir</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Checking if the weights are already available, otherwise I will download them!&quot;</span><span class="p">)</span>
+    <span class="n">weightfilename</span><span class="o">=</span><span class="n">auxfun_models</span><span class="o">.</span><span class="n">download_mpii_weigths</span><span class="p">(</span><span class="n">train_dir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span>
+    
+    <span class="c1"># create the pose_config.yaml files</span>
+    <span class="n">parent_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">deeplabcut</span><span class="o">.</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">defaultconfigfile</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">parent_path</span> <span class="o">/</span> <span class="s1">&#39;pose_cfg.yaml&#39;</span><span class="p">)</span>
+    <span class="n">trainingsetfolder</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetTrainingSetFolder</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">datafilename</span><span class="p">,</span><span class="n">metadatafilename</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetDataandMetaDataFilenames</span><span class="p">(</span><span class="n">trainingsetfolder</span><span class="p">,</span><span class="n">trainFraction</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">cfg</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">bodyparts</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;bodyparts&#39;</span><span class="p">]</span>
+    <span class="n">net_type</span> <span class="o">=</span><span class="s1">&#39;resnet_101&#39;</span><span class="c1">#&#39;resnet_&#39;+str(config[&#39;resnet&#39;])</span>
+    <span class="n">num_shuffles</span><span class="o">=</span> <span class="mi">1</span>
+    <span class="n">model_path</span><span class="p">,</span><span class="n">num_shuffles</span><span class="o">=</span><span class="n">auxfun_models</span><span class="o">.</span><span class="n">Check4weights</span><span class="p">(</span><span class="n">net_type</span><span class="p">,</span><span class="n">parent_path</span><span class="p">,</span><span class="n">num_shuffles</span><span class="p">)</span>
+    <span class="n">items2change</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="s1">&#39;dataset-test.mat&#39;</span><span class="p">,</span><span class="c1">#datafilename,</span>
+                        <span class="s2">&quot;metadataset&quot;</span><span class="p">:</span> <span class="n">metadatafilename</span><span class="p">,</span>
+                        <span class="s2">&quot;num_joints&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">bodyparts</span><span class="p">),</span>
+                        <span class="s2">&quot;all_joints&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bodyparts</span><span class="p">))],</span>
+                        <span class="s2">&quot;all_joints_names&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">bpt</span><span class="p">)</span> <span class="k">for</span> <span class="n">bpt</span> <span class="ow">in</span> <span class="n">bodyparts</span><span class="p">],</span>
+                        <span class="s2">&quot;init_weights&quot;</span><span class="p">:</span> <span class="n">weightfilename</span><span class="p">,</span> <span class="c1">#&#39;models/mpii/snapshot-1030000&#39;,</span>
+                        <span class="s2">&quot;project_path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">]),</span>
+                        <span class="s2">&quot;net_type&quot;</span><span class="p">:</span> <span class="n">net_type</span><span class="p">,</span>
+                        <span class="s2">&quot;dataset_type&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span>
+                    <span class="p">}</span>
+    <span class="n">trainingdata</span> <span class="o">=</span> <span class="n">MakeTrain_pose_yaml</span><span class="p">(</span><span class="n">items2change</span><span class="p">,</span><span class="n">path_train_config</span><span class="p">,</span><span class="n">defaultconfigfile</span><span class="p">)</span>
+
+    <span class="n">keys2save</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">,</span> <span class="s2">&quot;dataset_type&quot;</span><span class="p">,</span><span class="s2">&quot;num_joints&quot;</span><span class="p">,</span> <span class="s2">&quot;all_joints&quot;</span><span class="p">,</span> <span class="s2">&quot;all_joints_names&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;net_type&quot;</span><span class="p">,</span> <span class="s1">&#39;init_weights&#39;</span><span class="p">,</span> <span class="s1">&#39;global_scale&#39;</span><span class="p">,</span> <span class="s1">&#39;location_refinement&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;locref_stdev&#39;</span><span class="p">]</span>
+    <span class="n">MakeTest_pose_yaml</span><span class="p">(</span><span class="n">trainingdata</span><span class="p">,</span> <span class="n">keys2save</span><span class="p">,</span><span class="n">path_test_config</span><span class="p">)</span>
+    
+    <span class="n">video_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="s1">&#39;videos&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">analyzevideo</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># Analyze the videos</span>
+        <span class="n">deeplabcut</span><span class="o">.</span><span class="n">analyze_videos</span><span class="p">(</span><span class="n">cfg</span><span class="p">,[</span><span class="n">video_dir</span><span class="p">],</span><span class="n">videotype</span><span class="p">,</span><span class="n">save_as_csv</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">createlabeledvideo</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="n">deeplabcut</span><span class="o">.</span><span class="n">create_labeled_video</span><span class="p">(</span><span class="n">cfg</span><span class="p">,[</span><span class="n">video_dir</span><span class="p">],</span><span class="n">videotype</span><span class="p">,</span> <span class="n">draw_skeleton</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">deeplabcut</span><span class="o">.</span><span class="n">plot_trajectories</span><span class="p">(</span><span class="n">cfg</span><span class="p">,[</span><span class="n">video_dir</span><span class="p">],</span><span class="n">videotype</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

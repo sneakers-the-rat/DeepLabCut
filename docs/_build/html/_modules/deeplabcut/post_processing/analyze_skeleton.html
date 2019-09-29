@@ -1,0 +1,413 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.post_processing.analyze_skeleton &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.post_processing.analyze_skeleton</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.post_processing.analyze_skeleton</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="k">import</span> <span class="n">distance</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">factorial</span><span class="p">,</span> <span class="n">atan2</span><span class="p">,</span> <span class="n">degrees</span><span class="p">,</span> <span class="n">acos</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">pi</span>
+
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span>
+
+<span class="c1"># UTILS FUNCTIONS</span>
+<div class="viewcode-block" id="calc_distance_between_points_two_vectors_2d"><a class="viewcode-back" href="../../../source/deeplabcut.post_processing.html#deeplabcut.post_processing.analyze_skeleton.calc_distance_between_points_two_vectors_2d">[docs]</a><span class="k">def</span> <span class="nf">calc_distance_between_points_two_vectors_2d</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;calc_distance_between_points_two_vectors_2d [pairwise distance between vectors points]</span>
+<span class="sd">    </span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        v1 {[np.array]} -- [description]</span>
+<span class="sd">        v2 {[type]} -- [description]</span>
+<span class="sd">    </span>
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError -- [description]</span>
+<span class="sd">        ValueError -- [description]</span>
+<span class="sd">        ValueError -- [description]</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        [type] -- [description]</span>
+
+<span class="sd">    testing:</span>
+<span class="sd">    &gt;&gt;&gt; v1 = np.zeros((2, 5))</span>
+<span class="sd">    &gt;&gt;&gt; v2 = np.zeros((2, 5))</span>
+<span class="sd">    &gt;&gt;&gt; v2[1, :]  = [0, 10, 25, 50, 100]</span>
+<span class="sd">    &gt;&gt;&gt; d = calc_distance_between_points_two_vectors_2d(v1.T, v2.T)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># Check dataformats</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid argument data format&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">v1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">v2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid shape for input arrays&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">v1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">v2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Error: input arrays should have the same length&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Calculate distance</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="p">[</span><span class="n">distance</span><span class="o">.</span><span class="n">euclidean</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span> <span class="k">for</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">dist</span></div>
+
+
+<div class="viewcode-block" id="angle_between_points_2d_anticlockwise"><a class="viewcode-back" href="../../../source/deeplabcut.post_processing.html#deeplabcut.post_processing.analyze_skeleton.angle_between_points_2d_anticlockwise">[docs]</a><span class="k">def</span> <span class="nf">angle_between_points_2d_anticlockwise</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;angle_between_points_2d_clockwise [Determines the angle of a straight line drawn between point one and two. </span>
+<span class="sd">        The number returned, which is a double in degrees, tells us how much we have to rotate</span>
+<span class="sd">        a horizontal line anti-clockwise for it to match the line between the two points.]</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        p1 {[np.ndarray, list]} -- np.array or list [ with the X and Y coordinates of the point]</span>
+<span class="sd">        p2 {[np.ndarray, list]} -- np.array or list [ with the X and Y coordinates of the point]</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        [int] -- [clockwise angle between p1, p2 using the inner product and the deterinant of the two vectors]</span>
+
+<span class="sd">    Testing:  - to check:     print(zero, ninety, oneeighty, twoseventy)</span>
+<span class="sd">        &gt;&gt;&gt; zero = angle_between_points_2d_clockwise([0, 1], [0, 1])</span>
+<span class="sd">        &gt;&gt;&gt; ninety = angle_between_points_2d_clockwise([1, 0], [0, 1])</span>
+<span class="sd">        &gt;&gt;&gt; oneeighty = angle_between_points_2d_clockwise([0, -1], [0, 1])</span>
+<span class="sd">        &gt;&gt;&gt; twoseventy = angle_between_points_2d_clockwise([-1, 0], [0, 1])</span>
+<span class="sd">        &gt;&gt;&gt; ninety2 = angle_between_points_2d_clockwise([10, 0], [10, 1])</span>
+<span class="sd">        &gt;&gt;&gt; print(ninety2)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines the angle of a straight line drawn between point one and two. </span>
+<span class="sd">        The number returned, which is a double in degrees, tells us how much we have to rotate</span>
+<span class="sd">        a horizontal line anit-clockwise for it to match the line between the two points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">xDiff</span> <span class="o">=</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">yDiff</span> <span class="o">=</span> <span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ang</span> <span class="o">=</span> <span class="n">degrees</span><span class="p">(</span><span class="n">atan2</span><span class="p">(</span><span class="n">yDiff</span><span class="p">,</span> <span class="n">xDiff</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">ang</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">ang</span> <span class="o">+=</span> <span class="mi">360</span>
+    <span class="c1"># if not 0 &lt;= ang &lt;+ 360: raise ValueError(&#39;Ang was not computed correctly&#39;)</span>
+    <span class="k">return</span> <span class="n">ang</span></div>
+
+
+
+<div class="viewcode-block" id="calc_angle_between_vectors_of_points_2d"><a class="viewcode-back" href="../../../source/deeplabcut.post_processing.html#deeplabcut.post_processing.analyze_skeleton.calc_angle_between_vectors_of_points_2d">[docs]</a><span class="k">def</span> <span class="nf">calc_angle_between_vectors_of_points_2d</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;calc_angle_between_vectors_of_points_2d [calculates the clockwise angle between each set of point for two 2d arrays of points]</span>
+<span class="sd">    </span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        v1 {[np.ndarray]} -- [2d array with X,Y position at each timepoint]</span>
+<span class="sd">        v2 {[np.ndarray]} -- [2d array with X,Y position at each timepoint]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        [np.ndarray] -- [1d array with clockwise angle between pairwise points in v1,v2]</span>
+<span class="sd">    </span>
+<span class="sd">    Testing:</span>
+<span class="sd">    &gt;&gt;&gt; v1 = np.zeros((2, 4))</span>
+<span class="sd">    &gt;&gt;&gt; v1[1, :] = [1, 1, 1, 1, ]</span>
+<span class="sd">    &gt;&gt;&gt; v2 = np.zeros((2, 4))</span>
+<span class="sd">    &gt;&gt;&gt; v2[0, :] = [0, 1, 0, -1]</span>
+<span class="sd">    &gt;&gt;&gt; v2[1, :] = [1, 0, -1, 0]</span>
+<span class="sd">    &gt;&gt;&gt; a = calc_angle_between_vectors_of_points_2d(v2, v1)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># Check data format</span>
+    <span class="k">if</span> <span class="n">v1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">v2</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid format for input arguments&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v2</span><span class="p">):</span> 
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input arrays should have the same length, instead: &#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">v2</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">v1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">v2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid shape for input arrays: &#39;</span><span class="p">,</span> <span class="n">v1</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">v2</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># Calculate</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="n">v1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">angs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_points</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">v1</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">v2</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+        <span class="n">angs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">angle_between_points_2d_anticlockwise</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">angs</span></div>
+
+
+<span class="c1"># Process single bone</span>
+<div class="viewcode-block" id="analyzebone"><a class="viewcode-back" href="../../../source/deeplabcut.post_processing.html#deeplabcut.post_processing.analyze_skeleton.analyzebone">[docs]</a><span class="k">def</span> <span class="nf">analyzebone</span><span class="p">(</span><span class="n">bp1</span><span class="p">,</span> <span class="n">bp2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;[Computes length and orientation of the bone at each frame]</span>
+<span class="sd">    </span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        bp1 {[type]} -- [description]</span>
+<span class="sd">        bp2 {[type]} -- [description]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bp1_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">bp1</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">bp1</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">bp2_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">bp2</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">bp2</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># get bone length and orientation</span>
+    <span class="n">bone_length</span> <span class="o">=</span> <span class="n">calc_distance_between_points_two_vectors_2d</span><span class="p">(</span><span class="n">bp1_pos</span><span class="p">,</span> <span class="n">bp2_pos</span><span class="p">)</span>
+    <span class="n">bone_orientation</span> <span class="o">=</span> <span class="n">calc_angle_between_vectors_of_points_2d</span><span class="p">(</span><span class="n">bp1_pos</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">bp2_pos</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># keep the smallest of the two likelihoods</span>
+    <span class="n">likelihoods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">bp2</span><span class="o">.</span><span class="n">likelihood</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">bp2</span><span class="o">.</span><span class="n">likelihood</span><span class="o">.</span><span class="n">values</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">likelihood</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">likelihoods</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Create dataframe and return</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+                                    <span class="n">length</span><span class="o">=</span><span class="n">bone_length</span><span class="p">,</span>
+                                    <span class="n">orientation</span><span class="o">=</span><span class="n">bone_orientation</span><span class="p">,</span>
+                                    <span class="n">likelihood</span><span class="o">=</span><span class="n">likelihood</span><span class="p">,</span>
+                                    <span class="p">))</span>
+    <span class="c1"># df.index.name=name</span>
+    
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<span class="c1"># MAIN FUNC</span>
+<div class="viewcode-block" id="analyzeskeleton"><a class="viewcode-back" href="../../../source/deeplabcut.post_processing.html#deeplabcut.post_processing.analyze_skeleton.analyzeskeleton">[docs]</a><span class="k">def</span> <span class="nf">analyzeskeleton</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">videos</span><span class="p">,</span> <span class="n">videotype</span><span class="o">=</span><span class="s1">&#39;avi&#39;</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trainingsetindex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">save_as_csv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">destfolder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts length and orientation of each &quot;bone&quot; of the skeleton as defined in the config file. </span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    videos : list</span>
+<span class="sd">        A list of strings containing the full paths to videos for analysis or a path to the directory, where all the videos with same extension are stored.</span>
+<span class="sd">    </span>
+<span class="sd">    shuffle : int, optional</span>
+<span class="sd">        The shufle index of training dataset. The extracted frames will be stored in the labeled-dataset for</span>
+<span class="sd">        the corresponding shuffle of training dataset. Default is set to 1</span>
+
+<span class="sd">    trainingsetindex: int, optional</span>
+<span class="sd">        Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</span>
+<span class="sd">    </span>
+<span class="sd">    save_as_csv: bool, optional</span>
+<span class="sd">        Saves the predictions in a .csv file. The default is ``False``; if provided it must be either ``True`` or ``False``</span>
+
+<span class="sd">    destfolder: string, optional</span>
+<span class="sd">        Specifies the destination folder for analysis data (default is the path of the video). Note that for subsequent analysis this </span>
+<span class="sd">        folder also needs to be passed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Load config file, scorer and videos</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">scorer</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetScorerName</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="n">trainingsetindex</span><span class="p">])</span>
+    
+    <span class="n">Videos</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">Getlistofvideos</span><span class="p">(</span><span class="n">videos</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">Videos</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">destfolder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">videofolder</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">videofolder</span><span class="o">=</span><span class="n">destfolder</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processing </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">video</span><span class="p">))</span>
+        
+        <span class="n">dataname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">+</span><span class="n">scorer</span>
+        <span class="n">processedname</span><span class="o">=</span><span class="n">dataname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;_skeleton.h5&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># See if file was already proccessed</span>
+            <span class="n">Dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span> <span class="n">processedname</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Video already processed...&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">Dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="n">dataname</span><span class="o">+</span><span class="s1">&#39;.h5&#39;</span><span class="p">))</span>
+                <span class="c1"># Process skeleton</span>
+                <span class="n">bones</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">bp1</span><span class="p">,</span> <span class="n">bp2</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;skeleton&#39;</span><span class="p">]:</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bp1</span><span class="p">,</span> <span class="n">bp2</span><span class="p">)</span>
+                    <span class="n">bones</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">analyzebone</span><span class="p">(</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp1</span><span class="p">],</span> <span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp2</span><span class="p">])</span>
+                
+                <span class="n">skeleton</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">bones</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># save</span>
+                <span class="n">skeleton</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span><span class="n">processedname</span><span class="p">,</span> <span class="s1">&#39;df_with_missing&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">save_as_csv</span><span class="p">:</span>
+                    <span class="n">skeleton</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">processedname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;.csv&#39;</span><span class="p">)</span>
+    
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Video not analyzed -- Run analyze_videos first.&quot;</span><span class="p">)</span></div>
+                        
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;videos&#39;</span><span class="p">)</span>
+    <span class="n">cli_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

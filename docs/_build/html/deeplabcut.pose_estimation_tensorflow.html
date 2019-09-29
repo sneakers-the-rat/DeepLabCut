@@ -1,0 +1,613 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_tensorflow package &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="deeplabcut.pose_estimation_tensorflow.dataset package" href="deeplabcut.pose_estimation_tensorflow.dataset.html" />
+    <link rel="prev" title="deeplabcut.pose_estimation_3d package" href="deeplabcut.pose_estimation_3d.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deeplabcut.create_project.html">deeplabcut.create_project package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">deeplabcut</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="deeplabcut.html">deeplabcut package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="deeplabcut.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.create_project.html">deeplabcut.create_project package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.generate_training_dataset.html">deeplabcut.generate_training_dataset package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.pose_estimation_3d.html">deeplabcut.pose_estimation_3d package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">deeplabcut.pose_estimation_tensorflow package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.post_processing.html">deeplabcut.post_processing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.refine_training_dataset.html">deeplabcut.refine_training_dataset package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.utils.html">deeplabcut.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#module-deeplabcut.cli">deeplabcut.cli module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#module-deeplabcut.version">deeplabcut.version module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.html#module-deeplabcut">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">deeplabcut</a> &raquo;</li>
+        
+          <li><a href="deeplabcut.html">deeplabcut package</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_tensorflow package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/deeplabcut.pose_estimation_tensorflow.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="deeplabcut-pose-estimation-tensorflow-package">
+<h1>deeplabcut.pose_estimation_tensorflow package<a class="headerlink" href="#deeplabcut-pose-estimation-tensorflow-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.dataset.html">deeplabcut.pose_estimation_tensorflow.dataset package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.dataset.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.dataset.html#module-deeplabcut.pose_estimation_tensorflow.dataset.factory">deeplabcut.pose_estimation_tensorflow.dataset.factory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.dataset.html#module-deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset">deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.dataset.html#module-deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset_deterministic">deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset_deterministic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.dataset.html#module-deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset_tensorpack">deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset_tensorpack module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.dataset.html#module-deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset">deeplabcut.pose_estimation_tensorflow.dataset.pose_defaultdataset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.dataset.html#module-deeplabcut.pose_estimation_tensorflow.dataset">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.models.html">deeplabcut.pose_estimation_tensorflow.models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.models.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.models.pretrained.html">deeplabcut.pose_estimation_tensorflow.models.pretrained package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.models.pretrained.html#module-deeplabcut.pose_estimation_tensorflow.models.pretrained">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.models.html#module-deeplabcut.pose_estimation_tensorflow.models">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.nnet.html">deeplabcut.pose_estimation_tensorflow.nnet package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.nnet.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.nnet.html#module-deeplabcut.pose_estimation_tensorflow.nnet.losses">deeplabcut.pose_estimation_tensorflow.nnet.losses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.nnet.html#module-deeplabcut.pose_estimation_tensorflow.nnet.net_factory">deeplabcut.pose_estimation_tensorflow.nnet.net_factory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.nnet.html#module-deeplabcut.pose_estimation_tensorflow.nnet.pose_net">deeplabcut.pose_estimation_tensorflow.nnet.pose_net module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.nnet.html#module-deeplabcut.pose_estimation_tensorflow.nnet.predict">deeplabcut.pose_estimation_tensorflow.nnet.predict module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.nnet.html#module-deeplabcut.pose_estimation_tensorflow.nnet">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.util.html">deeplabcut.pose_estimation_tensorflow.util package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.util.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.util.html#module-deeplabcut.pose_estimation_tensorflow.util.logging">deeplabcut.pose_estimation_tensorflow.util.logging module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.util.html#module-deeplabcut.pose_estimation_tensorflow.util.visualize">deeplabcut.pose_estimation_tensorflow.util.visualize module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deeplabcut.pose_estimation_tensorflow.util.html#module-deeplabcut.pose_estimation_tensorflow.util">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.config">
+<span id="deeplabcut-pose-estimation-tensorflow-config-module"></span><h2>deeplabcut.pose_estimation_tensorflow.config module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.config" title="Permalink to this headline">¶</a></h2>
+<p>Adapted from DeeperCut by Eldar Insafutdinov
+<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a></p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.config.cfg_from_file">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.config.</code><code class="descname">cfg_from_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/config.html#cfg_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.config.cfg_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a config from file filename and merge it into the default options.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.config.load_config">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.config.</code><code class="descname">load_config</code><span class="sig-paren">(</span><em>filename='pose_cfg.yaml'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/config.html#load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.config.load_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.default_config">
+<span id="deeplabcut-pose-estimation-tensorflow-default-config-module"></span><h2>deeplabcut.pose_estimation_tensorflow.default_config module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.default_config" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<p>Adapted from DeeperCut by Eldar Insafutdinov
+<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a></p>
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.evaluate">
+<span id="deeplabcut-pose-estimation-tensorflow-evaluate-module"></span><h2>deeplabcut.pose_estimation_tensorflow.evaluate module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.evaluate" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.evaluate.evaluate_network">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.evaluate.</code><code class="descname">evaluate_network</code><span class="sig-paren">(</span><em>config, Shuffles=[1], plotting=None, show_errors=True, comparisonbodyparts='all', gputouse=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/evaluate.html#evaluate_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.evaluate.evaluate_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the network based on the saved models at different stages of the training network.</p>
+<p>The evaluation results are stored in the .h5 and .csv file under the subdirectory ‘evaluation_results’.
+Change the snapshotindex parameter in the config file to ‘all’ in order to evaluate all the saved models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>config</strong> (<em>string</em>) – Full path of the config.yaml file as a string.</li>
+<li><strong>Shuffles</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – List of integers specifying the shuffle indices of the training dataset. The default is [1]</li>
+<li><strong>plotting</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Plots the predictions on the train and test images. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>; if provided it must be either <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code></li>
+<li><strong>show_errors</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Display train and test errors. The default is <cite>True`</cite></li>
+<li><strong>comparisonbodyparts</strong> (<em>list of bodyparts</em><em>, </em><em>Default is &quot;all&quot;.</em>) – The average error will be computed for those body parts only (Has to be a subset of the body parts).</li>
+<li><strong>gputouse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional. Natural number indicating the number of your GPU</em><em> (</em><em>see number in nvidia-smi</em><em>)</em><em> If you do not have a GPU put None.</em>) – </li>
+<li><strong>See</strong> (<a class="reference external" href="https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries">https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries</a>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>If you do not want to plot
+&gt;&gt;&gt; deeplabcut.evaluate_network(‘/analysis/project/reaching-task/config.yaml’, shuffle=[1])
+——–</p>
+<p>If you want to plot
+&gt;&gt;&gt; deeplabcut.evaluate_network(‘/analysis/project/reaching-task/config.yaml’,shuffle=[1],True)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.evaluate.make_results_file">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.evaluate.</code><code class="descname">make_results_file</code><span class="sig-paren">(</span><em>final_result</em>, <em>evaluationfolder</em>, <em>DLCscorer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/evaluate.html#make_results_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.evaluate.make_results_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes result file in .h5 and csv format and saves under evaluation_results directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.evaluate.pairwisedistances">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.evaluate.</code><code class="descname">pairwisedistances</code><span class="sig-paren">(</span><em>DataCombined</em>, <em>scorer1</em>, <em>scorer2</em>, <em>pcutoff=-1</em>, <em>bodyparts=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/evaluate.html#pairwisedistances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.evaluate.pairwisedistances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the pairwise Euclidean distance metric over body parts vs. images</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.predict_videos">
+<span id="deeplabcut-pose-estimation-tensorflow-predict-videos-module"></span><h2>deeplabcut.pose_estimation_tensorflow.predict_videos module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.predict_videos" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.predict_videos.AnalyzeVideo">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.predict_videos.</code><code class="descname">AnalyzeVideo</code><span class="sig-paren">(</span><em>video</em>, <em>DLCscorer</em>, <em>trainFraction</em>, <em>cfg</em>, <em>dlc_cfg</em>, <em>sess</em>, <em>inputs</em>, <em>outputs</em>, <em>pdindex</em>, <em>save_as_csv</em>, <em>destfolder</em>, <em>get_nframesfrommetadata=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/predict_videos.html#AnalyzeVideo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.predict_videos.AnalyzeVideo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function for analyzing a video</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.predict_videos.GetPoseF">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.predict_videos.</code><code class="descname">GetPoseF</code><span class="sig-paren">(</span><em>cfg</em>, <em>dlc_cfg</em>, <em>sess</em>, <em>inputs</em>, <em>outputs</em>, <em>cap</em>, <em>nframes</em>, <em>batchsize</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/predict_videos.html#GetPoseF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.predict_videos.GetPoseF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batchwise prediction of pose</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.predict_videos.GetPoseS">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.predict_videos.</code><code class="descname">GetPoseS</code><span class="sig-paren">(</span><em>cfg</em>, <em>dlc_cfg</em>, <em>sess</em>, <em>inputs</em>, <em>outputs</em>, <em>cap</em>, <em>nframes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/predict_videos.html#GetPoseS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.predict_videos.GetPoseS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Non batch wise pose estimation for video cap.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.predict_videos.GetPosesofFrames">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.predict_videos.</code><code class="descname">GetPosesofFrames</code><span class="sig-paren">(</span><em>cfg</em>, <em>dlc_cfg</em>, <em>sess</em>, <em>inputs</em>, <em>outputs</em>, <em>directory</em>, <em>framelist</em>, <em>nframes</em>, <em>batchsize</em>, <em>rgb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/predict_videos.html#GetPosesofFrames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.predict_videos.GetPosesofFrames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batchwise prediction of pose  for framelist in directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.predict_videos.analyze_time_lapse_frames">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.predict_videos.</code><code class="descname">analyze_time_lapse_frames</code><span class="sig-paren">(</span><em>config</em>, <em>directory</em>, <em>frametype='.png'</em>, <em>shuffle=1</em>, <em>trainingsetindex=0</em>, <em>gputouse=None</em>, <em>save_as_csv=False</em>, <em>rgb=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/predict_videos.html#analyze_time_lapse_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.predict_videos.analyze_time_lapse_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Analyzed all images (of type = frametype) in a folder and stores the output in one file.</p>
+<p>You can crop the frames (before analysis), by changing ‘cropping’=True and setting ‘x1’,’x2’,’y1’,’y2’ in the config file.</p>
+<p>Output: The labels are stored as MultiIndex Pandas Array, which contains the name of the network, body part name, (x, y) label position</p>
+<blockquote>
+<div><p>in pixels, and the likelihood for each frame per body part. These arrays are stored in an efficient Hierarchical Data Format (HDF)</p>
+<p>in the same directory, where the video is stored. However, if the flag save_as_csv is set to True, the data can also be exported in</p>
+<p>comma-separated values format (.csv), which in turn can be imported in many programs, such as MATLAB, R, Prism, etc.</p>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>config</strong> (<em>string</em>) – Full path of the config.yaml file as a string.</li>
+<li><strong>directory</strong> (<em>string</em>) – Full path to directory containing the frames that shall be analyzed</li>
+<li><strong>frametype</strong> (<em>string</em><em>, </em><em>optional</em>) – Checks for the file extension of the frames. Only images with this extension are analyzed. The default is <code class="docutils literal notranslate"><span class="pre">.png</span></code></li>
+<li><strong>shuffle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – An integer specifying the shuffle index of the training dataset used for training the network. The default is 1.</li>
+<li><strong>trainingsetindex</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</li>
+<li><strong>gputouse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional. Natural number indicating the number of your GPU</em><em> (</em><em>see number in nvidia-smi</em><em>)</em><em> If you do not have a GPU put None.</em>) – </li>
+<li><strong>See</strong> (<a class="reference external" href="https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries">https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries</a>) – </li>
+<li><strong>save_as_csv</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Saves the predictions in a .csv file. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>; if provided it must be either <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code></li>
+<li><strong>rbg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional.</em>) – Whether to load image as rgb; Note e.g. some tiffs do not alow that option in io.imread, then just set this to false.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>If you want to analyze all frames in /analysis/project/timelapseexperiment1
+&gt;&gt;&gt; deeplabcut.analyze_videos(‘/analysis/project/reaching-task/config.yaml’,’/analysis/project/timelapseexperiment1’)
+——–</p>
+<p>If you want to analyze all frames in /analysis/project/timelapseexperiment1
+&gt;&gt;&gt; deeplabcut.analyze_videos(‘/analysis/project/reaching-task/config.yaml’,’/analysis/project/timelapseexperiment1’, frametype=’.bmp’)
+——–</p>
+<p>Note: for test purposes one can extract all frames from a video with ffmeg, e.g. ffmpeg -i testvideo.avi thumb%04d.png</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.predict_videos.analyze_videos">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.predict_videos.</code><code class="descname">analyze_videos</code><span class="sig-paren">(</span><em>config</em>, <em>videos</em>, <em>videotype='avi'</em>, <em>shuffle=1</em>, <em>trainingsetindex=0</em>, <em>gputouse=None</em>, <em>save_as_csv=False</em>, <em>destfolder=None</em>, <em>cropping=None</em>, <em>get_nframesfrommetadata=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/predict_videos.html#analyze_videos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.predict_videos.analyze_videos" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Makes prediction based on a trained network. The index of the trained network is specified by parameters in the config file (in particular the variable ‘snapshotindex’)</p>
+<p>You can crop the video (before analysis), by changing ‘cropping’=True and setting ‘x1’,’x2’,’y1’,’y2’ in the config file. The same cropping parameters will then be used for creating the video.
+Note: you can also pass cropping = [x1,x2,y1,y2] coordinates directly, that then will be used for all videos. You can of course loop over videos &amp; pass specific coordinates for each case.</p>
+<p>Output: The labels are stored as MultiIndex Pandas Array, which contains the name of the network, body part name, (x, y) label position</p>
+<blockquote>
+<div><p>in pixels, and the likelihood for each frame per body part. These arrays are stored in an efficient Hierarchical Data Format (HDF)</p>
+<p>in the same directory, where the video is stored. However, if the flag save_as_csv is set to True, the data can also be exported in</p>
+<p>comma-separated values format (.csv), which in turn can be imported in many programs, such as MATLAB, R, Prism, etc.</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+<dt>videos <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>A list of strings containing the full paths to videos for analysis or a path to the directory, where all the videos with same extension are stored.</dd>
+<dt>videotype: string, optional</dt>
+<dd>Checks for the extension of the video in case the input to the video is a directory.</dd>
+</dl>
+</div></blockquote>
+<p>Only videos with this extension are analyzed. The default is <code class="docutils literal notranslate"><span class="pre">.avi</span></code></p>
+<blockquote>
+<div><dl class="docutils">
+<dt>shuffle: int, optional</dt>
+<dd>An integer specifying the shuffle index of the training dataset used for training the network. The default is 1.</dd>
+<dt>trainingsetindex: int, optional</dt>
+<dd>Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</dd>
+</dl>
+<p>gputouse: int, optional. Natural number indicating the number of your GPU (see number in nvidia-smi). If you do not have a GPU put None.
+See: <a class="reference external" href="https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries">https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries</a></p>
+<dl class="docutils">
+<dt>save_as_csv: bool, optional</dt>
+<dd>Saves the predictions in a .csv file. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>; if provided it must be either <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code></dd>
+<dt>destfolder: string, optional</dt>
+<dd>Specifies the destination folder for analysis data (default is the path of the video). Note that for subsequent analysis this
+folder also needs to be passed.</dd>
+<dt>get_nframesfrommetadata: bool, Default true.</dt>
+<dd>Some videos have wrong metadata (and thus the frame number is not accurate). If this is set to False, then the
+video is loaded frame by frame and the number of frames is counted. This makes sure that for broken metadata
+the output file is correct. See <a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/issues/422">https://github.com/AlexEMG/DeepLabCut/issues/422</a></dd>
+</dl>
+<p>Windows example for analyzing 1 video
+&gt;&gt;&gt; deeplabcut.analyze_videos(‘C:myprojectreaching-taskconfig.yaml’,[‘C:yourusernamerig-95Videosreachingvideo1.avi’])
+——–</p>
+<p>If you want to analyze only 1 video
+&gt;&gt;&gt; deeplabcut.analyze_videos(‘/analysis/project/reaching-task/config.yaml’,[‘/analysis/project/videos/reachingvideo1.avi’])
+——–</p>
+<p>If you want to analyze all videos of type avi in a folder:
+&gt;&gt;&gt; deeplabcut.analyze_videos(‘/analysis/project/reaching-task/config.yaml’,[‘/analysis/project/videos’],videotype=’.avi’)
+——–</p>
+<p>If you want to analyze multiple videos
+&gt;&gt;&gt; deeplabcut.analyze_videos(‘/analysis/project/reaching-task/config.yaml’,[‘/analysis/project/videos/reachingvideo1.avi’,’/analysis/project/videos/reachingvideo2.avi’])
+——–</p>
+<p>If you want to analyze multiple videos with shuffle = 2
+&gt;&gt;&gt; deeplabcut.analyze_videos(‘/analysis/project/reaching-task/config.yaml’,[‘/analysis/project/videos/reachingvideo1.avi’,’/analysis/project/videos/reachingvideo2.avi’], shuffle=2)</p>
+<p>If you want to analyze multiple videos with shuffle = 2 and save results as an additional csv file too
+&gt;&gt;&gt; deeplabcut.analyze_videos(‘/analysis/project/reaching-task/config.yaml’,[‘/analysis/project/videos/reachingvideo1.avi’,’/analysis/project/videos/reachingvideo2.avi’], shuffle=2,save_as_csv=True)
+——–</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.predict_videos.bruteforce_countframes_bydecoding">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.predict_videos.</code><code class="descname">bruteforce_countframes_bydecoding</code><span class="sig-paren">(</span><em>cap</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/predict_videos.html#bruteforce_countframes_bydecoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.predict_videos.bruteforce_countframes_bydecoding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.test">
+<span id="deeplabcut-pose-estimation-tensorflow-test-module"></span><h2>deeplabcut.pose_estimation_tensorflow.test module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.test" title="Permalink to this headline">¶</a></h2>
+<p>Adapted from DeeperCut by Eldar Insafutdinov
+<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a></p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.test.test_net">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.test.</code><code class="descname">test_net</code><span class="sig-paren">(</span><em>visualise</em>, <em>cache_scoremaps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/test.html#test_net"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.test.test_net" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.train">
+<span id="deeplabcut-pose-estimation-tensorflow-train-module"></span><h2>deeplabcut.pose_estimation_tensorflow.train module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.train" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<p>Adapted from DeeperCut by Eldar Insafutdinov
+<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a></p>
+<dl class="class">
+<dt id="deeplabcut.pose_estimation_tensorflow.train.LearningRate">
+<em class="property">class </em><code class="descclassname">deeplabcut.pose_estimation_tensorflow.train.</code><code class="descname">LearningRate</code><span class="sig-paren">(</span><em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/train.html#LearningRate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.train.LearningRate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="deeplabcut.pose_estimation_tensorflow.train.LearningRate.get_lr">
+<code class="descname">get_lr</code><span class="sig-paren">(</span><em>iteration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/train.html#LearningRate.get_lr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.train.LearningRate.get_lr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.train.get_optimizer">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.train.</code><code class="descname">get_optimizer</code><span class="sig-paren">(</span><em>loss_op</em>, <em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/train.html#get_optimizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.train.get_optimizer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.train.load_and_enqueue">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.train.</code><code class="descname">load_and_enqueue</code><span class="sig-paren">(</span><em>sess</em>, <em>enqueue_op</em>, <em>coord</em>, <em>dataset</em>, <em>placeholders</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/train.html#load_and_enqueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.train.load_and_enqueue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.train.setup_preloading">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.train.</code><code class="descname">setup_preloading</code><span class="sig-paren">(</span><em>batch_spec</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/train.html#setup_preloading"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.train.setup_preloading" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.train.start_preloading">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.train.</code><code class="descname">start_preloading</code><span class="sig-paren">(</span><em>sess</em>, <em>enqueue_op</em>, <em>dataset</em>, <em>placeholders</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/train.html#start_preloading"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.train.start_preloading" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.train.train">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.train.</code><code class="descname">train</code><span class="sig-paren">(</span><em>config_yaml</em>, <em>displayiters</em>, <em>saveiters</em>, <em>maxiters</em>, <em>max_to_keep=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/train.html#train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.train.train" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.training">
+<span id="deeplabcut-pose-estimation-tensorflow-training-module"></span><h2>deeplabcut.pose_estimation_tensorflow.training module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.training" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a></p>
+<p>Please see AUTHORS for contributors.
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.training.train_network">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.training.</code><code class="descname">train_network</code><span class="sig-paren">(</span><em>config</em>, <em>shuffle=1</em>, <em>trainingsetindex=0</em>, <em>gputouse=None</em>, <em>max_snapshots_to_keep=5</em>, <em>autotune=False</em>, <em>displayiters=None</em>, <em>saveiters=None</em>, <em>maxiters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/training.html#train_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.training.train_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains the network with the labels in the training dataset.</p>
+<dl class="docutils">
+<dt>config <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Full path of the config.yaml file as a string.</dd>
+<dt>shuffle: int, optional</dt>
+<dd>Integer value specifying the shuffle index to select for training. Default is set to 1</dd>
+<dt>trainingsetindex: int, optional</dt>
+<dd>Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</dd>
+</dl>
+<p>gputouse: int, optional. Natural number indicating the number of your GPU (see number in nvidia-smi). If you do not have a GPU put None.
+See: <a class="reference external" href="https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries">https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries</a></p>
+<p>Additional parameters:</p>
+<p>max_snapshots_to_keep: int, or None. Sets how many snapshots are kept, i.e. states of the trained network. Every savinginteration many times
+a snapshot is stored, however only the last max_snapshots_to_keep many are kept! If you change this to None, then all are kept.
+See: <a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/issues/8#issuecomment-387404835">https://github.com/AlexEMG/DeepLabCut/issues/8#issuecomment-387404835</a></p>
+<p>autotune: property of TensorFlow, somehow faster if ‘false’ (as Eldar found out, see <a class="reference external" href="https://github.com/tensorflow/tensorflow/issues/13317">https://github.com/tensorflow/tensorflow/issues/13317</a>). Default: False</p>
+<p>displayiters: this variable is actually set in pose_config.yaml. However, you can overwrite it with this hack. Don’t use this regularly, just if you are too lazy to dig out
+the pose_config.yaml file for the corresponding project. If None, the value from there is used, otherwise it is overwritten! Default: None</p>
+<p>saveiters: this variable is actually set in pose_config.yaml. However, you can overwrite it with this hack. Don’t use this regularly, just if you are too lazy to dig out
+the pose_config.yaml file for the corresponding project. If None, the value from there is used, otherwise it is overwritten! Default: None</p>
+<p>maxiters: this variable is actually set in pose_config.yaml. However, you can overwrite it with this hack. Don’t use this regularly, just if you are too lazy to dig out
+the pose_config.yaml file for the corresponding project. If None, the value from there is used, otherwise it is overwritten! Default: None</p>
+<p class="rubric">Example</p>
+<p>for training the network for first shuffle of the training dataset.
+&gt;&gt;&gt; deeplabcut.train_network(‘/analysis/project/reaching-task/config.yaml’)
+——–</p>
+<p>for training the network for second shuffle of the training dataset.
+&gt;&gt;&gt; deeplabcut.train_network(‘/analysis/project/reaching-task/config.yaml’,shuffle=2)
+——–</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow.vis_dataset">
+<span id="deeplabcut-pose-estimation-tensorflow-vis-dataset-module"></span><h2>deeplabcut.pose_estimation_tensorflow.vis_dataset module<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow.vis_dataset" title="Permalink to this headline">¶</a></h2>
+<p>Adapted from DeeperCut by Eldar Insafutdinov
+<a class="reference external" href="https://github.com/eldar/pose-tensorflow">https://github.com/eldar/pose-tensorflow</a></p>
+<dl class="function">
+<dt id="deeplabcut.pose_estimation_tensorflow.vis_dataset.display_dataset">
+<code class="descclassname">deeplabcut.pose_estimation_tensorflow.vis_dataset.</code><code class="descname">display_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/deeplabcut/pose_estimation_tensorflow/vis_dataset.html#display_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deeplabcut.pose_estimation_tensorflow.vis_dataset.display_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-deeplabcut.pose_estimation_tensorflow">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-deeplabcut.pose_estimation_tensorflow" title="Permalink to this headline">¶</a></h2>
+<p>DeepLabCut2.0 Toolbox (deeplabcut.org)
+© A. &amp; M. Mathis Labs
+<a class="reference external" href="https://github.com/AlexEMG/DeepLabCut">https://github.com/AlexEMG/DeepLabCut</a>
+Please see AUTHORS for contributors.</p>
+<p><a class="reference external" href="https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</a>
+Licensed under GNU Lesser General Public License v3.0</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="deeplabcut.pose_estimation_tensorflow.dataset.html" class="btn btn-neutral float-right" title="deeplabcut.pose_estimation_tensorflow.dataset package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="deeplabcut.pose_estimation_3d.html" class="btn btn-neutral float-left" title="deeplabcut.pose_estimation_3d package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

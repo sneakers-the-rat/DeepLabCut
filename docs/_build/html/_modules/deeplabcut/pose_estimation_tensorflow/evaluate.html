@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_tensorflow.evaluate &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_tensorflow.evaluate</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_tensorflow.evaluate</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+
+<span class="sd">Please see AUTHORS for contributors.</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+
+<span class="c1"># Dependencies for anaysis</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+
+<div class="viewcode-block" id="pairwisedistances"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.evaluate.pairwisedistances">[docs]</a><span class="k">def</span> <span class="nf">pairwisedistances</span><span class="p">(</span><span class="n">DataCombined</span><span class="p">,</span><span class="n">scorer1</span><span class="p">,</span><span class="n">scorer2</span><span class="p">,</span><span class="n">pcutoff</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span><span class="n">bodyparts</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Calculates the pairwise Euclidean distance metric over body parts vs. images&#39;&#39;&#39;</span>
+    <span class="n">mask</span><span class="o">=</span><span class="n">DataCombined</span><span class="p">[</span><span class="n">scorer2</span><span class="p">]</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">&#39;likelihood&#39;</span><span class="p">,</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">pcutoff</span>
+    <span class="k">if</span> <span class="n">bodyparts</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+            <span class="n">Pointwisesquareddistance</span><span class="o">=</span><span class="p">(</span><span class="n">DataCombined</span><span class="p">[</span><span class="n">scorer1</span><span class="p">]</span><span class="o">-</span><span class="n">DataCombined</span><span class="p">[</span><span class="n">scorer2</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">RMSE</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">Pointwisesquareddistance</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">Pointwisesquareddistance</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="c1">#Euclidean distance (proportional to RMSE)</span>
+            <span class="k">return</span> <span class="n">RMSE</span><span class="p">,</span><span class="n">RMSE</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+            <span class="n">Pointwisesquareddistance</span><span class="o">=</span><span class="p">(</span><span class="n">DataCombined</span><span class="p">[</span><span class="n">scorer1</span><span class="p">][</span><span class="n">bodyparts</span><span class="p">]</span><span class="o">-</span><span class="n">DataCombined</span><span class="p">[</span><span class="n">scorer2</span><span class="p">][</span><span class="n">bodyparts</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">RMSE</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">Pointwisesquareddistance</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">Pointwisesquareddistance</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="c1">#Euclidean distance (proportional to RMSE)</span>
+            <span class="k">return</span> <span class="n">RMSE</span><span class="p">,</span><span class="n">RMSE</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="evaluate_network"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.evaluate.evaluate_network">[docs]</a><span class="k">def</span> <span class="nf">evaluate_network</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">Shuffles</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">plotting</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">show_errors</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span><span class="n">comparisonbodyparts</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span><span class="n">gputouse</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluates the network based on the saved models at different stages of the training network.\n</span>
+<span class="sd">    The evaluation results are stored in the .h5 and .csv file under the subdirectory &#39;evaluation_results&#39;.</span>
+<span class="sd">    Change the snapshotindex parameter in the config file to &#39;all&#39; in order to evaluate all the saved models.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    Shuffles: list, optional</span>
+<span class="sd">        List of integers specifying the shuffle indices of the training dataset. The default is [1]</span>
+
+<span class="sd">    plotting: bool, optional</span>
+<span class="sd">        Plots the predictions on the train and test images. The default is ``False``; if provided it must be either ``True`` or ``False``</span>
+
+<span class="sd">    show_errors: bool, optional</span>
+<span class="sd">        Display train and test errors. The default is `True``</span>
+
+<span class="sd">    comparisonbodyparts: list of bodyparts, Default is &quot;all&quot;.</span>
+<span class="sd">        The average error will be computed for those body parts only (Has to be a subset of the body parts).</span>
+
+<span class="sd">    gputouse: int, optional. Natural number indicating the number of your GPU (see number in nvidia-smi). If you do not have a GPU put None.</span>
+<span class="sd">    See: https://nvidia.custhelp.com/app/answers/detail/a_id/3751/~/useful-nvidia-smi-queries</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    If you do not want to plot</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.evaluate_network(&#39;/analysis/project/reaching-task/config.yaml&#39;, shuffle=[1])</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    If you want to plot</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.evaluate_network(&#39;/analysis/project/reaching-task/config.yaml&#39;,shuffle=[1],True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">io</span>
+    <span class="kn">import</span> <span class="nn">skimage.color</span>
+
+    <span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.nnet</span> <span class="k">import</span> <span class="n">predict</span> <span class="k">as</span> <span class="n">ptf_predict</span>
+    <span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.config</span> <span class="k">import</span> <span class="n">load_config</span>
+    <span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset</span> <span class="k">import</span> <span class="n">data_to_input</span>
+    <span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span><span class="p">,</span> <span class="n">visualization</span>
+    <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+    <span class="k">if</span> <span class="s1">&#39;TF_CUDNN_USE_AUTOTUNE&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TF_CUDNN_USE_AUTOTUNE&#39;</span><span class="p">]</span> <span class="c1">#was potentially set during training</span>
+
+    <span class="n">vers</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">12</span><span class="p">:</span>
+        <span class="n">TF</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">TF</span><span class="o">=</span><span class="n">tf</span>
+
+    <span class="n">TF</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TF_CPP_MIN_LOG_LEVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;2&#39;</span> <span class="c1">#</span>
+<span class="c1">#    tf.logging.set_verbosity(tf.logging.WARN)</span>
+
+    <span class="n">start_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="c1"># Read file path for pose_config file. &gt;&gt; pass it on</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">gputouse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#gpu selectinon</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CUDA_VISIBLE_DEVICES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gputouse</span><span class="p">)</span>
+
+    <span class="c1"># Loading human annotatated data</span>
+    <span class="n">trainingsetfolder</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetTrainingSetFolder</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+    <span class="n">Data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;project_path&quot;</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">trainingsetfolder</span><span class="p">),</span><span class="s1">&#39;CollectedData_&#39;</span> <span class="o">+</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;scorer&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">),</span><span class="s1">&#39;df_with_missing&#39;</span><span class="p">)</span>
+    <span class="c1"># Get list of body parts to evaluate network for</span>
+    <span class="n">comparisonbodyparts</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">IntersectionofBodyPartsandOnesGivenbyUser</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">comparisonbodyparts</span><span class="p">)</span>
+    <span class="c1"># Make folder for evaluation</span>
+    <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">attempttomakefolder</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;project_path&quot;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/evaluation-results/&quot;</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">shuffle</span> <span class="ow">in</span> <span class="n">Shuffles</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">trainFraction</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;TrainingFraction&quot;</span><span class="p">]:</span>
+            <span class="c1">##################################################</span>
+            <span class="c1"># Load and setup CNN part detector</span>
+            <span class="c1">##################################################</span>
+            <span class="n">datafn</span><span class="p">,</span><span class="n">metadatafn</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetDataandMetaDataFilenames</span><span class="p">(</span><span class="n">trainingsetfolder</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">cfg</span><span class="p">)</span>
+            <span class="n">modelfolder</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;project_path&quot;</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetModelFolder</span><span class="p">(</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">cfg</span><span class="p">)))</span>
+            <span class="n">path_test_config</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">modelfolder</span><span class="p">)</span> <span class="o">/</span> <span class="s1">&#39;test&#39;</span> <span class="o">/</span> <span class="s1">&#39;pose_cfg.yaml&#39;</span>
+            <span class="c1"># Load meta data</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">trainIndices</span><span class="p">,</span> <span class="n">testIndices</span><span class="p">,</span> <span class="n">trainFraction</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">LoadMetadata</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;project_path&quot;</span><span class="p">],</span><span class="n">metadatafn</span><span class="p">))</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">dlc_cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path_test_config</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;It seems the model for shuffle </span><span class="si">%s</span><span class="s2"> and trainFraction </span><span class="si">%s</span><span class="s2"> does not exist.&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">))</span>
+
+            <span class="c1">#change batch size, if it was edited during analysis!</span>
+            <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span> <span class="c1">#in case this was edited for analysis.</span>
+            <span class="c1">#Create folder structure to store results.</span>
+            <span class="n">evaluationfolder</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;project_path&quot;</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetEvaluationFolder</span><span class="p">(</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">cfg</span><span class="p">)))</span>
+            <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">attempttomakefolder</span><span class="p">(</span><span class="n">evaluationfolder</span><span class="p">,</span><span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1">#path_train_config = modelfolder / &#39;train&#39; / &#39;pose_cfg.yaml&#39;</span>
+
+            <span class="c1"># Check which snapshots are available and sort them by # iterations</span>
+            <span class="n">Snapshots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">modelfolder</span><span class="p">),</span> <span class="s1">&#39;train&#39;</span><span class="p">))</span><span class="k">if</span> <span class="s2">&quot;index&quot;</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span> <span class="c1">#check if any where found?</span>
+              <span class="n">Snapshots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+              <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Snapshots not found! It seems the dataset for shuffle </span><span class="si">%s</span><span class="s2"> and trainFraction </span><span class="si">%s</span><span class="s2"> is not trained.</span><span class="se">\n</span><span class="s2">Please train it before evaluating.</span><span class="se">\n</span><span class="s2">Use the function &#39;train_network&#39; to do so.&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">))</span>
+
+            <span class="n">increasing_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">Snapshots</span><span class="p">])</span>
+            <span class="n">Snapshots</span> <span class="o">=</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">increasing_indices</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;snapshotindex&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">snapindices</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;snapshotindex&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+                <span class="n">snapindices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Snapshots</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;snapshotindex&quot;</span><span class="p">]</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">Snapshots</span><span class="p">):</span>
+                <span class="n">snapindices</span><span class="o">=</span><span class="p">[</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;snapshotindex&quot;</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid choice, only -1 (last), any integer up to last, or all (as string)!&quot;</span><span class="p">)</span>
+
+            <span class="n">final_result</span><span class="o">=</span><span class="p">[]</span>
+            <span class="c1">##################################################</span>
+            <span class="c1"># Compute predictions over images</span>
+            <span class="c1">##################################################</span>
+            <span class="k">for</span> <span class="n">snapindex</span> <span class="ow">in</span> <span class="n">snapindices</span><span class="p">:</span>
+                <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;init_weights&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">modelfolder</span><span class="p">),</span><span class="s1">&#39;train&#39;</span><span class="p">,</span><span class="n">Snapshots</span><span class="p">[</span><span class="n">snapindex</span><span class="p">])</span> <span class="c1">#setting weights to corresponding snapshot.</span>
+                <span class="n">trainingsiterations</span> <span class="o">=</span> <span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;init_weights&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#read how many training siterations that corresponds to.</span>
+
+                <span class="c1">#name for deeplabcut net (based on its parameters)</span>
+                <span class="n">DLCscorer</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetScorerName</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span><span class="p">,</span><span class="n">trainingsiterations</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running &quot;</span><span class="p">,</span> <span class="n">DLCscorer</span><span class="p">,</span> <span class="s2">&quot; with # of trainingiterations:&quot;</span><span class="p">,</span> <span class="n">trainingsiterations</span><span class="p">)</span>
+                <span class="n">resultsfilename</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">evaluationfolder</span><span class="p">),</span><span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">snapindex</span><span class="p">]</span><span class="o">+</span>  <span class="s1">&#39;.h5&#39;</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">DataMachine</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">resultsfilename</span><span class="p">,</span><span class="s1">&#39;df_with_missing&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This net has already been evaluated!&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                    <span class="c1"># Specifying state of model (snapshot / training state)</span>
+                    <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">ptf_predict</span><span class="o">.</span><span class="n">setup_pose_prediction</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">)</span>
+
+                    <span class="n">Numimages</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">PredicteData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Numimages</span><span class="p">,</span><span class="mi">3</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;all_joints_names&#39;</span><span class="p">])))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Analyzing data...&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">imageindex</span><span class="p">,</span> <span class="n">imagename</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">index</span><span class="p">)):</span>
+                        <span class="n">image</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;project_path&#39;</span><span class="p">],</span><span class="n">imagename</span><span class="p">),</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+                        <span class="n">image</span> <span class="o">=</span> <span class="n">skimage</span><span class="o">.</span><span class="n">color</span><span class="o">.</span><span class="n">gray2rgb</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                        <span class="n">image_batch</span> <span class="o">=</span> <span class="n">data_to_input</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+                        <span class="c1"># Compute prediction with the CNN</span>
+                        <span class="n">outputs_np</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">inputs</span><span class="p">:</span> <span class="n">image_batch</span><span class="p">})</span>
+                        <span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span> <span class="o">=</span> <span class="n">ptf_predict</span><span class="o">.</span><span class="n">extract_cnn_output</span><span class="p">(</span><span class="n">outputs_np</span><span class="p">,</span> <span class="n">dlc_cfg</span><span class="p">)</span>
+
+                        <span class="c1"># Extract maximum scoring location from the heatmap, assume 1 person</span>
+                        <span class="n">pose</span> <span class="o">=</span> <span class="n">ptf_predict</span><span class="o">.</span><span class="n">argmax_pose_predict</span><span class="p">(</span><span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span><span class="p">,</span> <span class="n">dlc_cfg</span><span class="o">.</span><span class="n">stride</span><span class="p">)</span>
+                        <span class="n">PredicteData</span><span class="p">[</span><span class="n">imageindex</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pose</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># NOTE: thereby     cfg_test[&#39;all_joints_names&#39;] should be same order as bodyparts!</span>
+
+                    <span class="n">sess</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> <span class="c1">#closes the current tf session</span>
+
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">(</span>
+                        <span class="p">[[</span><span class="n">DLCscorer</span><span class="p">],</span> <span class="n">dlc_cfg</span><span class="p">[</span><span class="s1">&#39;all_joints_names&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;likelihood&#39;</span><span class="p">]],</span>
+                        <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;scorer&#39;</span><span class="p">,</span> <span class="s1">&#39;bodyparts&#39;</span><span class="p">,</span> <span class="s1">&#39;coords&#39;</span><span class="p">])</span>
+
+                    <span class="c1"># Saving results</span>
+                    <span class="n">DataMachine</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">PredicteData</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">Data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+                    <span class="n">DataMachine</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span><span class="n">resultsfilename</span><span class="p">,</span><span class="s1">&#39;df_with_missing&#39;</span><span class="p">,</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;table&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done and results stored for snapshot: &quot;</span><span class="p">,</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">snapindex</span><span class="p">])</span>
+                    <span class="n">DataCombined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">Data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">DataMachine</span><span class="o">.</span><span class="n">T</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+                    <span class="n">RMSE</span><span class="p">,</span><span class="n">RMSEpcutoff</span> <span class="o">=</span> <span class="n">pairwisedistances</span><span class="p">(</span><span class="n">DataCombined</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;scorer&quot;</span><span class="p">],</span> <span class="n">DLCscorer</span><span class="p">,</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;pcutoff&quot;</span><span class="p">],</span><span class="n">comparisonbodyparts</span><span class="p">)</span>
+                    <span class="n">testerror</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">RMSE</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">testIndices</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+                    <span class="n">trainerror</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">RMSE</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">trainIndices</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+                    <span class="n">testerrorpcutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">RMSEpcutoff</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">testIndices</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+                    <span class="n">trainerrorpcutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">RMSEpcutoff</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">trainIndices</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+                    <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">trainingsiterations</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">trainFraction</span><span class="p">),</span><span class="n">shuffle</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">trainerror</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">testerror</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;pcutoff&quot;</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">trainerrorpcutoff</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">testerrorpcutoff</span><span class="p">,</span><span class="mi">2</span><span class="p">)]</span>
+                    <span class="n">final_result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">show_errors</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Results for&quot;</span><span class="p">,</span><span class="n">trainingsiterations</span><span class="p">,</span><span class="s2">&quot; training iterations:&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">trainFraction</span><span class="p">),</span> <span class="n">shuffle</span><span class="p">,</span> <span class="s2">&quot;train error:&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">trainerror</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;pixels. Test error:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">testerror</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s2">&quot; pixels.&quot;</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;With pcutoff of&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;pcutoff&quot;</span><span class="p">],</span><span class="s2">&quot; train error:&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">trainerrorpcutoff</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;pixels. Test error:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">testerrorpcutoff</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;pixels&quot;</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Thereby, the errors are given by the average distances between the labels by DLC and the scorer.&quot;</span><span class="p">)</span>
+
+
+                    <span class="k">if</span> <span class="n">plotting</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting...&quot;</span><span class="p">)</span>
+                        <span class="n">colors</span> <span class="o">=</span> <span class="n">visualization</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">comparisonbodyparts</span><span class="p">),</span><span class="n">name</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;colormap&#39;</span><span class="p">])</span>
+
+                        <span class="n">foldername</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">evaluationfolder</span><span class="p">),</span><span class="s1">&#39;LabeledImages_&#39;</span> <span class="o">+</span> <span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">Snapshots</span><span class="p">[</span><span class="n">snapindex</span><span class="p">])</span>
+                        <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">attempttomakefolder</span><span class="p">(</span><span class="n">foldername</span><span class="p">)</span>
+                        <span class="n">NumFrames</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">DataCombined</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">NumFrames</span><span class="p">):</span>
+                            <span class="n">visualization</span><span class="o">.</span><span class="n">PlottingandSaveLabeledFrame</span><span class="p">(</span><span class="n">DataCombined</span><span class="p">,</span><span class="n">ind</span><span class="p">,</span><span class="n">trainIndices</span><span class="p">,</span><span class="n">cfg</span><span class="p">,</span><span class="n">colors</span><span class="p">,</span><span class="n">comparisonbodyparts</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">,</span><span class="n">foldername</span><span class="p">)</span>
+
+                    <span class="n">TF</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+                    <span class="c1">#print(final_result)</span>
+            <span class="n">make_results_file</span><span class="p">(</span><span class="n">final_result</span><span class="p">,</span><span class="n">evaluationfolder</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The network is evaluated and the results are stored in the subdirectory &#39;evaluation_results&#39;.&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;If it generalizes well, choose the best model for prediction and update the config file with the appropriate index for the &#39;snapshotindex&#39;.</span><span class="se">\n</span><span class="s2">Use the function &#39;analyze_video&#39; to make predictions on new videos.&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Otherwise consider retraining the network (see DeepLabCut workflow Fig 2)&quot;</span><span class="p">)</span>
+
+    <span class="c1">#returning to intial folder</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">start_path</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="make_results_file"><a class="viewcode-back" href="../../../source/deeplabcut.pose_estimation_tensorflow.html#deeplabcut.pose_estimation_tensorflow.evaluate.make_results_file">[docs]</a><span class="k">def</span> <span class="nf">make_results_file</span><span class="p">(</span><span class="n">final_result</span><span class="p">,</span><span class="n">evaluationfolder</span><span class="p">,</span><span class="n">DLCscorer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Makes result file in .h5 and csv format and saves under evaluation_results directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Training iterations:&quot;</span><span class="p">,</span><span class="s2">&quot;%Training dataset&quot;</span><span class="p">,</span><span class="s2">&quot;Shuffle number&quot;</span><span class="p">,</span><span class="s2">&quot; Train error(px)&quot;</span><span class="p">,</span><span class="s2">&quot; Test error(px)&quot;</span><span class="p">,</span><span class="s2">&quot;p-cutoff used&quot;</span><span class="p">,</span><span class="s2">&quot;Train error with p-cutoff&quot;</span><span class="p">,</span><span class="s2">&quot;Test error with p-cutoff&quot;</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">final_result</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">col_names</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">evaluationfolder</span><span class="p">),</span><span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;-results&#39;</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">),</span><span class="s1">&#39;df_with_missing&#39;</span><span class="p">,</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;table&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">evaluationfolder</span><span class="p">),</span><span class="n">DLCscorer</span> <span class="o">+</span> <span class="s1">&#39;-results&#39;</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span><span class="p">))</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
+    <span class="n">cli_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

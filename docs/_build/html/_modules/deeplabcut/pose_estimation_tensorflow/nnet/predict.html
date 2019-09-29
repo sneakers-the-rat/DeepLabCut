@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_tensorflow.nnet.predict &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_tensorflow.nnet.predict</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_tensorflow.nnet.predict</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Adapted from original predict.py by Eldar Insafutdinov&#39;s implementation of [DeeperCut](https://github.com/eldar/pose-tensorflow)</span>
+
+<span class="sd">Source: DeeperCut by Eldar Insafutdinov</span>
+<span class="sd">https://github.com/eldar/pose-tensorflow</span>
+
+
+<span class="sd">To do faster inference on videos:</span>
+
+<span class="sd">&quot;On the inference speed and video-compression robustness of DeepLabCut&quot;</span>
+<span class="sd">Alexander Mathis &amp; Richard Warren</span>
+<span class="sd">doi: https://doi.org/10.1101/457242</span>
+<span class="sd">See https://www.biorxiv.org/content/early/2018/10/30/457242</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="n">vers</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">12</span><span class="p">:</span>
+    <span class="n">TF</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">TF</span><span class="o">=</span><span class="n">tf</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.nnet.net_factory</span> <span class="k">import</span> <span class="n">pose_net</span>
+
+<div class="viewcode-block" id="setup_pose_prediction"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.predict.setup_pose_prediction">[docs]</a><span class="k">def</span> <span class="nf">setup_pose_prediction</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="n">TF</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">TF</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="n">cfg</span><span class="o">.</span><span class="n">batch_size</span>   <span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+    <span class="n">net_heads</span> <span class="o">=</span> <span class="n">pose_net</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">net_heads</span><span class="p">[</span><span class="s1">&#39;part_prob&#39;</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">location_refinement</span><span class="p">:</span>
+        <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">net_heads</span><span class="p">[</span><span class="s1">&#39;locref&#39;</span><span class="p">])</span>
+
+    <span class="n">restorer</span> <span class="o">=</span> <span class="n">TF</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">()</span>
+    <span class="n">sess</span> <span class="o">=</span> <span class="n">TF</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+    <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">TF</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+    <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">TF</span><span class="o">.</span><span class="n">local_variables_initializer</span><span class="p">())</span>
+
+    <span class="c1"># Restore variables from disk.</span>
+    <span class="n">restorer</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">init_weights</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span></div>
+
+<div class="viewcode-block" id="extract_cnn_output"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.predict.extract_cnn_output">[docs]</a><span class="k">def</span> <span class="nf">extract_cnn_output</span><span class="p">(</span><span class="n">outputs_np</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; extract locref + scmap from network &#39;&#39;&#39;</span>
+    <span class="n">scmap</span> <span class="o">=</span> <span class="n">outputs_np</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">scmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">scmap</span><span class="p">)</span>
+    <span class="n">locref</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">location_refinement</span><span class="p">:</span>
+        <span class="n">locref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">outputs_np</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">locref</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">locref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">locref</span><span class="p">,</span> <span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">locref</span> <span class="o">*=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">locref_stdev</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scmap</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span> <span class="c1">#for single body part!</span>
+        <span class="n">scmap</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">scmap</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span></div>
+
+<div class="viewcode-block" id="argmax_pose_predict"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.predict.argmax_pose_predict">[docs]</a><span class="k">def</span> <span class="nf">argmax_pose_predict</span><span class="p">(</span><span class="n">scmap</span><span class="p">,</span> <span class="n">offmat</span><span class="p">,</span> <span class="n">stride</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Combine scoremat and offsets to the final pose.&quot;&quot;&quot;</span>
+    <span class="n">num_joints</span> <span class="o">=</span> <span class="n">scmap</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">pose</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">joint_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_joints</span><span class="p">):</span>
+        <span class="n">maxloc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">scmap</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">joint_idx</span><span class="p">]),</span>
+                                  <span class="n">scmap</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">joint_idx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">offmat</span><span class="p">[</span><span class="n">maxloc</span><span class="p">][</span><span class="n">joint_idx</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">pos_f8</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">maxloc</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">stride</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">stride</span> <span class="o">+</span>
+                  <span class="n">offset</span><span class="p">)</span>
+        <span class="n">pose</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">pos_f8</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                               <span class="p">[</span><span class="n">scmap</span><span class="p">[</span><span class="n">maxloc</span><span class="p">][</span><span class="n">joint_idx</span><span class="p">]])))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="multi_pose_predict"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.predict.multi_pose_predict">[docs]</a><span class="k">def</span> <span class="nf">multi_pose_predict</span><span class="p">(</span><span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">):</span>
+    <span class="n">Y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">get_top_values</span><span class="p">(</span><span class="n">scmap</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">num_outputs</span><span class="p">)</span>
+    <span class="n">Y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_joints</span> <span class="o">=</span> <span class="n">scmap</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">DZ</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_outputs</span><span class="p">,</span><span class="n">num_joints</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span> 
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_outputs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_joints</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+            <span class="n">DZ</span><span class="p">[</span><span class="n">m</span><span class="p">,</span><span class="n">k</span><span class="p">,:</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">locref</span><span class="p">[</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">k</span><span class="p">,:]</span>
+            <span class="n">DZ</span><span class="p">[</span><span class="n">m</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">scmap</span><span class="p">[</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+            
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span><span class="o">*</span><span class="n">stride</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">stride</span> <span class="o">+</span> <span class="n">DZ</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span><span class="o">*</span><span class="n">stride</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">stride</span> <span class="o">+</span> <span class="n">DZ</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">DZ</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span>
+    
+    <span class="n">pose</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">num_joints</span><span class="p">,</span> <span class="n">num_outputs</span><span class="o">*</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span> 
+    <span class="n">pose</span><span class="p">[:,</span><span class="mi">0</span><span class="p">::</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">pose</span><span class="p">[:,</span><span class="mi">1</span><span class="p">::</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">pose</span><span class="p">[:,</span><span class="mi">2</span><span class="p">::</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">return</span> <span class="n">pose</span></div>
+    
+<div class="viewcode-block" id="getpose"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.predict.getpose">[docs]</a><span class="k">def</span> <span class="nf">getpose</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">outall</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Extract pose &#39;&#39;&#39;</span>
+    <span class="n">im</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">outputs_np</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">inputs</span><span class="p">:</span> <span class="n">im</span><span class="p">})</span>
+    <span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span> <span class="o">=</span> <span class="n">extract_cnn_output</span><span class="p">(</span><span class="n">outputs_np</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
+    <span class="n">num_outputs</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_outputs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">pose</span> <span class="o">=</span> <span class="n">multi_pose_predict</span><span class="p">(</span><span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">stride</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pose</span> <span class="o">=</span> <span class="n">argmax_pose_predict</span><span class="p">(</span><span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">stride</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outall</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span><span class="p">,</span> <span class="n">pose</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pose</span></div>
+
+<span class="c1">## Functions below implement are for batch sizes &gt; 1:</span>
+<div class="viewcode-block" id="extract_cnn_outputmulti"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.predict.extract_cnn_outputmulti">[docs]</a><span class="k">def</span> <span class="nf">extract_cnn_outputmulti</span><span class="p">(</span><span class="n">outputs_np</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; extract locref + scmap from network</span>
+<span class="sd">    Dimensions: image batch x imagedim1 x imagedim2 x bodypart&#39;&#39;&#39;</span>
+    <span class="n">scmap</span> <span class="o">=</span> <span class="n">outputs_np</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">locref</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">location_refinement</span><span class="p">:</span>
+        <span class="n">locref</span> <span class="o">=</span><span class="n">outputs_np</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">locref</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">locref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">locref</span><span class="p">,</span> <span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">locref</span> <span class="o">*=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">locref_stdev</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scmap</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span> <span class="c1">#for single body part!</span>
+        <span class="n">scmap</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">scmap</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span></div>
+
+
+<div class="viewcode-block" id="get_top_values"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.predict.get_top_values">[docs]</a><span class="k">def</span> <span class="nf">get_top_values</span><span class="p">(</span><span class="n">scmap</span><span class="p">,</span> <span class="n">n_top</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">batchsize</span><span class="p">,</span><span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="p">,</span><span class="n">num_joints</span> <span class="o">=</span> <span class="n">scmap</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">scmap_flat</span> <span class="o">=</span> <span class="n">scmap</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batchsize</span><span class="p">,</span><span class="n">nx</span><span class="o">*</span><span class="n">ny</span><span class="p">,</span><span class="n">num_joints</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_top</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">scmap_top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">scmap_flat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="kc">None</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">scmap_top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argpartition</span><span class="p">(</span><span class="n">scmap_flat</span><span class="p">,</span> <span class="o">-</span><span class="n">n_top</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="o">-</span><span class="n">n_top</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batchsize</span><span class="p">):</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">scmap_flat</span><span class="p">[</span><span class="n">ix</span><span class="p">,</span> <span class="n">scmap_top</span><span class="p">[</span><span class="n">ix</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_joints</span><span class="p">)]</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">vals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">scmap_top</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">scmap_top</span><span class="p">[</span><span class="n">ix</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_joints</span><span class="p">)]</span>
+        <span class="n">scmap_top</span> <span class="o">=</span> <span class="n">scmap_top</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">Y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">scmap_top</span><span class="p">,</span> <span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">Y</span><span class="p">,</span> <span class="n">X</span></div>
+
+<div class="viewcode-block" id="getposeNP"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.predict.getposeNP">[docs]</a><span class="k">def</span> <span class="nf">getposeNP</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">outall</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Adapted from DeeperCut, performs numpy-based faster inference on batches.</span>
+<span class="sd">        Introduced in https://www.biorxiv.org/content/10.1101/457242v1 &#39;&#39;&#39;</span>
+
+    <span class="n">num_outputs</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">outputs_np</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">inputs</span><span class="p">:</span> <span class="n">image</span><span class="p">})</span>
+
+    <span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span> <span class="o">=</span> <span class="n">extract_cnn_outputmulti</span><span class="p">(</span><span class="n">outputs_np</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span> <span class="c1">#processes image batch.</span>
+    <span class="n">batchsize</span><span class="p">,</span><span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="p">,</span><span class="n">num_joints</span> <span class="o">=</span> <span class="n">scmap</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">Y</span><span class="p">,</span><span class="n">X</span> <span class="o">=</span> <span class="n">get_top_values</span><span class="p">(</span><span class="n">scmap</span><span class="p">,</span> <span class="n">n_top</span><span class="o">=</span><span class="n">num_outputs</span><span class="p">)</span>
+
+    <span class="c1">#Combine scoremat and offsets to the final pose.</span>
+    <span class="n">DZ</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_outputs</span><span class="p">,</span><span class="n">batchsize</span><span class="p">,</span><span class="n">num_joints</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_outputs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batchsize</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_joints</span><span class="p">):</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+                <span class="n">DZ</span><span class="p">[</span><span class="n">m</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">k</span><span class="p">,:</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">locref</span><span class="p">[</span><span class="n">l</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">k</span><span class="p">,:]</span>
+                <span class="n">DZ</span><span class="p">[</span><span class="n">m</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">scmap</span><span class="p">[</span><span class="n">l</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span><span class="o">*</span><span class="n">cfg</span><span class="o">.</span><span class="n">stride</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">cfg</span><span class="o">.</span><span class="n">stride</span> <span class="o">+</span> <span class="n">DZ</span><span class="p">[:,:,:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span><span class="o">*</span><span class="n">cfg</span><span class="o">.</span><span class="n">stride</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">cfg</span><span class="o">.</span><span class="n">stride</span> <span class="o">+</span> <span class="n">DZ</span><span class="p">[:,:,:,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">DZ</span><span class="p">[:,:,:,</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">Xs</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">Ys</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">Ps</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">pose</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">],</span> <span class="n">num_outputs</span><span class="o">*</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;num_joints&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">pose</span><span class="p">[:,</span><span class="mi">0</span><span class="p">::</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">Xs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batchsize</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">pose</span><span class="p">[:,</span><span class="mi">1</span><span class="p">::</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">Ys</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batchsize</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">pose</span><span class="p">[:,</span><span class="mi">2</span><span class="p">::</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">Ps</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batchsize</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">outall</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">scmap</span><span class="p">,</span> <span class="n">locref</span><span class="p">,</span> <span class="n">pose</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pose</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

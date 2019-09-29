@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_tensorflow.util.visualize &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_tensorflow.util.visualize</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_tensorflow.util.visualize</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Adapted from DeeperCut by Eldar Insafutdinov</span>
+<span class="sd">https://github.com/eldar/pose-tensorflow</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.misc</span> <span class="k">import</span> <span class="n">imresize</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DLClight&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;AGG&#39;</span><span class="p">)</span> <span class="c1">#anti-grain geometry engine #https://matplotlib.org/faq/usage_faq.html</span>
+<span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Darwin&#39;</span><span class="p">:</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;WxAgg&#39;</span><span class="p">)</span> <span class="c1">#TkAgg</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;TkAgg&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+
+<span class="k">def</span> <span class="nf">_npcircle</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">transparency</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Draw a circle on an image using only numpy methods.&quot;&quot;&quot;</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
+    <span class="n">cx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span>
+    <span class="n">cy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cy</span><span class="p">)</span>
+    <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ogrid</span><span class="p">[</span><span class="o">-</span><span class="n">radius</span><span class="p">:</span> <span class="n">radius</span><span class="p">,</span> <span class="o">-</span><span class="n">radius</span><span class="p">:</span> <span class="n">radius</span><span class="p">]</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">image</span><span class="p">[</span><span class="n">cy</span><span class="o">-</span><span class="n">radius</span><span class="p">:</span><span class="n">cy</span><span class="o">+</span><span class="n">radius</span><span class="p">,</span> <span class="n">cx</span><span class="o">-</span><span class="n">radius</span><span class="p">:</span><span class="n">cx</span><span class="o">+</span><span class="n">radius</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">image</span><span class="p">[</span><span class="n">cy</span><span class="o">-</span><span class="n">radius</span><span class="p">:</span><span class="n">cy</span><span class="o">+</span><span class="n">radius</span><span class="p">,</span> <span class="n">cx</span><span class="o">-</span><span class="n">radius</span><span class="p">:</span><span class="n">cx</span><span class="o">+</span><span class="n">radius</span><span class="p">][</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">transparency</span> <span class="o">+</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">color</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">transparency</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="check_point"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.util.html#deeplabcut.pose_estimation_tensorflow.util.visualize.check_point">[docs]</a><span class="k">def</span> <span class="nf">check_point</span><span class="p">(</span><span class="n">cur_x</span><span class="p">,</span> <span class="n">cur_y</span><span class="p">,</span> <span class="n">minx</span><span class="p">,</span> <span class="n">miny</span><span class="p">,</span> <span class="n">maxx</span><span class="p">,</span> <span class="n">maxy</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">minx</span> <span class="o">&lt;</span> <span class="n">cur_x</span> <span class="o">&lt;</span> <span class="n">maxx</span> <span class="ow">and</span> <span class="n">miny</span> <span class="o">&lt;</span> <span class="n">cur_y</span> <span class="o">&lt;</span> <span class="n">maxy</span></div>
+
+
+<div class="viewcode-block" id="visualize_joints"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.util.html#deeplabcut.pose_estimation_tensorflow.util.visualize.visualize_joints">[docs]</a><span class="k">def</span> <span class="nf">visualize_joints</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">pose</span><span class="p">):</span>
+    <span class="n">marker_size</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">minx</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">marker_size</span>
+    <span class="n">miny</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">marker_size</span>
+    <span class="n">maxx</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">marker_size</span>
+    <span class="n">maxy</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">marker_size</span>
+    <span class="n">num_joints</span> <span class="o">=</span> <span class="n">pose</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">visim</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">245</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">131</span><span class="p">,</span> <span class="mi">250</span><span class="p">],</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">245</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">131</span><span class="p">,</span> <span class="mi">250</span><span class="p">],</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">p_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_joints</span><span class="p">):</span>
+        <span class="n">cur_x</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="n">p_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">cur_y</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="n">p_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">check_point</span><span class="p">(</span><span class="n">cur_x</span><span class="p">,</span> <span class="n">cur_y</span><span class="p">,</span> <span class="n">minx</span><span class="p">,</span> <span class="n">miny</span><span class="p">,</span> <span class="n">maxx</span><span class="p">,</span> <span class="n">maxy</span><span class="p">):</span>
+            <span class="n">_npcircle</span><span class="p">(</span><span class="n">visim</span><span class="p">,</span>
+                      <span class="n">cur_x</span><span class="p">,</span> <span class="n">cur_y</span><span class="p">,</span>
+                      <span class="n">marker_size</span><span class="p">,</span>
+                      <span class="n">colors</span><span class="p">[</span><span class="n">p_idx</span><span class="p">],</span>
+                      <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">visim</span></div>
+
+
+<div class="viewcode-block" id="show_heatmaps"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.util.html#deeplabcut.pose_estimation_tensorflow.util.visualize.show_heatmaps">[docs]</a><span class="k">def</span> <span class="nf">show_heatmaps</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">scmap</span><span class="p">,</span> <span class="n">pose</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;jet&quot;</span><span class="p">):</span>
+    <span class="n">interp</span> <span class="o">=</span> <span class="s2">&quot;bilinear&quot;</span>
+    <span class="n">all_joints</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">all_joints</span>
+    <span class="n">all_joints_names</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">all_joints_names</span>
+    <span class="n">subplot_width</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">subplot_height</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">all_joints</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">subplot_width</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">axarr</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">subplot_height</span><span class="p">,</span> <span class="n">subplot_width</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pidx</span><span class="p">,</span> <span class="n">part</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_joints</span><span class="p">):</span>
+        <span class="n">plot_j</span> <span class="o">=</span> <span class="p">(</span><span class="n">pidx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">subplot_width</span>
+        <span class="n">plot_i</span> <span class="o">=</span> <span class="p">(</span><span class="n">pidx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">subplot_width</span>
+        <span class="n">scmap_part</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">scmap</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">part</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">scmap_part</span> <span class="o">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">scmap_part</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="n">interp</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">)</span>
+        <span class="n">scmap_part</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">scmap_part</span><span class="p">,</span> <span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="s1">&#39;minimum&#39;</span><span class="p">)</span>
+        <span class="n">curr_plot</span> <span class="o">=</span> <span class="n">axarr</span><span class="p">[</span><span class="n">plot_j</span><span class="p">,</span> <span class="n">plot_i</span><span class="p">]</span>
+        <span class="n">curr_plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">all_joints_names</span><span class="p">[</span><span class="n">pidx</span><span class="p">])</span>
+        <span class="n">curr_plot</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+        <span class="n">curr_plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">interp</span><span class="p">)</span>
+        <span class="n">curr_plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">scmap_part</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">interp</span><span class="p">)</span>
+
+    <span class="n">curr_plot</span> <span class="o">=</span> <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">curr_plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Pose&#39;</span><span class="p">)</span>
+    <span class="n">curr_plot</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+    <span class="n">curr_plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">visualize_joints</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pose</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="waitforbuttonpress"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.util.html#deeplabcut.pose_estimation_tensorflow.util.visualize.waitforbuttonpress">[docs]</a><span class="k">def</span> <span class="nf">waitforbuttonpress</span><span class="p">():</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">waitforbuttonpress</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

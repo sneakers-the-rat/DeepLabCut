@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.post_processing.filtering &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.post_processing.filtering</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.post_processing.filtering</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+<span class="sd">Please see AUTHORS for contributors.</span>
+
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">auxiliaryfunctions</span><span class="p">,</span> <span class="n">visualization</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.utils</span> <span class="k">import</span> <span class="n">frameselectiontools</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.refine_training_dataset.outlier_frames</span> <span class="k">import</span> <span class="n">FitSARIMAXModel</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">skimage.util</span> <span class="k">import</span> <span class="n">img_as_ubyte</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">signal</span>
+
+
+<div class="viewcode-block" id="filterpredictions"><a class="viewcode-back" href="../../../source/deeplabcut.post_processing.html#deeplabcut.post_processing.filtering.filterpredictions">[docs]</a><span class="k">def</span> <span class="nf">filterpredictions</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">video</span><span class="p">,</span><span class="n">videotype</span><span class="o">=</span><span class="s1">&#39;avi&#39;</span><span class="p">,</span><span class="n">shuffle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">trainingsetindex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">filtertype</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">,</span><span class="n">windowlength</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">p_bound</span><span class="o">=.</span><span class="mi">001</span><span class="p">,</span><span class="n">ARdegree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">MAdegree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">alpha</span><span class="o">=.</span><span class="mi">01</span><span class="p">,</span><span class="n">save_as_csv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">destfolder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    Fits frame-by-frame pose predictions with ARIMA model (filtertype=&#39;arima&#39;) or median filter (default).</span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : string</span>
+<span class="sd">        Full path of the config.yaml file as a string.</span>
+
+<span class="sd">    video : string</span>
+<span class="sd">        Full path of the video to extract the frame from. Make sure that this video is already analyzed.</span>
+
+<span class="sd">    shuffle : int, optional</span>
+<span class="sd">        The shufle index of training dataset. The extracted frames will be stored in the labeled-dataset for</span>
+<span class="sd">        the corresponding shuffle of training dataset. Default is set to 1</span>
+
+<span class="sd">    trainingsetindex: int, optional</span>
+<span class="sd">        Integer specifying which TrainingsetFraction to use. By default the first (note that TrainingFraction is a list in config.yaml).</span>
+
+<span class="sd">    filtertype: string</span>
+<span class="sd">        Select which filter, &#39;arima&#39; or &#39;median&#39; filter. </span>
+<span class="sd">    </span>
+<span class="sd">    windowlength: int</span>
+<span class="sd">        For filtertype=&#39;median&#39; filters the input array using a local window-size given by windowlength. The array will automatically be zero-padded.</span>
+<span class="sd">        https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.medfilt.html The windowlenght should be an odd number.</span>
+
+<span class="sd">    p_bound: float between 0 and 1, optional</span>
+<span class="sd">        For filtertype &#39;arima&#39; this parameter defines the likelihood below, </span>
+<span class="sd">        below which a body part will be consided as missing data for filtering purposes.</span>
+
+<span class="sd">    ARdegree: int, optional</span>
+<span class="sd">        For filtertype &#39;arima&#39; Autoregressive degree of Sarimax model degree.</span>
+<span class="sd">        see https://www.statsmodels.org/dev/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html</span>
+
+<span class="sd">    MAdegree: int</span>
+<span class="sd">        For filtertype &#39;arima&#39; Moving Avarage degree of Sarimax model degree.</span>
+<span class="sd">        See https://www.statsmodels.org/dev/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html</span>
+
+<span class="sd">    alpha: float</span>
+<span class="sd">        Significance level for detecting outliers based on confidence interval of fitted SARIMAX model.</span>
+
+<span class="sd">    save_as_csv: bool, optional</span>
+<span class="sd">        Saves the predictions in a .csv file. The default is ``False``; if provided it must be either ``True`` or ``False``</span>
+
+<span class="sd">    destfolder: string, optional</span>
+<span class="sd">        Specifies the destination folder for analysis data (default is the path of the video). Note that for subsequent analysis this </span>
+<span class="sd">        folder also needs to be passed.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    Arima model:</span>
+<span class="sd">    deeplabcut.filterpredictions(&#39;C:\\myproject\\reaching-task\\config.yaml&#39;,[&#39;C:\\myproject\\trailtracking-task\\test.mp4&#39;],shuffle=3,filterype=&#39;arima&#39;,ARdegree=5,MAdegree=2)</span>
+<span class="sd">    </span>
+<span class="sd">    Use median filter over 10bins:</span>
+<span class="sd">    deeplabcut.filterpredictions(&#39;C:\\myproject\\reaching-task\\config.yaml&#39;,[&#39;C:\\myproject\\trailtracking-task\\test.mp4&#39;],shuffle=3,windowlength=10)</span>
+<span class="sd">    </span>
+<span class="sd">    One can then use the filtered rather than the frame-by-frame predictions by calling:</span>
+<span class="sd">        </span>
+<span class="sd">    deeplabcut.plot_trajectories(&#39;C:\\myproject\\reaching-task\\config.yaml&#39;,[&#39;C:\\myproject\\trailtracking-task\\test.mp4&#39;],shuffle=3,filtered=True)</span>
+
+<span class="sd">    deeplabcut.create_labeled_video(&#39;C:\\myproject\\reaching-task\\config.yaml&#39;,[&#39;C:\\myproject\\trailtracking-task\\test.mp4&#39;],shuffle=3,filtered=True)</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    Returns filtered pandas array with the same structure as normal output of network.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">scorer</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">GetScorerName</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="n">shuffle</span><span class="p">,</span><span class="n">trainFraction</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;TrainingFraction&#39;</span><span class="p">][</span><span class="n">trainingsetindex</span><span class="p">])</span>
+    <span class="n">Videos</span><span class="o">=</span><span class="n">auxiliaryfunctions</span><span class="o">.</span><span class="n">Getlistofvideos</span><span class="p">(</span><span class="n">video</span><span class="p">,</span><span class="n">videotype</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Videos</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">Videos</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="n">destfolder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">destfolder</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Filtering with </span><span class="si">%s</span><span class="s2"> model </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">filtertype</span><span class="p">,</span><span class="n">video</span><span class="p">))</span>
+<span class="c1">#            print(&quot;Filtering with ARIMA model %s&quot;,video)</span>
+            <span class="n">videofolder</span> <span class="o">=</span> <span class="n">destfolder</span>
+            <span class="n">dataname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">+</span><span class="n">scorer</span>
+            <span class="n">filteredname</span><span class="o">=</span><span class="n">dataname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;filtered.h5&#39;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">Dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="n">filteredname</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Video already filtered...&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">Dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="n">dataname</span><span class="o">+</span><span class="s1">&#39;.h5&#39;</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">bpindex</span><span class="p">,</span><span class="n">bp</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;bodyparts&#39;</span><span class="p">])):</span>
+                        <span class="n">pdindex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([[</span><span class="n">scorer</span><span class="p">],</span> <span class="p">[</span><span class="n">bp</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]],</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;scorer&#39;</span><span class="p">,</span> <span class="s1">&#39;bodyparts&#39;</span><span class="p">,</span> <span class="s1">&#39;coords&#39;</span><span class="p">])</span>
+                        <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">p</span><span class="o">=</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">Dataframe</span><span class="p">[</span><span class="n">scorer</span><span class="p">][</span><span class="n">bp</span><span class="p">][</span><span class="s1">&#39;likelihood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+                        
+                        <span class="k">if</span> <span class="n">filtertype</span><span class="o">==</span><span class="s1">&#39;arima&#39;</span><span class="p">:</span>
+                            <span class="n">meanx</span><span class="p">,</span><span class="n">CIx</span><span class="o">=</span><span class="n">FitSARIMAXModel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">p_bound</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">ARdegree</span><span class="p">,</span><span class="n">MAdegree</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+                            <span class="n">meany</span><span class="p">,</span><span class="n">CIy</span><span class="o">=</span><span class="n">FitSARIMAXModel</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">p_bound</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">ARdegree</span><span class="p">,</span><span class="n">MAdegree</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+                            
+                            <span class="n">meanx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="n">meany</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">meanx</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">medfilt</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">kernel_size</span><span class="o">=</span><span class="n">windowlength</span><span class="p">)</span>
+                            <span class="n">meany</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">medfilt</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">kernel_size</span><span class="o">=</span><span class="n">windowlength</span><span class="p">)</span>
+                            
+                        <span class="k">if</span> <span class="n">bpindex</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                            <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">meanx</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">meany</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]),</span> <span class="n">columns</span><span class="o">=</span><span class="n">pdindex</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">item</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">meanx</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">meany</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]),</span> <span class="n">columns</span><span class="o">=</span><span class="n">pdindex</span><span class="p">)</span>
+                            <span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">T</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    
+                    <span class="n">data</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="n">filteredname</span><span class="p">),</span> <span class="s1">&#39;df_with_missing&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">save_as_csv</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving filtered csv poses!&quot;</span><span class="p">)</span>
+                        <span class="n">data</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">videofolder</span><span class="p">,</span><span class="n">filteredname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;.csv&#39;</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Video not analyzed -- Run analyze_videos first.&quot;</span><span class="p">)</span></div>
+                    
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;videos&#39;</span><span class="p">)</span>
+    <span class="n">cli_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

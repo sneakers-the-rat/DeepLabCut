@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.pose_estimation_tensorflow.nnet.pose_net &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.pose_estimation_tensorflow.nnet.pose_net</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.pose_estimation_tensorflow.nnet.pose_net</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Source: DeeperCut by Eldar Insafutdinov</span>
+<span class="sd">https://github.com/eldar/pose-tensorflow</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">tensorflow.contrib.slim</span> <span class="k">as</span> <span class="nn">slim</span>
+<span class="kn">from</span> <span class="nn">tensorflow.contrib.slim.nets</span> <span class="k">import</span> <span class="n">resnet_v1</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.dataset.pose_dataset</span> <span class="k">import</span> <span class="n">Batch</span>
+<span class="kn">from</span> <span class="nn">deeplabcut.pose_estimation_tensorflow.nnet</span> <span class="k">import</span> <span class="n">losses</span>
+<span class="n">vers</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">12</span><span class="p">:</span>
+    <span class="n">TF</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">TF</span><span class="o">=</span><span class="n">tf</span>
+
+<span class="n">net_funcs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;resnet_50&#39;</span><span class="p">:</span> <span class="n">resnet_v1</span><span class="o">.</span><span class="n">resnet_v1_50</span><span class="p">,</span>
+             <span class="s1">&#39;resnet_101&#39;</span><span class="p">:</span> <span class="n">resnet_v1</span><span class="o">.</span><span class="n">resnet_v1_101</span><span class="p">,</span>
+             <span class="s1">&#39;resnet_152&#39;</span><span class="p">:</span> <span class="n">resnet_v1</span><span class="o">.</span><span class="n">resnet_v1_152</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="prediction_layer"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.prediction_layer">[docs]</a><span class="k">def</span> <span class="nf">prediction_layer</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">slim</span><span class="o">.</span><span class="n">arg_scope</span><span class="p">([</span><span class="n">slim</span><span class="o">.</span><span class="n">conv2d</span><span class="p">,</span> <span class="n">slim</span><span class="o">.</span><span class="n">conv2d_transpose</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;SAME&#39;</span><span class="p">,</span>
+                        <span class="n">activation_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalizer_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">weights_regularizer</span><span class="o">=</span><span class="n">slim</span><span class="o">.</span><span class="n">l2_regularizer</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">weight_decay</span><span class="p">)):</span>
+        <span class="k">with</span> <span class="n">TF</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">slim</span><span class="o">.</span><span class="n">conv2d_transpose</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">,</span>
+                                         <span class="n">kernel_size</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                         <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;block4&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pred</span></div>
+
+
+<div class="viewcode-block" id="get_batch_spec"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.get_batch_spec">[docs]</a><span class="k">def</span> <span class="nf">get_batch_spec</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="n">num_joints</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">num_joints</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">batch_size</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">Batch</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+        <span class="n">Batch</span><span class="o">.</span><span class="n">part_score_targets</span><span class="p">:</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">num_joints</span><span class="p">],</span>
+        <span class="n">Batch</span><span class="o">.</span><span class="n">part_score_weights</span><span class="p">:</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">num_joints</span><span class="p">],</span>
+        <span class="n">Batch</span><span class="o">.</span><span class="n">locref_targets</span><span class="p">:</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">num_joints</span> <span class="o">*</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="n">Batch</span><span class="o">.</span><span class="n">locref_mask</span><span class="p">:</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">num_joints</span> <span class="o">*</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="PoseNet"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet">[docs]</a><span class="k">class</span> <span class="nc">PoseNet</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
+
+<div class="viewcode-block" id="PoseNet.extract_features"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.extract_features">[docs]</a>    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">net_fun</span> <span class="o">=</span> <span class="n">net_funcs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">net_type</span><span class="p">]</span>
+
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">mean_pixel</span><span class="p">,</span>
+                           <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;img_mean&#39;</span><span class="p">)</span>
+        <span class="n">im_centered</span> <span class="o">=</span> <span class="n">inputs</span> <span class="o">-</span> <span class="n">mean</span>
+
+        <span class="c1"># The next part of the code depends upon which tensorflow version you have.</span>
+        <span class="n">vers</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">__version__</span>
+        <span class="n">vers</span> <span class="o">=</span> <span class="n">vers</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="c1">#Updated based on https://github.com/AlexEMG/DeepLabCut/issues/44</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">vers</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">:</span> <span class="c1">#check if lower than version 1.4.</span>
+            <span class="k">with</span> <span class="n">slim</span><span class="o">.</span><span class="n">arg_scope</span><span class="p">(</span><span class="n">resnet_v1</span><span class="o">.</span><span class="n">resnet_arg_scope</span><span class="p">(</span><span class="kc">False</span><span class="p">)):</span>
+                <span class="n">net</span><span class="p">,</span> <span class="n">end_points</span> <span class="o">=</span> <span class="n">net_fun</span><span class="p">(</span><span class="n">im_centered</span><span class="p">,</span>
+                                          <span class="n">global_pool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output_stride</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">slim</span><span class="o">.</span><span class="n">arg_scope</span><span class="p">(</span><span class="n">resnet_v1</span><span class="o">.</span><span class="n">resnet_arg_scope</span><span class="p">()):</span>
+                <span class="n">net</span><span class="p">,</span> <span class="n">end_points</span> <span class="o">=</span> <span class="n">net_fun</span><span class="p">(</span><span class="n">im_centered</span><span class="p">,</span>
+                                          <span class="n">global_pool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output_stride</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">net</span><span class="p">,</span><span class="n">end_points</span></div>
+
+<div class="viewcode-block" id="PoseNet.prediction_layers"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.prediction_layers">[docs]</a>    <span class="k">def</span> <span class="nf">prediction_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">end_points</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span>
+
+        <span class="n">num_layers</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;resnet_([0-9]*)&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">net_type</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">layer_name</span> <span class="o">=</span> <span class="s1">&#39;resnet_v1_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_layers</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/block</span><span class="si">{}</span><span class="s1">/unit_</span><span class="si">{}</span><span class="s1">/bottleneck_v1&#39;</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">with</span> <span class="n">TF</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s1">&#39;pose&#39;</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">):</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;part_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prediction_layer</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="s1">&#39;part_pred&#39;</span><span class="p">,</span>
+                                                <span class="n">cfg</span><span class="o">.</span><span class="n">num_joints</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">location_refinement</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;locref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prediction_layer</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="s1">&#39;locref_pred&#39;</span><span class="p">,</span>
+                                                 <span class="n">cfg</span><span class="o">.</span><span class="n">num_joints</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">intermediate_supervision</span><span class="p">:</span>
+                <span class="n">interm_name</span> <span class="o">=</span> <span class="n">layer_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">intermediate_supervision_layer</span><span class="p">)</span>
+                <span class="n">block_interm_out</span> <span class="o">=</span> <span class="n">end_points</span><span class="p">[</span><span class="n">interm_name</span><span class="p">]</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;part_pred_interm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prediction_layer</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">block_interm_out</span><span class="p">,</span>
+                                                           <span class="s1">&#39;intermediate_supervision&#39;</span><span class="p">,</span>
+                                                           <span class="n">cfg</span><span class="o">.</span><span class="n">num_joints</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="PoseNet.get_net"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.get_net">[docs]</a>    <span class="k">def</span> <span class="nf">get_net</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">net</span><span class="p">,</span> <span class="n">end_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_layers</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">end_points</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PoseNet.test"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.test">[docs]</a>    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">heads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_net</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">heads</span><span class="p">[</span><span class="s1">&#39;part_pred&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;part_prob&#39;</span><span class="p">:</span> <span class="n">prob</span><span class="p">,</span> <span class="s1">&#39;locref&#39;</span><span class="p">:</span> <span class="n">heads</span><span class="p">[</span><span class="s1">&#39;locref&#39;</span><span class="p">]}</span></div>
+
+<div class="viewcode-block" id="PoseNet.train"><a class="viewcode-back" href="../../../../source/deeplabcut.pose_estimation_tensorflow.nnet.html#deeplabcut.pose_estimation_tensorflow.nnet.pose_net.PoseNet.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span>
+
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">deterministic</span><span class="p">:</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">set_random_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+        <span class="n">heads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_net</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">Batch</span><span class="o">.</span><span class="n">inputs</span><span class="p">])</span>
+
+        <span class="n">weigh_part_predictions</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">weigh_part_predictions</span>
+        <span class="n">part_score_weights</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="n">Batch</span><span class="o">.</span><span class="n">part_score_weights</span><span class="p">]</span> <span class="k">if</span> <span class="n">weigh_part_predictions</span> <span class="k">else</span> <span class="mf">1.0</span>
+
+        <span class="k">def</span> <span class="nf">add_part_loss</span><span class="p">(</span><span class="n">pred_layer</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">TF</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">sigmoid_cross_entropy</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">Batch</span><span class="o">.</span><span class="n">part_score_targets</span><span class="p">],</span>
+                                                   <span class="n">heads</span><span class="p">[</span><span class="n">pred_layer</span><span class="p">],</span>
+                                                   <span class="n">part_score_weights</span><span class="p">)</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">loss</span><span class="p">[</span><span class="s1">&#39;part_loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">add_part_loss</span><span class="p">(</span><span class="s1">&#39;part_pred&#39;</span><span class="p">)</span>
+        <span class="n">total_loss</span> <span class="o">=</span> <span class="n">loss</span><span class="p">[</span><span class="s1">&#39;part_loss&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">intermediate_supervision</span><span class="p">:</span>
+            <span class="n">loss</span><span class="p">[</span><span class="s1">&#39;part_loss_interm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">add_part_loss</span><span class="p">(</span><span class="s1">&#39;part_pred_interm&#39;</span><span class="p">)</span>
+            <span class="n">total_loss</span> <span class="o">=</span> <span class="n">total_loss</span> <span class="o">+</span> <span class="n">loss</span><span class="p">[</span><span class="s1">&#39;part_loss_interm&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">location_refinement</span><span class="p">:</span>
+            <span class="n">locref_pred</span> <span class="o">=</span> <span class="n">heads</span><span class="p">[</span><span class="s1">&#39;locref&#39;</span><span class="p">]</span>
+            <span class="n">locref_targets</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="n">Batch</span><span class="o">.</span><span class="n">locref_targets</span><span class="p">]</span>
+            <span class="n">locref_weights</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="n">Batch</span><span class="o">.</span><span class="n">locref_mask</span><span class="p">]</span>
+
+            <span class="n">loss_func</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">huber_loss</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">locref_huber_loss</span> <span class="k">else</span> <span class="n">tf</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">mean_squared_error</span>
+            <span class="n">loss</span><span class="p">[</span><span class="s1">&#39;locref_loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">locref_loss_weight</span> <span class="o">*</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">locref_targets</span><span class="p">,</span> <span class="n">locref_pred</span><span class="p">,</span> <span class="n">locref_weights</span><span class="p">)</span>
+            <span class="n">total_loss</span> <span class="o">=</span> <span class="n">total_loss</span> <span class="o">+</span> <span class="n">loss</span><span class="p">[</span><span class="s1">&#39;locref_loss&#39;</span><span class="p">]</span>
+
+        <span class="c1"># loss[&#39;total_loss&#39;] = slim.losses.get_total_loss(add_regularization_losses=params.regularize)</span>
+        <span class="n">loss</span><span class="p">[</span><span class="s1">&#39;total_loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_loss</span>
+        <span class="k">return</span> <span class="n">loss</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>deeplabcut.utils.auxfun_videos &mdash; DeepLabCut  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DeepLabCut
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.create_project.html">Create Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.generate_training_dataset.html">Generate Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_3d.html">Pose Estimation 3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.pose_estimation_tensorflow.html">Pose Estimatino TF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.post_processing.html">Post-Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.refine_training_dataset.html">Refine Training Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deeplabcut.utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DeepLabCut</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>deeplabcut.utils.auxfun_videos</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for deeplabcut.utils.auxfun_videos</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DeepLabCut2.0 Toolbox (deeplabcut.org)</span>
+<span class="sd">© A. &amp; M. Mathis Labs</span>
+<span class="sd">https://github.com/AlexEMG/DeepLabCut</span>
+<span class="sd">Please see AUTHORS for contributors.</span>
+
+<span class="sd">https://github.com/AlexEMG/DeepLabCut/blob/master/AUTHORS</span>
+<span class="sd">Licensed under GNU Lesser General Public License v3.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">subprocess</span><span class="o">,</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="ShortenVideo"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.ShortenVideo">[docs]</a><span class="k">def</span> <span class="nf">ShortenVideo</span><span class="p">(</span><span class="n">vname</span><span class="p">,</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;00:00:01&#39;</span><span class="p">,</span><span class="n">stop</span><span class="o">=</span><span class="s1">&#39;00:01:00&#39;</span><span class="p">,</span><span class="n">outsuffix</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">,</span><span class="n">outpath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Auxiliary function to shorten video and output with outsuffix appended.</span>
+<span class="sd">    to the same folder from start (hours:minutes:seconds) to stop (hours:minutes:seconds).</span>
+
+<span class="sd">    Returns the full path to the shortened video!</span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    ----------</span>
+<span class="sd">    videos : string</span>
+<span class="sd">        A string containing the full paths of the video.</span>
+
+<span class="sd">    start: hours:minutes:seconds</span>
+<span class="sd">        Time formatted in hours:minutes:seconds, where shortened video shall start.</span>
+
+<span class="sd">    stop: hours:minutes:seconds</span>
+<span class="sd">        Time formatted in hours:minutes:seconds, where shortened video shall end.</span>
+
+<span class="sd">    outsuffix: str</span>
+<span class="sd">        Suffix for output videoname (see example).</span>
+
+<span class="sd">    outpath: str</span>
+<span class="sd">        Output path for saving video to (by default will be the same folder as the video)</span>
+
+<span class="sd">    Linux/MacOs</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.ShortenVideo(&#39;/data/videos/mouse1.avi&#39;)</span>
+
+<span class="sd">    Extracts (sub)video from 1st second to 1st minutes (default values) and saves it in /data/videos as mouse1short.avi</span>
+
+<span class="sd">    Windows:</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.ShortenVideo(&#39;C:\\yourusername\\rig-95\\Videos\\reachingvideo1.avi&#39;, start=&#39;00:17:00&#39;,stop=&#39;00:22:00&#39;,outsuffix=&#39;brief&#39;)</span>
+
+<span class="sd">    Extracts (sub)video from minute 17 to 22 and and saves it in C:\\yourusername\\rig-95\\Videos as reachingvideo1brief.avi</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">outpath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">vidpath</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">vname</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vidpath</span><span class="o">=</span><span class="n">outpath</span>
+
+    <span class="c1">#TODO check if those times exist...</span>
+    <span class="n">newfilename</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vidpath</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">vname</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">outsuffix</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">vname</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Slicing and saving to name&quot;</span><span class="p">,</span> <span class="n">newfilename</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;ffmpeg&#39;</span><span class="p">,</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span><span class="n">vname</span><span class="p">,</span><span class="s1">&#39;-ss&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">start</span><span class="p">),</span><span class="s1">&#39;-to&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">stop</span><span class="p">),</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span><span class="s1">&#39;copy&#39;</span><span class="p">,</span><span class="n">newfilename</span><span class="p">])</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">newfilename</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DownSampleVideo"><a class="viewcode-back" href="../../../source/deeplabcut.utils.html#deeplabcut.utils.DownSampleVideo">[docs]</a><span class="k">def</span> <span class="nf">DownSampleVideo</span><span class="p">(</span><span class="n">vname</span><span class="p">,</span><span class="n">width</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span><span class="n">height</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="n">outsuffix</span><span class="o">=</span><span class="s1">&#39;cropped&#39;</span><span class="p">,</span><span class="n">outpath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Auxiliary function to downsample a video and output it to the same folder with &quot;outsuffix&quot; appended in its name.</span>
+<span class="sd">    Width and height will control the new dimensions. You can also pass only height or width and set the other one to -1,</span>
+<span class="sd">    this will keep the aspect ratio identical.</span>
+
+<span class="sd">    Returns the full path to the downsampled video!</span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vname : string</span>
+<span class="sd">        A string containing the full path of the video.</span>
+
+<span class="sd">    width: int</span>
+<span class="sd">        width of output video</span>
+
+<span class="sd">    height: int</span>
+<span class="sd">        height of output video.</span>
+
+<span class="sd">    outsuffix: str</span>
+<span class="sd">        Suffix for output videoname (see example).</span>
+
+<span class="sd">    outpath: str</span>
+<span class="sd">        Output path for saving video to (by default will be the same folder as the video)</span>
+
+<span class="sd">    Linux/MacOs</span>
+<span class="sd">    &gt;&gt;&gt; deeplabcut.DownSampleVideo(&#39;/data/videos/mouse1.avi&#39;)</span>
+
+<span class="sd">    Downsamples the video using default values and saves it in /data/videos as mouse1cropped.avi</span>
+
+<span class="sd">    Windows:</span>
+<span class="sd">    &gt;&gt;&gt; shortenedvideoname=deeplabcut.DownSampleVideo(&#39;C:\\yourusername\\rig-95\\Videos\\reachingvideo1.avi&#39;, width=220,height=320,outsuffix=&#39;cropped&#39;)</span>
+
+<span class="sd">    Downsamples the video to a width of 220 and height of 320 and saves it in C:\\yourusername\\rig-95\\Videos as reachingvideo1cropped.avi</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">outpath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">vidpath</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">vname</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vidpath</span><span class="o">=</span><span class="n">outpath</span>
+
+    <span class="n">newfilename</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vidpath</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">vname</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">outsuffix</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">vname</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downsampling and saving to name&quot;</span><span class="p">,</span> <span class="n">newfilename</span><span class="p">)</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;ffmpeg -i </span><span class="si">{vname}</span><span class="s2"> -filter:v scale=</span><span class="si">{width}</span><span class="s2">:</span><span class="si">{height}</span><span class="s2"> -c:a copy </span><span class="si">{newfilename}</span><span class="s2">&quot;</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">newfilename</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Test
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
