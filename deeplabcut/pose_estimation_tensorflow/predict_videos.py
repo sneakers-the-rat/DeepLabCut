@@ -33,7 +33,7 @@ from skimage.util import img_as_ubyte
 ####################################################
 
 def analyze_videos(config, videos, videotype='avi', shuffle=1, trainingsetindex=0, gputouse=None, save_as_csv=False,
-                   destfolder=None, batchsize=None, crop=None, get_nframesfrommetadata=True, TFGPUinference=True,
+                   destfolder=None, batchsize=None, crop=None, get_nframesfrommetadata=True, TFGPUinference=True, useFrozen=False,
                    dynamic=(False, .5, 10)):
     """
     Makes prediction based on a trained network. The index of the trained network is specified by parameters in the config file (in particular the variable 'snapshotindex')
@@ -82,6 +82,9 @@ def analyze_videos(config, videos, videotype='avi', shuffle=1, trainingsetindex=
     TFGPUinference: bool, default: True
         Perform inference on GPU with Tensorflow code. Introduced in "Pretraining boosts out-of-domain robustness for pose estimation" by
         Alexander Mathis, Mert Yüksekgönül, Byron Rogers, Matthias Bethge, Mackenzie W. Mathis Source: https://arxiv.org/abs/1909.11229
+
+    useFrozen: bool, optional
+        use frozen tensorflow model
 
     dynamic: triple containing (state,detectiontreshold,margin)
         If the state is true, then dynamic cropping will be performed. That means that if an object is detected (i.e. any body part > detectiontreshold),
@@ -202,6 +205,8 @@ def analyze_videos(config, videos, videotype='avi', shuffle=1, trainingsetindex=
     #sess, inputs, outputs = predict.setup_pose_prediction(dlc_cfg)
     if TFGPUinference:
         sess, inputs, outputs = predict.setup_GPUpose_prediction(dlc_cfg)
+    elif useFrozen:
+        sess, inputs, outputs = predict.setup_frozen_prediction(dlc_cfg)
     else:
         sess, inputs, outputs = predict.setup_pose_prediction(dlc_cfg)
 
@@ -217,7 +222,7 @@ def analyze_videos(config, videos, videotype='avi', shuffle=1, trainingsetindex=
     if len(Videos)>0:
         #looping over videos
         for video in Videos:
-            DLCscorer=AnalyzeVideo(video,DLCscorer,DLCscorerlegacy,trainFraction,cfg,dlc_cfg,sess,inputs, outputs,pdindex,save_as_csv, destfolder,TFGPUinference,dynamic)
+            DLCscorer=AnalyzeVideo(video,DLCscorer,DLCscorerlegacy,trainFraction,cfg,dlc_cfg,sess,inputs, outputs,pdindex,save_as_csv, destfolder,TFGPUinference,useFrozen,dynamic)
 
         os.chdir(str(start_path))
         print("The videos are analyzed. Now your research can truly start! \n You can create labeled videos with 'create_labeled_video'.")
@@ -348,6 +353,83 @@ def GetPoseS_GTF(cfg,dlc_cfg, sess, inputs, outputs,cap,nframes):
     pbar.close()
     return PredictedData,nframes
 
+def GetPoseS_Frozen(cfg, dlc_cfg, sess, inputs, outputs, cap, nframes):
+    ''' Non batch wise pose estimation for video cap.'''
+    if cfg['cropping']:
+        ny,nx=checkcropping(cfg,cap)
+
+    PredictedData = np.zeros((nframes, dlc_cfg['num_outputs'] * 3 * len(dlc_cfg['all_joints_names'])))
+    pbar=tqdm(total=nframes)
+    counter=0
+    step=max(10,int(nframes/100))
+    while(cap.isOpened()):
+            if counter%step==0:
+                pbar.update(step)
+
+            ret, frame = cap.read()
+            if ret:
+                frame=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                if cfg['cropping']:
+                    frame= img_as_ubyte(frame[cfg['y1']:cfg['y2'],cfg['x1']:cfg['x2']])
+                else:
+                    frame = img_as_ubyte(frame)
+                pose = sess.run(outputs, feed_dict={inputs: np.expand_dims(frame, axis=0).astype(float)})
+                PredictedData[counter, :] = pose.flatten()  # NOTE: thereby cfg['all_joints_names'] should be same order as bodyparts!
+            else:
+                nframes=counter
+                break
+            counter+=1
+
+    pbar.close()
+    return PredictedData,nframes
+
+def GetPoseF_Frozen(cfg, dlc_cfg, sess, inputs, outputs, cap, nframes, batchsize):
+    ''' Batchwise prediction of pose '''
+    PredictedData = np.zeros((nframes, 3 * len(dlc_cfg['all_joints_names'])))
+    batch_ind = 0 # keeps track of which image within a batch should be written to
+    batch_num = 0 # keeps track of which batch you are at
+    ny,nx=int(cap.get(4)),int(cap.get(3))
+    if cfg['cropping']:
+        ny,nx=checkcropping(cfg,cap)
+
+    frames = np.empty((batchsize, ny, nx, 3), dtype='ubyte') # this keeps all frames in a batch
+    pbar=tqdm(total=nframes)
+    counter=0
+    step=max(10,int(nframes/100))
+    while(cap.isOpened()):
+            if counter%step==0:
+                pbar.update(step)
+            ret, frame = cap.read()
+            if ret:
+                frame=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                if cfg['cropping']:
+                    frames[batch_ind] = img_as_ubyte(frame[cfg['y1']:cfg['y2'],cfg['x1']:cfg['x2']])
+                else:
+                    frames[batch_ind] = img_as_ubyte(frame)
+
+                if batch_ind==batchsize-1:
+                    pose = sess.run(outputs, feed_dict={inputs: frames})
+                    pose[:, [0,1,2]] = pose[:, [1,0,2]] #change order to have x,y,confidence
+                    pose=np.reshape(pose,(batchsize,-1)) #bring into batchsize times x,y,conf etc.
+                    PredictedData[batch_num*batchsize:(batch_num+1)*batchsize, :] = pose
+                    batch_ind = 0
+                    batch_num += 1
+                else:
+                   batch_ind+=1
+            else:
+                nframes = counter
+                print("Detected frames: ", nframes)
+                if batch_ind>0:
+                    pose = sess.run(outputs, feed_dict={inputs: frames})
+                    pose[:, [0,1,2]] = pose[:, [1,0,2]] #change order to have x,y,confidence
+                    pose=np.reshape(pose,(batchsize,-1)) #bring into batchsize times x,y,conf etc.
+                    PredictedData[batch_num*batchsize:batch_num*batchsize+batch_ind, :] = pose[:batch_ind,:]
+                break
+            counter+=1
+
+    pbar.close()
+    return PredictedData,nframes
+
 def GetPoseF_GTF(cfg,dlc_cfg, sess, inputs, outputs,cap,nframes,batchsize):
     ''' Batchwise prediction of pose '''
     PredictedData = np.zeros((nframes, 3 * len(dlc_cfg['all_joints_names'])))
@@ -463,7 +545,7 @@ def GetPoseDynamic(cfg,dlc_cfg, sess, inputs, outputs,cap,nframes,detectiontresh
     pbar.close()
     return PredictedData,nframes
 
-def AnalyzeVideo(video,DLCscorer,DLCscorerlegacy,trainFraction,cfg,dlc_cfg,sess,inputs, outputs,pdindex,save_as_csv, destfolder=None,TFGPUinference=True,dynamic=(False,.5,10)):
+def AnalyzeVideo(video,DLCscorer,DLCscorerlegacy,trainFraction,cfg,dlc_cfg,sess,inputs, outputs,pdindex,save_as_csv, destfolder=None,TFGPUinference=True,useFrozen=False,dynamic=(False,.5,10)):
     ''' Helper function for analyzing a video. '''
     print("Starting to analyze % ", video)
     vname = Path(video).stem
@@ -495,11 +577,15 @@ def AnalyzeVideo(video,DLCscorer,DLCscorerlegacy,trainFraction,cfg,dlc_cfg,sess,
             if int(dlc_cfg["batch_size"])>1:
                 if TFGPUinference:
                     PredictedData,nframes=GetPoseF_GTF(cfg,dlc_cfg, sess, inputs, outputs,cap,nframes,int(dlc_cfg["batch_size"]))
+                elif useFrozen:
+                    PredictedData,nframes=GetPoseF_Frozen(cfg,dlc_cfg, sess, inputs, outputs, cap, nframes, int(dlc_cfg["batch_size"]))
                 else:
                     PredictedData,nframes=GetPoseF(cfg,dlc_cfg, sess, inputs, outputs,cap,nframes,int(dlc_cfg["batch_size"]))
             else:
                 if TFGPUinference:
-                    PredictedData,nframes=GetPoseS_GTF(cfg,dlc_cfg, sess, inputs, outputs,cap,nframes)
+                    PredictedData,nframes=GetPoseF_GTF(cfg,dlc_cfg, sess, inputs, outputs,cap,nframes,int(dlc_cfg["batch_size"]))
+                elif useFrozen:
+                    PredictedData,nframes=GetPoseF_Frozen(cfg, dlc_cfg, sess, inputs, outputs, cap, nframes, int(dlc_cfg["batch_size"]))
                 else:
                     PredictedData,nframes=GetPoseS(cfg,dlc_cfg, sess, inputs, outputs,cap,nframes)
 

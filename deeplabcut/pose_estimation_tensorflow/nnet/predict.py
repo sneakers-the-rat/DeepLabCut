@@ -201,3 +201,49 @@ def setup_GPUpose_prediction(cfg):
 
 def extract_GPUprediction(outputs, cfg):
     return outputs[0]
+
+def freeze_model(cfg):
+
+    """
+    Load a saved checkpoint, freeze and save the graph
+    From: https://leimao.github.io/blog/Save-Load-Inference-From-TF-Frozen-Graph/
+    """
+
+    from tensorflow.python.tools import freeze_graph
+
+    sess, _, _ = setup_GPUpose_prediction(cfg)
+    pbtxt_file = cfg.init_weights+'_frozen.pbtxt' if cfg.batch_size == 1 else cfg.init_weights+'_frozen_batch.pbtxt'
+    pb_file = cfg.init_weights+'_frozen.pb' if cfg.batch_size == 1 else cfg.init_weights+'_frozen_batch.pb'
+    tf.train.write_graph(sess.graph.as_graph_def(), '', pbtxt_file, as_text=True)
+    freeze_graph.freeze_graph(pbtxt_file, '', False,
+                              cfg.init_weights, "concat_1",
+                               "save/restore_all", "save/Const:0",
+                               pb_file, True, '')
+
+def setup_frozen_prediction(cfg, freeze=True):
+
+    pb_file = cfg.init_weights+'_frozen.pb' if cfg.batch_size == 1 else cfg.init_weights+'_frozen_batch.pb'
+
+    if not os.path.isfile(pb_file):
+        if freeze:
+            print("Frozen model not found, freezing model now...")
+            freeze_model(cfg)
+            print("Freezing complete!")
+        else:
+            print("Frozen model not found, using checkpoint instead!")
+            return setup_pose_prediction(cfg)
+
+    graph = tf.Graph()
+    with tf.gfile.GFile(pb_file, 'rb') as f:
+        graph_def = tf.GraphDef()
+        graph_def.ParseFromString(f.read())
+
+    with graph.as_default():
+        inputs = tf.placeholder(tf.float32, shape=[cfg.batch_size, None, None, 3])
+        tf.import_graph_def(graph_def, {'Placeholder' : inputs}, name='Placeholder')
+    graph.finalize()
+
+    sess = tf.Session(graph=graph)
+    outputs = graph.get_tensor_by_name("Placeholder_1/concat_1:0")
+
+    return sess, inputs, outputs
