@@ -16,7 +16,6 @@ GK 12/05/2019
 '''
 
 import cv2
-import time
 import os
 from pathlib import Path
 import numpy as np
@@ -24,7 +23,6 @@ from deeplabcut.utils import auxiliaryfunctions
 from deeplabcut.pose_estimation_tensorflow.nnet import predict
 from deeplabcut.pose_estimation_tensorflow.config import load_config
 from skimage.util import img_as_ubyte
-from skimage.draw import circle
 
 import tensorflow as tf
 
