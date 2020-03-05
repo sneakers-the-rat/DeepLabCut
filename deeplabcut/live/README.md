@@ -21,7 +21,16 @@ DLCLive parameters:
   - useTFGPUInference = bool, optional; Perform inference on GPU with Tensorflow code
   - processor = dlc pose processor object, optional
 
-#### Instructions for use:
+### Minimal installation:
+
+To install deeplabcut for the purpose of live inference, here are instructions to create a minimal conda environment:
+
+```
+conda create -n dlc_live python=3.6 tensorflow<-gpu>=1.13.1 wxpython shapely
+pip install git+https://github.com/gkane26/DeepLabCut.git@live
+```
+
+### Instructions for use:
 
 1. Initialize processor (if desired)
 2. Initialize the DLCLive object
