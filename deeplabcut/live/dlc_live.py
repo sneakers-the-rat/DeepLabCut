@@ -19,12 +19,14 @@ import cv2
 import os
 from pathlib import Path
 import numpy as np
+from skimage.util import img_as_ubyte
+import threading
+
+import tensorflow as tf
+
 from deeplabcut.utils import auxiliaryfunctions
 from deeplabcut.pose_estimation_tensorflow.nnet import predict
 from deeplabcut.pose_estimation_tensorflow.config import load_config
-from skimage.util import img_as_ubyte
-
-import tensorflow as tf
 
 class DLCLive(object):
     '''
@@ -72,12 +74,16 @@ class DLCLive(object):
         i) to run a forward predicting model that will predict the future pose from past history of poses (history can be stored in the processor object, but is not stored in this DLCLive object)
         ii) to trigger external hardware based on pose estimation (e.g. see 'TeensyLaser' processor)
 
+    camera: camera object, optional
+        Camera object that has two properties:
+        i) frame: numpy array; the latest frame
+        ii) new_pose: bool; whether the pose should be estimated on the latest frame
     '''
 
     def __init__(self, config, cropping=None,
                  fps=100, iteration=None, shuffle=1, trainingsetindex=0,
                  gputouse=None, useFrozen=True, TFGPUinference=False, dynamic=(False,.5,10),
-                 processor=None):
+                 processor=None, camera=None):
 
         self.cropping = cropping
         self.iteration = iteration
@@ -88,6 +94,8 @@ class DLCLive(object):
         self.TFGPUinference = TFGPUinference
         self.dynamic = dynamic
         self.processor = processor
+        self.camera = camera
+        self.poses = []
         self.setup_prediction(config)
 
     def setup_prediction(self, config):
@@ -169,7 +177,13 @@ class DLCLive(object):
         else:
             self.sess, self.inputs, self.outputs = predict.setup_pose_prediction(self.dlc_cfg)
 
-    def get_pose(self, frame):
+    def get_pose(self, frame=None):
+
+        if frame is None:
+            if self.camera is None:
+                raise DLCLiveException("No frame provided for live pose estimation")
+            else:
+                frame = self.camera.frame
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame = img_as_ubyte(frame) if not self.cfg['cropping'] else img_as_ubyte(frame[self.cfg['y1']:self.cfg['y2'],self.cfg['x1']:self.cfg['x2']])
@@ -185,3 +199,25 @@ class DLCLive(object):
             pose = self.processor.process(pose)
 
         return pose
+
+
+    def _pose_on_thread(self):
+        while self.continue_stream:
+            if self.camera.new_frame:
+                self.poses.append(self.get_pose())
+
+
+    def start_pose_stream(self):
+        if self.camera is None:
+            raise DLCException("DLCLive object does not have a camera. Cannot start pose stream without a camera.")
+        self.continue_stream = True
+        threading.Thread(target=self._pose_on_thread).start()
+
+
+    def stop_pose_stream(self):
+        self.continue_stream = False
+
+
+class DLCLiveException(Exception):
+    ''' Raise when no frame is passed to DLCLive's get_pose '''
+    pass
