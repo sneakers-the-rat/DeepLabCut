@@ -32,7 +32,6 @@ from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as Navigat
 # Class for GUI MainFrame
 # ###########################################################################
 class ImagePanel(wx.Panel):
-
     def __init__(self, parent,config,gui_size,**kwargs):
         h=gui_size[0]/2
         w=gui_size[1]/3
@@ -125,7 +124,7 @@ class ScrollPanel(SP.ScrolledPanel):
 class MainFrame(wx.Frame):
     """Contains the main GUI and button boxes"""
 
-    def __init__(self, parent,config):
+    def __init__(self, parent, config, imtypes):
 # Settting the GUI size and panels design
         displays = (wx.Display(i) for i in range(wx.Display.GetCount())) # Gets the number of displays
         screenSizes = [display.GetGeometry().GetSize() for display in displays] # Gets the size of each display
@@ -133,6 +132,7 @@ class MainFrame(wx.Frame):
         screenWidth = screenSizes[index][0]
         screenHeight = screenSizes[index][1]
         self.gui_size = (screenWidth*0.7,screenHeight*0.85)
+        self.imtypes = imtypes #imagetypes to look for in folder e.g. *.png
 
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = 'DeepLabCut2.0 - Labeling ToolBox',
                             size = wx.Size(self.gui_size), pos = wx.DefaultPosition, style = wx.RESIZE_BORDER|wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
@@ -252,6 +252,21 @@ class MainFrame(wx.Frame):
             self.nextLabel(event=None)
         elif event.GetKeyCode() == wx.WXK_UP:
             self.previousLabel(event=None)
+        elif event.GetKeyCode() == wx.WXK_BACK:
+            pos_abs = event.GetPosition()
+            inv = self.axes.transData.inverted()
+            pos_rel = list(inv.transform(pos_abs))
+            pos_rel[1] = self.axes.get_ylim()[0] - pos_rel[1]  # Recall y-axis is inverted
+            i = np.nanargmin([self.calc_distance(*dp.point.center, *pos_rel) for dp in self.drs])
+            closest_dp = self.drs[i]
+            msg = wx.MessageBox('Do you want to remove the label %s ?' % closest_dp.bodyParts, 'Remove!',
+                                wx.YES_NO | wx.ICON_WARNING)
+            if msg == 2:
+                closest_dp.delete_data()
+
+    @staticmethod
+    def calc_distance(x1, y1, x2, y2):
+        return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
     def activateSlider(self,event):
         """
@@ -310,7 +325,7 @@ class MainFrame(wx.Frame):
         Opens Instructions
         """
         MainFrame.updateZoomPan(self)
-        wx.MessageBox('1. Select one of the body parts from the radio buttons to add a label (if necessary change config.yaml first to edit the label names). \n\n2. Right clicking on the image will add the selected label and the next available label will be selected from the radio button. \n The label will be marked as circle filled with a unique color.\n\n3. To change the marker size, mark the checkbox and move the slider. \n\n4. Hover your mouse over this newly added label to see its name. \n\n5. Use left click and drag to move the label position.  \n\n6. Once you are happy with the position, right click to add the next available label. You can always reposition the old labels, if required. You can delete a label with the middle button mouse click. \n\n7. Click Next/Previous to move to the next/previous image.\n User can also add a missing label by going to a previous/next image and using the left click to add the selected label.\n NOTE: the user cannot add a label if the label is already present. \n\n8. When finished labeling all the images, click \'Save\' to save all the labels as a .h5 file. \n\n9. Click OK to continue using the labeling GUI.', 'User instructions', wx.OK | wx.ICON_INFORMATION)
+        wx.MessageBox('1. Select one of the body parts from the radio buttons to add a label (if necessary change config.yaml first to edit the label names). \n\n2. Right clicking on the image will add the selected label and the next available label will be selected from the radio button. \n The label will be marked as circle filled with a unique color.\n\n3. To change the marker size, mark the checkbox and move the slider. \n\n4. Hover your mouse over this newly added label to see its name. \n\n5. Use left click and drag to move the label position.  \n\n6. Once you are happy with the position, right click to add the next available label. You can always reposition the old labels, if required. You can delete a label with the middle button mouse click or hotkey: "backspace/delete". \n\n7. Click Next/Previous to move to the next/previous image.\n User can also add a missing label by going to a previous/next image and using the left click to add the selected label.\n NOTE: the user cannot add a label if the label is already present. \n\n8. When finished labeling all the images, click \'Save\' to save all the labels as a .h5 file. \n\n9. Click OK to continue using the labeling GUI.', 'User instructions', wx.OK | wx.ICON_INFORMATION)
         self.statusbar.SetStatusText("Help")
 
     def homeButton(self,event):
@@ -434,7 +449,15 @@ class MainFrame(wx.Frame):
         self.colormap = plt.get_cmap(self.cfg['colormap'])
         self.colormap = self.colormap.reversed()
         self.project_path=self.cfg['project_path']
-        self.index =np.sort([fn for fn in glob.glob(os.path.join(self.dir,'*.png')) if ('labeled.png' not in fn)])
+        
+        imlist=[]
+        for imtype in self.imtypes:
+            imlist.extend([fn for fn in glob.glob(os.path.join(self.dir,imtype)) if ('labeled.png' not in fn)])
+        
+        if len(imlist)==0:
+            print("No images found!!")
+            
+        self.index =np.sort(imlist)
         self.statusbar.SetStatusText('Working on folder: {}'.format(os.path.split(str(self.dir))[-1]))
         self.relativeimagenames=['labeled'+n.split('labeled')[1] for n in self.index]#[n.split(self.project_path+'/')[1] for n in self.index]
 
@@ -673,9 +696,9 @@ class MainFrame(wx.Frame):
             self.toolbar.zoom()
             self.zoom.SetValue(False)
 
-def show(config):
+def show(config,imtypes=['*.png']):
     app = wx.App()
-    frame = MainFrame(None,config).Show()
+    frame = MainFrame(None, config, imtypes).Show()
     app.MainLoop()
 
 

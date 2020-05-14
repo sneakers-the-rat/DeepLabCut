@@ -11,6 +11,18 @@ Licensed under GNU Lesser General Public License v3.0
 
 from pathlib import Path
 import subprocess, os
+import cv2
+
+# Historically DLC used: from scipy.misc import imread, imresize >> deprecated functions
+def imread(path,mode=None):
+    return cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
+
+#https://docs.opencv.org/3.4.0/da/d54/group__imgproc__transform.html#ga5bb5a1fea74ea38e1a5445ca803ff121
+def imresize(img,size=1.0,interpolationmethod=cv2.INTER_AREA):
+    if size!=1.0:
+        return cv2.resize(img,None,fx=size,fy=size,interpolation=interpolationmethod) #(int(height*size),int(width*size)))
+    else:
+        return img
 
 def ShortenVideo(vname,start='00:00:01',stop='00:01:00',outsuffix='short',outpath=None):
     """
@@ -57,7 +69,7 @@ def ShortenVideo(vname,start='00:00:01',stop='00:01:00',outsuffix='short',outpat
     subprocess.call(['ffmpeg','-i',vname,'-ss',str(start),'-to',str(stop),'-c','copy',newfilename])
     return str(newfilename)
 
-def DownSampleVideo(vname,width=-1,height=200,outsuffix='cropped',outpath=None):
+def DownSampleVideo(vname,width=-1,height=200,outsuffix='downsampled',outpath=None,rotateccw=False):
     """
     Auxiliary function to downsample a video and output it to the same folder with "outsuffix" appended in its name.
     Width and height will control the new dimensions. You can also pass only height or width and set the other one to -1,
@@ -82,6 +94,9 @@ def DownSampleVideo(vname,width=-1,height=200,outsuffix='cropped',outpath=None):
     outpath: str
         Output path for saving video to (by default will be the same folder as the video)
 
+    rotateccw: bool
+        Default false, rotates counter-clockwise if true. 
+
     Linux/MacOs
     >>> deeplabcut.DownSampleVideo('/data/videos/mouse1.avi')
 
@@ -99,6 +114,9 @@ def DownSampleVideo(vname,width=-1,height=200,outsuffix='cropped',outpath=None):
 
     newfilename=os.path.join(vidpath,str(Path(vname).stem)+str(outsuffix)+str(Path(vname).suffix))
     print("Downsampling and saving to name", newfilename)
-    command = f"ffmpeg -i {vname} -filter:v scale={width}:{height} -c:a copy {newfilename}"
+    if rotateccw:
+        command = f"ffmpeg -i {vname} -filter:v scale={width}:{height} transpose=clock -c:a copy {newfilename}"
+    else:
+        command = f"ffmpeg -i {vname} -filter:v scale={width}:{height} -c:a copy {newfilename}"
     subprocess.call(command, shell=True)
     return str(newfilename)
